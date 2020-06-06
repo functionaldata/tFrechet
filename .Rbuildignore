@@ -1,3 +1,4 @@
 ^\.travis\.yml$
 ^ISSUE_TEMPLATE\.md$
 ^tests$
+^cran-comments\.md$
