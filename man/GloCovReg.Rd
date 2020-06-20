@@ -36,9 +36,8 @@ For power (and Frobenius) metrics, either \code{y} or \code{M} must be input; \c
 }
 }
 \examples{
-\donttest{
 #Example y input
-n=200             # sample size
+n=50             # sample size
 t=seq(0,1,length.out=100)       # length of data
 x = matrix(runif(n),n)
 theta1 = theta2 = array(0,n)
@@ -64,7 +63,7 @@ for (i in 1:n){
 x=cbind(matrix(rnorm(n),n),matrix(rnorm(n),n)) #vector of predictor values
 xout=cbind(runif(3),runif(3)) #output predictor levels
 Cov_est=GloCovReg(x=x,M=M,xout=xout,optns=list(corrOut=FALSE,metric="power",alpha=3))
-}
+
 }
 \references{
 \itemize{

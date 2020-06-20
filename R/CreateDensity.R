@@ -23,7 +23,6 @@
 #' \item{y}{A vector of length \code{nRegGrid} with the values of the KDE at the support points.}
 #'
 #' @examples
-#'\donttest{
 #'
 #' ### compact support case
 #'
@@ -86,7 +85,7 @@
 #' legend('topright',
 #'        c('true','raw sample','histogram','frequency table (unequal bin)'),
 #'        col=1:4,lty=1:4,lwd=3,bty='n')
-#'}
+#'
 #' @references
 #' \itemize{
 #' \item \cite{HG Müller, JL Wang and WB Capra (1997). "From lifetables to hazard rates: The transformation approach." Biometrika 84, 881--892.}

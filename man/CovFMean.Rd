@@ -27,7 +27,6 @@ Available control options are
 }
 }
 \examples{
-\donttest{
 #Example M input
 n=10 #sample size
 m=5 # dimension of covariance matrices
@@ -38,7 +37,7 @@ for (i in 1:n){
  M[,,i]<-aux
 }
 Fmean=CovFMean(M=M,optns=list(metric="frobenius"))
-}
+
 }
 \references{
 \itemize{

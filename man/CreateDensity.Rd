@@ -4,8 +4,13 @@
 \alias{CreateDensity}
 \title{Create density functions from raw data, histogram objects or frequency tables with bins}
 \usage{
-CreateDensity(y = NULL, histogram = NULL, freq = NULL, bin = NULL,
-  optns = list())
+CreateDensity(
+  y = NULL,
+  histogram = NULL,
+  freq = NULL,
+  bin = NULL,
+  optns = list()
+)
 }
 \arguments{
 \item{y}{A vector of raw readings.}
@@ -39,7 +44,6 @@ Available control options are
 }
 }
 \examples{
-\donttest{
 
 ### compact support case
 
@@ -102,7 +106,7 @@ points(x0,dnorm(x0),type='l',lwd=2)
 legend('topright',
        c('true','raw sample','histogram','frequency table (unequal bin)'),
        col=1:4,lty=1:4,lwd=3,bty='n')
-}
+
 }
 \references{
 \itemize{

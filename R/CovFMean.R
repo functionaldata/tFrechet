@@ -11,7 +11,6 @@
 #' \item{Mout}{A list containing the Fréchet mean of the covariance matrices in \code{M}.}
 #' \item{optns}{A list containing the \code{optns} parameters utilized.}
 #' @examples
-#' \donttest{
 #'#Example M input
 #'n=10 #sample size
 #'m=5 # dimension of covariance matrices
@@ -22,7 +21,7 @@
 #'  M[,,i]<-aux
 #'}
 #' Fmean=CovFMean(M=M,optns=list(metric="frobenius"))
-#'}
+#'
 #' @references
 #' \itemize{
 #' \item \cite{Petersen, A. and Müller, H.-G. (2019). Fréchet regression for random objects with Euclidean predictors. The Annals of Statistics, 47(2), 691--719.}

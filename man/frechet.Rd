@@ -3,8 +3,14 @@
 \docType{package}
 \name{frechet}
 \alias{frechet}
-\alias{frechet-package}
 \title{frechet: Statistical Analysis for Random Objects and Non-Euclidean Data}
 \description{
-frechet: Statistical Analysis for Random Objects and Non-Euclidean Data
+Provides implementation of statistical methods for random objects 
+lying in various metric spaces, which are not necessarily linear spaces. 
+The core of this package is Fréchet regression for random objects with 
+Euclidean predictors, which allows one to perform regression analysis 
+for non-Euclidean responses under some mild conditions. 
+Examples include distributions in \eqn{L^2}-Wasserstein space, 
+covariance matrices endowed with power metric (with Frobenius metric as a special case), Cholesky and log-Cholesky metrics.  
+References: Petersen, A., & Müller, H.-G. (2019) <doi:10.1214/17-AOS1624>.
 }

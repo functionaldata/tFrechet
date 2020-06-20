@@ -23,17 +23,17 @@
 #' \item{optns}{A list of control options used.}
 #'
 #' @examples
-#'\donttest{
 #' xin = seq(0,1,0.05)
 #' yin = lapply(xin, function(x) {
 #'   rnorm(100, rnorm(1,x,0.005), 0.05)
 #' })
-#' hin = lapply(yin, function(y) hist(y, breaks = 50, plot=FALSE))
 #' qSup = seq(0,1,0.02)
-#' xout = xin
+#' xout = seq(0,1,0.25)
 #' res1 <- GloDenReg(xin=xin, yin=yin, xout=xout, optns = list(qSup = qSup))
-#' res2 <- GloDenReg(xin=xin, hin=hin, xout=xout, optns = list(qSup = qSup))
 #' plot(res1)
+#'\donttest{
+#' hin = lapply(yin, function(y) hist(y, breaks = 50, plot=FALSE))
+#' res2 <- GloDenReg(xin=xin, hin=hin, xout=xout, optns = list(qSup = qSup))
 #' plot(res2)
 #'}
 #' @references

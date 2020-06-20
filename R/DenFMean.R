@@ -12,14 +12,13 @@
 #' \item{qSup}{A numeric vector giving the domain grid of \code{qout}.}
 #' \item{optns}{A list of control options used.}
 #' @examples
-#'\donttest{
 #' xin = seq(0,1,0.05)
 #' yin = lapply(xin, function(x) {
 #'   rnorm(100, rnorm(1,x + x^2,0.005), 0.05)
 #' })
 #' res <- DenFMean(yin=yin)
 #' plot(res)
-#'}
+#'
 #' @export
 
 DenFMean <- function(yin=NULL, hin=NULL, qin=NULL, optns=list()) {

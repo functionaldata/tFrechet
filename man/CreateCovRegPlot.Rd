@@ -11,6 +11,9 @@ CreateCovRegPlot(x, optns = list())
 
 \item{optns}{A list of control options specified by \code{list(name=value)}. See 'Details'.}
 }
+\value{
+No return value.
+}
 \description{
 Plots for Fréchet regression for covariance matrices.
 }
@@ -40,9 +43,8 @@ Currently, it supports seven methods, named "circle" (default), "square", "ellip
 }
 }
 \examples{
-\donttest{
 #Example y input
-n=200             # sample size
+n=20             # sample size
 t=seq(0,1,length.out=100)       # length of data
 x = matrix(runif(n),n)
 theta1 = theta2 = array(0,n)
@@ -56,7 +58,8 @@ phi2 = sqrt(6/5)*(1-t/2)
 y = theta1\%*\%t(phi1) + theta2 \%*\% t(phi2)
 xout = matrix(c(0.25,0.5,0.75),3)
 Cov_est=GloCovReg(x=x,y=y,xout=xout,optns=list(corrOut = FALSE, metric="power",alpha=3))
-CreateCovRegPlot(Cov_est, optns = list(plot.method = "color"))
 CreateCovRegPlot(Cov_est, optns = list(ind.xout = 2, plot.method = "shade"))
+\donttest{
+CreateCovRegPlot(Cov_est, optns = list(plot.method = "color"))
 }
 }

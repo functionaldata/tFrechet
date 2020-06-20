@@ -2,7 +2,7 @@
 #' @param x A \code{denReg} object, result of \code{\link{DenFMean}}, \code{\link{GloDenReg}} or \code{\link{LocDenReg}}.
 #' @param obj An integer indicating which output to be plotted; 1, 2, 3, 4, and 5 for \code{dout}, \code{qout}, \code{din}, \code{qin}, and reference chart for \code{qout}, respectively - default: 1.
 #' @param prob A vector specifying the probability levels for reference chart if \code{obj} is set to 5. Default: \code{c(0.05,0.25,0.5,0.75,0.95)}.
-#' @param xlab Character holding the label for x-axis; default: \code{"x"} when \code{obj} is 2, 4, or 5, and \code{"Probability"} when \code{obj} is 1 or 3.
+#' @param xlab Character holding the label for x-axis; default: \code{"Probability"} when \code{obj} is 2 or 4, \code{""} when \code{obj} is 1 or 3, \code{"x"} when \code{obj} is 5.
 #' @param ylab Character holding the label for y-axis; default: \code{"Quantile"} when \code{obj} is 2, 4, or 5, and \code{"Density"} when \code{obj} is 1 or 3.
 #' @param main Character holding the plot title; default: \code{NULL}.
 #' @param xlim A numeric vector of length 2 holding the range of the x-axis to be drawn; default: automatically determined by the input \code{x}.
@@ -18,6 +18,7 @@
 #' (e.g., \code{\link{heat.colors}}, \code{\link{terrain.colors}} and functions created by \code{\link{colorRampPalette}}).
 #' Default is \code{colorRampPalette(colors = c("pink","royalblue"))} for more than one curves and \code{"black"} otherwise.
 #' @param ... Can set up \code{lty}, \code{lwd}, etc.
+#' @return No return value.
 #' @note see \code{\link{DenFMean}}, \code{\link{GloDenReg}} and \code{\link{LocDenReg}} for example code.
 #' @export
 
@@ -76,7 +77,7 @@ plot.denReg <- function(x, obj = NULL, prob = NULL,
   } else {
 
     if(is.null(ylab)) ylab <- ifelse(obj %in% c(1,3), "Density", "Quantile")
-    if(is.null(xlab)) xlab <- ifelse(obj %in% c(1,3), "x", "Probability")
+    if(is.null(xlab)) xlab <- ifelse(obj %in% c(1,3), "", "Probability")
 
     if ((obj == 1 & is.list(x$dout)) | obj == 3) {
       if (obj == 1) {
@@ -88,7 +89,10 @@ plot.denReg <- function(x, obj = NULL, prob = NULL,
         colPalette <- function(num) rep("black",num)
       } else {
         if (col.bar) {
-          def.par <- par(no.readonly = TRUE)
+          oldpar <- par(no.readonly = TRUE)
+          on.exit(par(oldpar))
+          
+          #def.par <- par(no.readonly = TRUE)
           layout(t(1:2), widths = c(widrt,1))
         }
       }
@@ -129,7 +133,9 @@ plot.denReg <- function(x, obj = NULL, prob = NULL,
         colPalette <- function(num) rep("black",num)
       } else {
         if (col.bar) {
-          def.par <- par(no.readonly = TRUE)
+          oldpar <- par(no.readonly = TRUE)
+          on.exit(par(oldpar))
+          
           layout(t(1:2), widths = c(widrt,1))
         }
       }
@@ -154,7 +160,7 @@ plot.denReg <- function(x, obj = NULL, prob = NULL,
     if (n > 1) {
       if (col.bar) {
         color.bar(colVal = colVal, lut = colPalette(length(colVal)), nticks = nticks, ticks = ticks, title = col.lab)
-        par(def.par)
+        #par(def.par)
       }
     }
   }

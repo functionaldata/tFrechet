@@ -17,9 +17,8 @@
 #' \item{Mout}{A list of estimated conditional covariance or correlation matrices at \code{xout}.}
 #' \item{optns}{A list containing the \code{optns} parameters utilized.}
 #' @examples
-#' \donttest{
 #'#Example y input
-#'n=200             # sample size
+#'n=50             # sample size
 #'t=seq(0,1,length.out=100)       # length of data
 #'x = matrix(runif(n),n)
 #'theta1 = theta2 = array(0,n)
@@ -45,7 +44,7 @@
 #'x=cbind(matrix(rnorm(n),n),matrix(rnorm(n),n)) #vector of predictor values
 #'xout=cbind(runif(3),runif(3)) #output predictor levels
 #'Cov_est=GloCovReg(x=x,M=M,xout=xout,optns=list(corrOut=FALSE,metric="power",alpha=3))
-#'}
+#'
 #' @references
 #' \itemize{
 #' \item \cite{Petersen, A. and Müller, H.-G. (2019). Fréchet regression for random objects with Euclidean predictors. The Annals of Statistics, 47(2), 691--719.}

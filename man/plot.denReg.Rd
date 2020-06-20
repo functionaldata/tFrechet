@@ -4,11 +4,25 @@
 \alias{plot.denReg}
 \title{Plots for Fréchet regression for univariate densities.}
 \usage{
-\method{plot}{denReg}(x, obj = NULL, prob = NULL, xlab = NULL,
-  ylab = NULL, main = NULL, ylim = NULL, xlim = NULL,
-  col.bar = TRUE, widrt = 4, col.lab = NULL, nticks = 5,
-  ticks = NULL, add = FALSE, pos.prob = 0.9, colPalette = NULL,
-  ...)
+\method{plot}{denReg}(
+  x,
+  obj = NULL,
+  prob = NULL,
+  xlab = NULL,
+  ylab = NULL,
+  main = NULL,
+  ylim = NULL,
+  xlim = NULL,
+  col.bar = TRUE,
+  widrt = 4,
+  col.lab = NULL,
+  nticks = 5,
+  ticks = NULL,
+  add = FALSE,
+  pos.prob = 0.9,
+  colPalette = NULL,
+  ...
+)
 }
 \arguments{
 \item{x}{A \code{denReg} object, result of \code{\link{DenFMean}}, \code{\link{GloDenReg}} or \code{\link{LocDenReg}}.}
@@ -17,7 +31,7 @@
 
 \item{prob}{A vector specifying the probability levels for reference chart if \code{obj} is set to 5. Default: \code{c(0.05,0.25,0.5,0.75,0.95)}.}
 
-\item{xlab}{Character holding the label for x-axis; default: \code{"x"} when \code{obj} is 2, 4, or 5, and \code{"Probability"} when \code{obj} is 1 or 3.}
+\item{xlab}{Character holding the label for x-axis; default: \code{"Probability"} when \code{obj} is 2 or 4, \code{""} when \code{obj} is 1 or 3, \code{"x"} when \code{obj} is 5.}
 
 \item{ylab}{Character holding the label for y-axis; default: \code{"Quantile"} when \code{obj} is 2, 4, or 5, and \code{"Density"} when \code{obj} is 1 or 3.}
 
@@ -46,6 +60,9 @@
 Default is \code{colorRampPalette(colors = c("pink","royalblue"))} for more than one curves and \code{"black"} otherwise.}
 
 \item{...}{Can set up \code{lty}, \code{lwd}, etc.}
+}
+\value{
+No return value.
 }
 \description{
 Plots for Fréchet regression for univariate densities.

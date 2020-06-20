@@ -8,6 +8,7 @@
 #' @param nticks An integer giving the number of ticks used in the axis of color bar.
 #' @param ticks A numeric vector giving the locations of ticks used in the axis of color bar; it overrides \code{nticks}.
 #' @param title A character giving the label of the variable according to which the color bar is generated.
+#' @return No return value.
 #' @export
 
 color.bar <- function(colVal = NULL, colBreaks = NULL, min = NULL, max = NULL,

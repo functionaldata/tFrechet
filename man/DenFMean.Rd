@@ -30,12 +30,11 @@ Obtain Fréchet means of densities with respect to \eqn{L^2}-Wasserstein distanc
 Available control options are \code{qSup}, \code{nqSup}, \code{lower}, \code{upper}, \code{bwDen}, \code{nRegGrid}, \code{delta}, \code{kernelDen}, \code{infSupport}, \code{outputGrid}. See \code{\link{LocDenReg}} for details.
 }
 \examples{
-\donttest{
 xin = seq(0,1,0.05)
 yin = lapply(xin, function(x) {
   rnorm(100, rnorm(1,x + x^2,0.005), 0.05)
 })
 res <- DenFMean(yin=yin)
 plot(res)
-}
+
 }

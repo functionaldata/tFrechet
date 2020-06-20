@@ -4,8 +4,16 @@
 \alias{color.bar}
 \title{Generate color bar/scale.}
 \usage{
-color.bar(colVal = NULL, colBreaks = NULL, min = NULL, max = NULL,
-  lut = NULL, nticks = 5, ticks = NULL, title = NULL)
+color.bar(
+  colVal = NULL,
+  colBreaks = NULL,
+  min = NULL,
+  max = NULL,
+  lut = NULL,
+  nticks = 5,
+  ticks = NULL,
+  title = NULL
+)
 }
 \arguments{
 \item{colVal}{A numeric vector giving the variable values to which each color is corresponding. It overrides \code{min} (and \code{max}) if \code{min > min(colVal)} (\code{max < max(colVal)}).}
@@ -24,6 +32,9 @@ color.bar(colVal = NULL, colBreaks = NULL, min = NULL, max = NULL,
 \item{ticks}{A numeric vector giving the locations of ticks used in the axis of color bar; it overrides \code{nticks}.}
 
 \item{title}{A character giving the label of the variable according to which the color bar is generated.}
+}
+\value{
+No return value.
 }
 \description{
 Generate color bar/scale.

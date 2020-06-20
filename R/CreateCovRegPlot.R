@@ -24,10 +24,10 @@
 #' \item{CorrOut}{Logical, indicating if output is shown as correlation or covariance matrix. Default is \code{FALSE} and corresponds to a covariance matrix.}
 #' \item{plot.display}{Character, "full" (default), "upper" or "lower", display full matrix, lower triangular or upper triangular matrix.}
 #'}
+#'@return No return value.
 #'@examples
-#'\donttest{
 #'#Example y input
-#'n=200             # sample size
+#'n=20             # sample size
 #'t=seq(0,1,length.out=100)       # length of data
 #'x = matrix(runif(n),n)
 #'theta1 = theta2 = array(0,n)
@@ -41,8 +41,9 @@
 #'y = theta1%*%t(phi1) + theta2 %*% t(phi2)
 #'xout = matrix(c(0.25,0.5,0.75),3)
 #'Cov_est=GloCovReg(x=x,y=y,xout=xout,optns=list(corrOut = FALSE, metric="power",alpha=3))
-#'CreateCovRegPlot(Cov_est, optns = list(plot.method = "color"))
 #'CreateCovRegPlot(Cov_est, optns = list(ind.xout = 2, plot.method = "shade"))
+#'\donttest{
+#'CreateCovRegPlot(Cov_est, optns = list(plot.method = "color"))
 #'}
 #'@export
 
@@ -70,13 +71,15 @@ CreateCovRegPlot <- function(x, optns = list()) {
     optns$nrow <- round(optns$nrow)
     nrow <- optns$nrow
   }
-
-  op <- par(mfrow = c(nrow, ceiling(length(ind.xout)/nrow)))
+  
+  oldpar <- par(no.readonly = TRUE)
+  on.exit(par(oldpar))
+  
+  par(mfrow = c(nrow, ceiling(length(ind.xout)/nrow)))
   for (ind in 1:length(ind.xout)) {
     mout = x$Mout[[ind]]
     covplot(mout, optns = optns)
   }
-  par(op)
 }
 
 
