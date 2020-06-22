@@ -117,13 +117,13 @@ GFRCovPower  = function(x,y=NULL,M=NULL,xout,optns = list()){
       }
       for(i in 1:n){
         P=eigen(M[,,i])$vectors
-        Lambd_alpha=diag(eigen(M[,,i])$values**alpha)
+        Lambd_alpha=diag(pmax(0,eigen(M[,,i])$values)**alpha)
         M_alpha=P%*%Lambd_alpha%*%t(P)
         M_hat[,,j]=M_hat[,,j]+s[i]*M_alpha/n
       }
       M_hat[,,j]=as.matrix(Matrix::nearPD(M_hat[,,j],corr = FALSE)$mat)
       P=eigen(M_hat[,,j])$vectors
-      Lambd_alpha=diag(eigen(M_hat[,,j])$values**(1/alpha))
+      Lambd_alpha=diag(pmax(0,eigen(M_hat[,,j])$values)**(1/alpha))
       M_hat[,,j]=P%*%Lambd_alpha%*%t(P)
       M_hat[,,j]=as.matrix(Matrix::forceSymmetric(M_hat[,,j]))
     }
@@ -135,13 +135,13 @@ GFRCovPower  = function(x,y=NULL,M=NULL,xout,optns = list()){
       }
       for(i in 1:n){
         P=eigen(M[,,i])$vectors
-        Lambd_alpha=diag(log(eigen(M[,,i])$values))
+        Lambd_alpha=diag(log(pmax(1e-30,eigen(M[,,i])$values)))
         M_alpha=P%*%Lambd_alpha%*%t(P)
         M_hat[,,j]=M_hat[,,j]+s[i]*M_alpha/n
       }
       M_hat[,,j]=as.matrix(Matrix::nearPD(M_hat[,,j],corr = FALSE)$mat)
       P=eigen(M_hat[,,j])$vectors
-      Lambd_alpha=diag(exp(eigen(M_hat[,,j])$values))
+      Lambd_alpha=diag(exp(pmax(0,eigen(M_hat[,,j])$values)))
       M_hat[,,j]=P%*%Lambd_alpha%*%t(P)
       M_hat[,,j]=as.matrix(Matrix::forceSymmetric(M_hat[,,j]))
     }

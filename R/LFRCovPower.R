@@ -136,25 +136,25 @@ LFRCovPower= function(x,y=NULL,M=NULL, xout,optns = list()){
     if(alpha>0){
       for(i in 1:length(idx)){
         P=eigen(M[,,idx[i]])$vectors
-        Lambd_alpha=diag(eigen(M[,,idx[i]])$values**alpha)
+        Lambd_alpha=diag(pmax(0,eigen(M[,,idx[i]])$values)**alpha)
         M_alpha=P%*%Lambd_alpha%*%t(P)
         M_hat[,,1]=M_hat[,,1]+sL[i]*M_alpha/s
       }
       M_hat[,,1]=as.matrix(Matrix::nearPD(M_hat[,,1],corr = FALSE)$mat)
       P=eigen(M_hat[,,1])$vectors
-      Lambd_alpha=diag(eigen(M_hat[,,1])$values**(1/alpha))
+      Lambd_alpha=diag(pmax(0,eigen(M_hat[,,1])$values)**(1/alpha))
       M_hat[,,1]=P%*%Lambd_alpha%*%t(P)
       M_hat[,,1]=as.matrix(Matrix::forceSymmetric(M_hat[,,1]))
     } else{
       for(i in 1:length(idx)){
         P=eigen(M[,,idx[i]])$vectors
-        Lambd_alpha=diag(log(eigen(M[,,idx[i]])$values))
+        Lambd_alpha=diag(log(pmax(1e-30,eigen(M[,,idx[i]])$values)))
         M_alpha=P%*%Lambd_alpha%*%t(P)
         M_hat[,,1]=M_hat[,,1]+sL[i]*M_alpha/s
       }
       M_hat[,,1]=as.matrix(Matrix::nearPD(M_hat[,,1],corr = FALSE)$mat)
       P=eigen(M_hat[,,1])$vectors
-      Lambd_alpha=diag(exp(eigen(M_hat[,,1])$values))
+      Lambd_alpha=diag(exp(pmax(0,eigen(M_hat[,,1])$values)))
       M_hat[,,1]=P%*%Lambd_alpha%*%t(P)
       M_hat[,,1]=as.matrix(Matrix::forceSymmetric(M_hat[,,1]))
     }
