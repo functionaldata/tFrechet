@@ -8,9 +8,9 @@
 #' @details Available control options are
 #' \describe{
 #' \item{corrOut}{Boolean indicating if output is shown as correlation or covariance matrix. Default is \code{FALSE} and corresponds to a covariance matrix.}
-#' \item{metric}{Metric type choice, \code{"frobenius"}, \code{"power"}, \code{"log_cholesky"}, \code{"cholesky"} - default: \code{"frobenius"} which corresponds to the power metric with \code{alpha} equal to 2.
+#' \item{metric}{Metric type choice, \code{"frobenius"}, \code{"power"}, \code{"log_cholesky"}, \code{"cholesky"} - default: \code{"frobenius"} which corresponds to the power metric with \code{alpha} equal to 1.
 #' For power (and Frobenius) metrics, either \code{y} or \code{M} must be input; \code{y} would override \code{M}. For Cholesky and log-Cholesky metrics, \code{M} must be input and \code{y} does not apply.}
-#' \item{alpha}{The power parameter for the power metric, which can be any non-negative integer. Default is 2 which corresponds to Frobenius metric.}
+#' \item{alpha}{The power parameter for the power metric. Default is 1 which corresponds to Frobenius metric.}
 #' \item{bwMean}{A vector of length p holding the bandwidths for conditional mean estimation if \code{y} is provided. If \code{bwMean} is not provided, it is chosen by cross validation.}
 #' \item{bwCov}{A vector of length p holding the bandwidths for conditional covariance estimation. If \code{bwCov} is not provided, it is chosen by cross validation.}
 #' \item{kernel}{Name of the kernel function to be chosen from \code{"rect"}, \code{"gauss"}, \code{"epan"}, \code{"gausvar"}, \code{"quar"}. Default is \code{"gauss"}.}
