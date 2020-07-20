@@ -5,7 +5,7 @@
 #' @details Available control options are
 #' \describe{
 #' \item{metric}{Metric type choice, \code{"frobenius"}, \code{"power"}, \code{"log_cholesky"}, \code{"cholesky"} - default: \code{"frobenius"} which corresponds to the power metric with \code{alpha} equal to 1.}
-#' \item{alpha}{The power parameter for the power metric, which can be any non-negative integer. Default is 1 which corresponds to Frobenius metric.}
+#' \item{alpha}{The power parameter for the power metric, which can be any non-negative number. Default is 1 which corresponds to Frobenius metric.}
 #' }
 #' @return A list containing the following fields:
 #' \item{Mout}{A list containing the Fréchet mean of the covariance matrices in \code{M}.}
