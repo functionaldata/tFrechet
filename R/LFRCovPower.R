@@ -204,7 +204,7 @@ LFRCovPower= function(x,y=NULL,M=NULL, xout,optns = list()){
       }
       if(p==1){
         objF=matrix(0,nrow=20,ncol=1)
-        aux1=as.matrix(seq(delta[1]*0.2,delta[1],length.out=20))
+        aux1=as.matrix(seq(delta[1]*0.01,delta[1]*0.2,length.out=20))
         for(i in 1:20){
           for(j in 1:dim(x)[1]){
             aux=computeLFR_originalSpace(setdiff(1:dim(x)[1],j),x[j],aux1[i])-M[,,j]
@@ -217,8 +217,8 @@ LFRCovPower= function(x,y=NULL,M=NULL, xout,optns = list()){
       if(p==2){
         if(n<=30){
           objF=matrix(0,nrow=6,ncol=6)
-          aux1=seq(delta[1]*0.2,delta[1],length.out=6)
-          aux2=seq(delta[2]*0.2,delta[2],length.out=6)
+          aux1=seq(delta[1]*0.01,delta[1]*0.2,length.out=6)
+          aux2=seq(delta[2]*0.01,delta[2]*0.2,length.out=6)
           for(i1 in 1:6){
             for(i2 in 1:6){
               for(j in 1:dim(x)[1]){
@@ -237,8 +237,8 @@ LFRCovPower= function(x,y=NULL,M=NULL, xout,optns = list()){
             sum(diag(aux%*%t(aux)))
           }
           objF=matrix(0,nrow=6,ncol=6)
-          aux1=seq(delta[1]*0.2,delta[1],length.out=6)
-          aux2=seq(delta[2]*0.2,delta[2],length.out=6)
+          aux1=seq(delta[1]*0.01,delta[1]*0.2,length.out=6)
+          aux2=seq(delta[2]*0.01,delta[2]*0.2,length.out=6)
           for(i1 in 1:6){
             for(i2 in 1:6){
               for(j in 1:10){

@@ -165,7 +165,7 @@ LFRCov  = function(x, y=NULL,M=NULL, xout,optns = list()){
         }
         if(p==1){
           objF=matrix(0,nrow=20,ncol=1)
-          aux1=as.matrix(seq(delta[1]*0.2,delta[1],length.out=20))
+          aux1=as.matrix(seq(delta[1]*0.01,delta[1]*0.2,length.out=20))
           for(i in 1:20){
             for(j in 1:dim(x)[1]){
               aux=as.matrix(Matrix::nearPD(computeLFR(setdiff(1:dim(x)[1],j),x[j],aux1[i]),corr = FALSE)$mat)-M[,,j]
@@ -177,8 +177,8 @@ LFRCov  = function(x, y=NULL,M=NULL, xout,optns = list()){
         }
         if(p==2){
           objF=matrix(0,nrow=10,ncol=10)
-          aux1=seq(delta[1]*0.2,delta[1],length.out=10)
-          aux2=seq(delta[2]*0.2,delta[2],length.out=10)
+          aux1=seq(delta[1]*0.01,delta[1]*0.2,length.out=10)
+          aux2=seq(delta[2]*0.01,delta[2]*0.2,length.out=10)
           for(i1 in 1:10){
             for(i2 in 1:10){
               for(j in 1:dim(x)[1]){
