@@ -8,13 +8,13 @@
 #' @param optns A list of options control parameters specified by \code{list(name=value)}. See `Details'.
 #' @details Available control options are
 #' \describe{
-#' \item{bwReg}{A scalar used as the bandwidth or a character indicating the selection method: \code{"CV"} (default) or \code{"GCV"}.}
+#' \item{bwReg}{A scalar used as the bandwidth or \code{"CV"} (default), i.e., a data-adaptive selection done by cross-validation.}
 #' \item{kernelReg}{A character holding the type of kernel functions for local Fréchet regression for densities; \code{"rect"}, \code{"gauss"}, \code{"epan"}, \code{"gausvar"}, \code{"quar"} - default: \code{"gauss"}.}
 #' \item{qSup}{A numeric vector holding the grid on [0,1] quantile functions take value on. Default is an equidistant grid.}
 #' \item{nqSup}{A scalar giving the length of \code{qSup}. Default is 201.}
 #' \item{lower}{A scalar with the lower bound of the support of the distribution. Default is \code{NULL}.}
 #' \item{upper}{A scalar with the upper bound of the support of the distribution. Default is \code{NULL}.}
-#' \item{bwRange}{Bandwidth selection range if \code{bwReg} equals \code{"CV"} or \code{"GCV"}.}
+#' \item{bwRange}{Bandwidth selection range if \code{bwReg} equals \code{"CV"}.}
 #' \item{bwDen}{The bandwidth value for the smoothed mean function; positive numeric - default: determine automatically based on the data-driven bandwidth selector proposed by Sheather and Jones (1991).}
 #' \item{ndSup}{The number of support points the kernel density estimation; numeric - default: 101.}
 #' \item{dSup}{User defined output grid for the support of kernel density estimation, it overrides \code{nRegGrid}; numeric - default: \code{NULL}}
@@ -204,17 +204,16 @@ LocDenReg <- function(xin=NULL, yin=NULL, hin=NULL, qin=NULL, xout=NULL, optns=l
     if (optnsReg$bw == "CV") {
       optnsReg$bw <- bwCV(xin=xin, qin=qin, xout=xout, optns=optnsReg)
     } else {
-      if (optnsReg$bw != "GCV")
-        warning("optns$bwReg was mis-specified and is reset to be chosen by GCV.")
-      optnsReg$bw <- bwGCV(xin=xin, qin=qin, xout=xout, optns=optnsReg)
+      warning("optns$bwReg was mis-specified and is reset to be chosen by CV.")
+      optnsReg$bw <- bwCV(xin=xin, qin=qin, xout=xout, optns=optnsReg)
     }
     #if (optnsReg$bw < diff(range(xin))*0.1)
     #  optnsReg$bw <- diff(range(xin))*0.1
   } else {
     if (optnsReg$bw < max(diff(sort(xin))) & !is.null(optnsReg$ker)) {
       if(optnsReg$ker %in% c("rect","quar","epan")) {
-        warning("optns$bwReg was set too small and is reset to be chosen by GCV.")
-        optnsReg$bw <- bwGCV(xin=xin, qin=qin, xout=xout, optns=optnsReg)
+        warning("optns$bwReg was set too small and is reset to be chosen by CV.")
+        optnsReg$bw <- bwCV(xin=xin, qin=qin, xout=xout, optns=optnsReg)
       }
     }
   }
