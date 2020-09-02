@@ -14,14 +14,14 @@
 #' \item{nqSup}{A scalar giving the length of \code{qSup}. Default is 201.}
 #' \item{lower}{A scalar with the lower bound of the support of the distribution. Default is \code{NULL}.}
 #' \item{upper}{A scalar with the upper bound of the support of the distribution. Default is \code{NULL}.}
-#' \item{bwRange}{Bandwidth selection range if \code{bwReg} equals \code{"CV"}.}
-#' \item{bwDen}{The bandwidth value for the smoothed mean function; positive numeric - default: determine automatically based on the data-driven bandwidth selector proposed by Sheather and Jones (1991).}
-#' \item{ndSup}{The number of support points the kernel density estimation; numeric - default: 101.}
-#' \item{dSup}{User defined output grid for the support of kernel density estimation, it overrides \code{nRegGrid}; numeric - default: \code{NULL}}
-#' \item{delta}{The size of the bin to be used; numeric - default: \code{diff(range(y))/1000}. It only works when the raw sample is available.}
-#' \item{kernelDen}{A character holding the type of kernel functions for density estimation; \code{"rect"}, \code{"gauss"}, \code{"epan"}, \code{"gausvar"}, \code{"quar"} - default: \code{"gauss"}.}
-#' \item{infSupport}{logical if we expect the distribution to have infinite support or not; logical - default: \code{TRUE}}
-#' \item{denLowerThreshold}{\code{FALSE} or a positive value giving the lower threshold of the densities; default: \code{0.001 * mean(qin[,ncol(qin)] - qin[,1])}.}
+#' \item{bwRange}{Bandwidth selection range if \code{bwReg} equals \code{"CV"}. Default is \code{NULL}, automatically chosen by a data-adaptive method.}
+#' \item{bwDen}{The bandwidth value used in \code{CreateDensity()} for density estimation; positive numeric - default: determine automatically based on the data-driven bandwidth selector proposed by Sheather and Jones (1991).}
+#' \item{ndSup}{The number of support points the kernel density estimation uses in \code{CreateDensity()}; numeric - default: 101.}
+#' \item{dSup}{User defined output grid for the support of kernel density estimation used in \code{CreateDensity()}, it overrides \code{nRegGrid}; numeric - default: \code{NULL}}
+#' \item{delta}{The size of the bin to be used used in \code{CreateDensity()}; numeric - default: \code{diff(range(y))/1000}. It only works when the raw sample is available.}
+#' \item{kernelDen}{A character holding the type of kernel functions used in \code{CreateDensity()} for density estimation; \code{"rect"}, \code{"gauss"}, \code{"epan"}, \code{"gausvar"}, \code{"quar"} - default: \code{"gauss"}.}
+#' \item{infSupport}{logical if we expect the distribution to have infinite support or not, used in \code{CreateDensity()} for density estimation; logical - default: \code{FALSE}}
+#' \item{denLowerThreshold}{\code{FALSE} or a positive value giving the lower threshold of the densities used in \code{CreateDensity()}; default: \code{0.001 * mean(qin[,ncol(qin)] - qin[,1])}.}
 #' }
 #' @return A list containing the following components:
 #' \item{xout}{Input \code{xout}.}
