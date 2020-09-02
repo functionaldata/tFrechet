@@ -63,7 +63,7 @@ test_that("Generates warnings when more than one of the three, yin, hin, and qin
   expect_equal(sum(abs(res_h$qin - res_hq$qin)),0)
 })
 
-test_that("Works with fully observed distributions; p=2", {
+test_that("Works with fully observed distributions and providing bandwidth; p=2", {
   set.seed(1)
   xin <- cbind(runif(200),runif(200))
   qSup <- qbeta((1:99)/100,1/2,1/2)
@@ -78,4 +78,21 @@ test_that("Works with fully observed distributions; p=2", {
   res <- LocDenReg(xin=xin, qin=qin, xout=xout, optns = list(qSup = c(0,qSup,1)))
   expect_true(mean(sqrt(apply((qtrue - res$qout[,-c(1,length(res$qSup))])^2,
                               1, pracma::trapz, x = qSup))) / mean(qin) < 1e-4)
+})
+
+test_that("Works with fully observed distributions; p=2", {
+  set.seed(1)
+  xin <- cbind(runif(200),runif(200))
+  qSup <- qbeta((1:99)/100,1/2,1/2)
+  sd <- 0.1
+  qin=matrix(0,nrow=nrow(xin),ncol=(length(qSup)+2))
+  qtrue=matrix(0,nrow=nrow(xin),ncol=(length(qSup)))
+  for(i in 1:nrow(xin)){
+    qin[i,]=qnorm(c(1e-6,qSup,1-1e-6), mean=xin[i,1]^2+xin[i,2], sd=sd)
+    qtrue[i,]=qnorm(qSup, mean=xin[i,1]^2+xin[i,2], sd=sd)
+  }
+  xout <- xin
+  res <- LocDenReg(xin=xin, qin=qin, xout=xout, optns = list(qSup = c(0,qSup,1),bwReg=c(0.05,0.05)))
+  expect_true(mean(sqrt(apply((qtrue - res$qout[,-c(1,length(res$qSup))])^2,
+                              1, pracma::trapz, x = qSup))) / mean(qin) < 1e-2)
 })

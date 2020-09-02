@@ -272,10 +272,19 @@ LocDenReg <- function(xin=NULL, yin=NULL, hin=NULL, qin=NULL, xout=NULL, optns=l
     #if (optnsReg$bw < diff(range(xin))*0.1)
     #  optnsReg$bw <- diff(range(xin))*0.1
   } else {
-    if (optnsReg$bw < max(diff(sort(xin))) & !is.null(optnsReg$ker)) { ###### requires change
-      if(optnsReg$ker %in% c("rect","quar","epan")) {
-        warning("optns$bwReg was set too small and is reset to be chosen by CV.")
-        optnsReg$bw <- bwCV(xin=xin, qin=qin, xout=xout, optns=optnsReg)
+    if(ncol(xin)==1){
+      if (optnsReg$bw[1] < max(diff(sort(xin[,1]))) & !is.null(optnsReg$ker)) {
+        if(optnsReg$ker %in% c("rect","quar","epan")) {
+          warning("optns$bwReg was set too small and is reset to be chosen by CV.")
+          optnsReg$bw <- bwCV(xin=xin, qin=qin, xout=xout, optns=optnsReg)
+        }
+      }
+    }else{
+      if (optnsReg$bw[1] < max(diff(sort(xin[,1]))) & optnsReg$bw[2] < max(diff(sort(xin[,2]))) & !is.null(optnsReg$ker)) {
+        if(optnsReg$ker %in% c("rect","quar","epan")) {
+          warning("optns$bwReg was set too small and is reset to be chosen by CV.")
+          optnsReg$bw <- bwCV(xin=xin, qin=qin, xout=xout, optns=optnsReg)
+        }
       }
     }
   }
