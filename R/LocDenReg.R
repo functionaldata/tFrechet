@@ -3,7 +3,7 @@
 #' @param xin A n by p matrix holding the n observations of the predictor.
 #' @param yin A matrix or list holding the sample of observations of the response. If \code{yin} is a matrix, each row holds the observations of the response corresponding to a predictor value in the corresponding row of \code{xin}.
 #' @param hin A list holding the histograms of the response corresponding to each predictor value in the corresponding row of \code{xin}.
-#' @param qin A matrix or list holding the quantile functions of the response. If \code{qin} is a matrix, each row holds the quantile function corresponding to a predictor value in the corresponding row of \code{xin}.
+#' @param qin A matrix or list holding the quantile functions of the response. If \code{qin} is a matrix, the support of the quantile functions should be the same (i.e., \code{optns$qSup}), and each row of \code{qin} holds the quantile function corresponding to a predictor value in the corresponding row of \code{xin}. If the quantile functions are evaluated on different grids, then \code{qin} should be a list, each element consisting of two components \code{x} and \code{y} holding the support grid and the corresponding values of the quantile functions, respectively.
 #' @param xout A m by p matrix holding the m output predictor values. Default is \code{xin}.
 #' @param optns A list of options control parameters specified by \code{list(name=value)}. See `Details'.
 #' @details Available control options are
