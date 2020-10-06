@@ -15,6 +15,7 @@
 #' @importFrom Matrix Matrix
 #' @importFrom pracma trapz
 #' @importFrom stats aggregate approx approxfun binomial cov cor density dist dnorm dunif fitted glm kmeans lm median na.omit optim optimize poly predict quantile rnorm runif spline var sd weighted.mean
+#' @importFrom trust trust
 #' @importFrom utils head tail
 NULL
 

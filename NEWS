@@ -1,1 +1,8 @@
+frechet v0.2.0 (Release date: Oct-12-2020)
+=============
+Changes:
+* Added functions computing L2 Wasserstein distance between distributions, power distance, Cholesky, and log-Cholesky distance between covariance matrices, and geodesic distance on spheres.
+* Added local Fréchet regression for spherical data with respect to geodesic distance.
+* Fixed typos in documentation.
+
 * Initial release

@@ -3,9 +3,9 @@ Type: Package
 Title: Statistical Analysis for Random Objects and Non-Euclidean Data
 URL: https://github.com/functionaldata/tFrechet
 BugReports: https://github.com/functionaldata/tFrechet/issues
-Version: 0.1.0
+Version: 0.2.0
 Encoding: UTF-8
-Date: 2020-06-09
+Date: 2020-10-12
 Authors@R: 
     c(person(given = "Yaqing",
              family = "Chen",
@@ -51,7 +51,8 @@ Imports:
     Matrix,
     methods,
     pracma,
-    rosqp
+    rosqp,
+    trust
 Suggests: 
     Rcpp (>= 0.11.5), 
     testthat
