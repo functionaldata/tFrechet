@@ -24,7 +24,7 @@ LocDenReg(
 
 \item{xout}{A numeric vector holding the output grid for the predictor. Default is \code{xin}.}
 
-\item{optns}{A list of options control parameters specified by \code{list(name=value)}. See `Details'.}
+\item{optns}{A list of control parameters specified by \code{list(name=value)}. See `Details'.}
 }
 \value{
 A list containing the following components:

@@ -5,7 +5,7 @@
 #' @param hin A list holding the histograms of the response corresponding to each predictor value in \code{xin}.
 #' @param qin A matrix or list holding the quantile functions of the response. If \code{qin} is a matrix, each row holds the quantile function corresponding to a predictor value in \code{xin}.
 #' @param xout A numeric vector holding the output grid for the predictor. Default is \code{xin}.
-#' @param optns A list of options control parameters specified by \code{list(name=value)}. See `Details'.
+#' @param optns A list of control parameters specified by \code{list(name=value)}. See `Details'.
 #' @details Available control options are
 #' \describe{
 #' \item{bwReg}{A scalar used as the bandwidth or a character indicating the selection method: \code{"CV"} (default) or \code{"GCV"}.}
