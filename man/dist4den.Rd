@@ -10,9 +10,13 @@ dist4den(d1 = NULL, d2 = NULL, fctn_type = NULL, optns = list())
 \item{d1, d2}{Lists holding the density functions or quantile functions of the two distributions.
 Each list consists of two numeric vectors \code{x} and \code{y} of the same length,
 where \code{x} holds the support grid and \code{y} holds the values of the function.
-Note that \code{d1$x} and \code{d2$x} can have different lengths.}
+Note that the type of functions representing the distributions in \code{d1} and \code{d2}
+should be the same---either both are density functions, or both are quantile functions. 
+If both are quantile functions, all elements in \code{d1$x} and \code{d2$x} must be between 0 and 1.
+\code{d1$x} and \code{d2$x} may have different lengths.}
 
-\item{fctn_type}{Two numeric vectors holding the values of the quantile functions of the two distributions evaluated on the same grid given in \code{qSup}.}
+\item{fctn_type}{Character vector of length 1 holding the function type in \code{d1} and \code{d2} 
+representing the distributions: \code{"density"} (default), \code{"quantile"}.}
 
 \item{optns}{A list of control parameters specified by \code{list(name=value)}.}
 }

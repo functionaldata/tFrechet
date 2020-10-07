@@ -2,8 +2,12 @@
 #'@param d1,d2 Lists holding the density functions or quantile functions of the two distributions.
 #' Each list consists of two numeric vectors \code{x} and \code{y} of the same length,
 #' where \code{x} holds the support grid and \code{y} holds the values of the function.
-#' Note that \code{d1$x} and \code{d2$x} can have different lengths.
-#'@param fctn_type Two numeric vectors holding the values of the quantile functions of the two distributions evaluated on the same grid given in \code{qSup}.
+#' Note that the type of functions representing the distributions in \code{d1} and \code{d2}
+#' should be the same---either both are density functions, or both are quantile functions. 
+#' If both are quantile functions, all elements in \code{d1$x} and \code{d2$x} must be between 0 and 1.
+#' \code{d1$x} and \code{d2$x} may have different lengths. 
+#'@param fctn_type Character vector of length 1 holding the function type in \code{d1} and \code{d2} 
+#' representing the distributions: \code{"density"} (default), \code{"quantile"}.
 #'@param optns A list of control parameters specified by \code{list(name=value)}.
 #' @details Available control options are:
 #' \describe{
@@ -25,6 +29,10 @@ dist4den <- function(d1 = NULL, d2 = NULL, fctn_type = NULL, optns = list()) {
   }
   if (is.null(fctn_type)) {
     fctn_type <- "density"
+  }
+  if (length(fctn_type) > 1) {
+    fctn_type <- fctn_type[1]
+    warning("fctn_type has length greater than 1---only the first element is used.")
   }
   if (!fctn_type %in% c("density","quantile")) {
     stop("Unrecognized value of fctn_type.")
@@ -61,6 +69,12 @@ dist4den <- function(d1 = NULL, d2 = NULL, fctn_type = NULL, optns = list()) {
     q1 <- fdadensity::dens2quantile(d1$y, dSup = d1$x, qSup = qSup)
     q2 <- fdadensity::dens2quantile(d2$y, dSup = d2$x, qSup = qSup)
   } else if (fctn_type == "quantile") {
+    if (any(d1$x < 0 | d1$x > 1)) {
+      stop("Some elements in d1$x do not lie in [0,1].")
+    }
+    if (any(d2$x < 0 | d2$x > 1)) {
+      stop("Some elements in d2$x do not lie in [0,1].")
+    }
     if (is.unsorted(d1$x)) {
       d1$y <- d1$y[order(d1$x)]
       d1$x <- sort(d1$x)
