@@ -1,9 +1,9 @@
 require(testthat)
-test_that('Both A and B must be matrices', {
+test_that('A and B must be of matrix class', {
   A <- c(1,10)
   B <- matrix(1,10,10)
   optns = list(metric='log_cholesky')
-  expect_error(DistCholesky(A,B,optns=optns),"Both A and B must be matrices")
+  expect_error(DistCholesky(A,B,optns=optns),"A and B must be of matrix class")
 })
 
 test_that('Both A and B must have the same dimension', {

@@ -1,6 +1,7 @@
 #'@title Power distance for covariance matrices
 #'@description Power distance computation for covariance matrices.
-#'@param M A q by q by 2 array (resp. a list of two q by q matrices) where \code{M[,,i]} (resp. \code{M[[i]]}) contains the i-th covariance matrix of dimension q by q.
+#' @param A an p by p matrix
+#' @param B an p by p matrix
 #' @param optns A list of options control parameters specified by \code{list(name=value)}. See `Details'.
 #' @details Available control options are
 #' \describe{
@@ -8,10 +9,10 @@
 #' \item{alpha}{The power parameter for the power metric, which can be any non-negative number. Default is 1 which corresponds to frobenius metric.}
 #' }
 #' @return A list containing the following fields:
-#' \item{dist}{The distance between the two covariance matrices in \code{M}.}
+#' \item{dist}{The distance between the two covariance matrices in \code{A} and \code{B}.}
 #' \item{optns}{A list containing the \code{optns} parameters utilized.}
 #' @examples
-#'#Example M input as array
+#'#Example
 #'m=5 # dimension of covariance matrices
 #'M <- array(0,c(m,m,2))
 #'for (i in 1:2){
@@ -19,7 +20,9 @@
 #'  aux<-diag(m)+y0%*%t(y0)
 #'  M[,,i]<-aux
 #'}
-#' covDistance=CovFPowerDist(M=M,optns=list(metric="frobenius"))
+#'A=M[,,1]
+#'B=M[,,2]
+#' covDistance=CovFPowerDist(A=A,B=B,optns=list(metric="frobenius"))
 #'
 #' @references
 #' \itemize{
@@ -27,24 +30,17 @@
 #' \item \cite{Petersen, A. and Müller, H.-G. (2019). Fréchet regression for random objects with Euclidean predictors. The Annals of Statistics, 47(2), 691--719.}
 #' \item \cite{Petersen, A., Deoni, S. and Müller, H.-G. (2019). Fréchet estimation of time-varying covariance matrices from sparse data, with application to the regional co-evolution of myelination in the developing brain. The Annals of Applied Statistics, 13(1), 393--419.}
 #' }
-#' @export
 
-CovFPowerDist= function(M=NULL, optns = list()){
+CovFPowerDist= function(A=NULL,B=NULL, optns = list()){
   
-  if(is.null(M)){
-    stop("M must be provided")
+  if(!is.matrix(A) | !is.matrix(B) ){
+    stop('A and B must be of matrix class')
   }
-  if(is.list(M)){
-    n=length(M)
-    M=array(as.numeric(unlist(M)), dim=c(dim(M[[1]])[1],dim(M[[1]])[1],length(M)))
-  } else{
-    if(!is.array(M)){
-      stop('M must be an array or a list')
-    }
-    n=dim(M)[3]
+  if(nrow(A)!=ncol(A) | nrow(B)!=ncol(B)){
+    stop('Both A and B must be square matrices')
   }
-  if(n>2){
-    stop('Only two covariance matrices should be provided')
+  if(sum(dim(A)!=dim(B))>0){
+    stop('Both A and B must have the same dimension')
   }
   
   if (is.null(optns$metric)){
@@ -62,6 +58,10 @@ CovFPowerDist= function(M=NULL, optns = list()){
   if(!metric%in%c("frobenius","power")){
     stop("metric choice not supported.")
   }
+  
+  M <- array(0,c(nrow(A),ncol(A),2))
+  M[,,1]=A
+  M[,,2]=B
   
   if(metric=="frobenius"){
     dist <- sqrt(sum(diag((M[,,1]-M[,,2])%*%(M[,,1]-M[,,2]))))

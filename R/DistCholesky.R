@@ -19,10 +19,10 @@
 #' B <- b %*% t(b)
 #' res <- DistCholesky(A,B)
 
-DistCholesky <- function(A,B,optns = list()){
+DistCholesky <- function(A=NULL,B=NULL,optns = list()){
   
-  if((class(A)[1] != 'matrix')|(class(B)[1] != 'matrix')){
-    stop('Both A and B must be matrices')
+  if(!is.matrix(A) | !is.matrix(B) ){
+    stop('A and B must be of matrix class')
   }
   if(nrow(A)!=ncol(A) | nrow(B)!=ncol(B)){
     stop('Both A and B must be square matrices')
