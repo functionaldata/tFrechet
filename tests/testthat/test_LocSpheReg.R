@@ -14,7 +14,7 @@ test_that("Works with specified bandwith, random design", {
   basis <- bss_tgsp(phi = phi_true, theta = theta_true)
   yin_tg <- basis$b1 * rnorm(n, mean = 0, sd = err_sd) + 
     basis$b2 * rnorm(n, mean = 0, sd = err_sd)
-  yin <- t(sapply(seq_len(n), function(i) expS2(base = ytrue[i,], tg = yin_tg[i,])))
+  yin <- t(sapply(seq_len(n), function(i) expSphere(base = ytrue[i,], tg = yin_tg[i,])))
   
   res <- LocSpheReg(xin=xin, yin=yin, xout=xout, optns = list(bw = 0.15, kernel = "epan"))
   phi_true <- acos(xout)
@@ -37,7 +37,7 @@ test_that("Works with specified bandwith, fixed design", {
   basis <- bss_tgsp(phi = phi_true, theta = theta_true)
   yin_tg <- basis$b1 * rnorm(n, mean = 0, sd = err_sd) + 
     basis$b2 * rnorm(n, mean = 0, sd = err_sd)
-  yin <- t(sapply(seq_len(n), function(i) expS2(base = ytrue[i,], tg = yin_tg[i,])))
+  yin <- t(sapply(seq_len(n), function(i) expSphere(base = ytrue[i,], tg = yin_tg[i,])))
   
   res <- LocSpheReg(xin=xin, yin=yin, xout=xout, optns = list(bw = 0.15, kernel = "epan"))
   phi_true <- acos(xout)
@@ -60,7 +60,7 @@ test_that("Works with CV-chosen bandwith, random design", {
   basis <- bss_tgsp(phi = phi_true, theta = theta_true)
   yin_tg <- basis$b1 * rnorm(n, mean = 0, sd = err_sd) + 
     basis$b2 * rnorm(n, mean = 0, sd = err_sd)
-  yin <- t(sapply(seq_len(n), function(i) expS2(base = ytrue[i,], tg = yin_tg[i,])))
+  yin <- t(sapply(seq_len(n), function(i) expSphere(base = ytrue[i,], tg = yin_tg[i,])))
   
   res <- LocSpheReg(xin=xin, yin=yin, xout=xout, optns = list(kernel = "epan"))
   phi_true <- acos(xout)

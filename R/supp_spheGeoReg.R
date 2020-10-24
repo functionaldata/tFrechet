@@ -72,7 +72,7 @@ bwCV_sphe <- function(xin, yin, xout, optns) {
 }
 
 # exp map
-expS2 <- function(base,tg, tol = 1e-10) {
+expSphere <- function(base,tg, tol = 1e-10) {
   tgNorm <- l2norm(tg)
   if (!is.na(tgNorm) & tgNorm <= tol) {
     base
@@ -82,7 +82,7 @@ expS2 <- function(base,tg, tol = 1e-10) {
 }
 
 # log map
-logS2 <- function(base, x, tol = 1e-10) {
+logSphere <- function(base, x, tol = 1e-10) {
   tg <- (x - sum(x * base) * base)
   tgNorm <- l2norm(tg)
   if (!is.na(tgNorm) & tgNorm <= tol) {
