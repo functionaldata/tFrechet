@@ -12,17 +12,18 @@
 #' @return A list containing the following fields:
 #' \item{dist}{the distance between covariance matrices \code{A} and \code{B}.}
 #' \item{optns}{A list containing the \code{optns} parameters utilized.}
-#'#Example M input as array
-#'m=5 # dimension of covariance matrices
-#'M <- array(0,c(m,m,2))
-#'for (i in 1:2){
-#'  y0=rnorm(m)
-#'  aux<-diag(m)+y0%*%t(y0)
-#'  M[,,i]<-aux
-#'}
-#'A=M[,,1]
-#'B=M[,,2]
-#' covDistance=CovFPowerDist(A=A,B=B,optns=list(metric="frobenius"))
+#' @examples 
+#'# M input as array
+#' m <- 5 # dimension of covariance matrices
+#' M <- array(0,c(m,m,2))
+#' for (i in 1:2) {
+#'  y0 <- rnorm(m)
+#'  aux <- diag(m) + y0 %*% t(y0)
+#'  M[,,i] <- aux
+#' }
+#' A <- M[,,1]
+#' B <- M[,,2]
+#' covDistance <- CovFPowerDist(A=A, B=B, optns=list(metric="frobenius"))
 #' @references
 #' \itemize{
 #' \item \cite{Petersen, A. and Müller, H.-G. (2016). Fréchet integration and adaptive metric selection for interpretable covariances of multivariate functional data. Biometrika, 103, 103--120.}
@@ -30,7 +31,7 @@
 #' \item \cite{Petersen, A., Deoni, S. and Müller, H.-G. (2019). Fréchet estimation of time-varying covariance matrices from sparse data, with application to the regional co-evolution of myelination in the developing brain. The Annals of Applied Statistics, 13(1), 393--419.}
 #' }
 #' @export
-#'
+
 dist4cov= function(A=NULL,B=NULL, optns = list()){
   if(!is.matrix(A) | !is.matrix(B) ){
     stop('A and B must be of matrix class')
