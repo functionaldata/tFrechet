@@ -6,7 +6,10 @@
 #' Note that only one of the three \code{yin}, \code{hin}, and \code{qin} needs to be input.
 #' If more than one of them are specified, \code{yin} overwrites \code{hin}, and \code{hin} overwrites \code{qin}.
 #' @param optns A list of options control parameters specified by \code{list(name=value)}.
-#' @details Available control options are \code{qSup}, \code{nqSup}, \code{lower}, \code{upper}, \code{bwDen}, \code{nRegGrid}, \code{delta}, \code{kernelDen}, \code{infSupport}, \code{outputGrid}. See \code{\link{LocDenReg}} for details.
+#' @details Available control options are \code{qSup}, \code{nqSup}, 
+#' \code{bwDen}, \code{ndSup}, \code{dSup}, \code{delta}, 
+#' \code{kernelDen}, \code{infSupport}, and \code{denLowerThreshold}. 
+#' See \code{\link{LocDenReg}} for details.
 #' @return A list containing the following components:
 #' \item{dout}{A numeric vector holding the density of the Fréchet mean.}
 #' \item{dSup}{A numeric vector giving the domain grid of \code{dout} when it is a matrix.}

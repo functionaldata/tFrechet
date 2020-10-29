@@ -29,7 +29,10 @@ A list containing the following components:
 Obtain Fréchet means of densities with respect to \eqn{L^2}-Wasserstein distance.
 }
 \details{
-Available control options are \code{qSup}, \code{nqSup}, \code{lower}, \code{upper}, \code{bwDen}, \code{nRegGrid}, \code{delta}, \code{kernelDen}, \code{infSupport}, \code{outputGrid}. See \code{\link{LocDenReg}} for details.
+Available control options are \code{qSup}, \code{nqSup}, 
+\code{bwDen}, \code{ndSup}, \code{dSup}, \code{delta}, 
+\code{kernelDen}, \code{infSupport}, and \code{denLowerThreshold}. 
+See \code{\link{LocDenReg}} for details.
 }
 \examples{
 xin = seq(0,1,0.05)
