@@ -1,5 +1,5 @@
 #' @title the Log-Cholesky and Cholesky distance between symmetric positive definite 
-#'  
+#' @noRd
 #' @description the Log-Cholesky and Cholesky distance between two matrices
 #' @param A an p by p matrix
 #' @param B an p by p matrix

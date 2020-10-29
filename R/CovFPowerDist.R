@@ -1,4 +1,5 @@
 #'@title Power distance for covariance matrices
+#'@noRd
 #'@description Power distance computation for covariance matrices.
 #' @param A an p by p matrix
 #' @param B an p by p matrix

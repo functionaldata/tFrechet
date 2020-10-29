@@ -1,5 +1,5 @@
 #' @title Global Fréchet regression of covariance matrices with Log-Cholesky and Cholesky metric
-#' 
+#' @noRd
 #' @description Global Fréchet regression of covariance matrices with Euclidean predictors.
 #' 
 #' @param x an n by p matrix of predictors.
@@ -35,7 +35,6 @@
 #' @references
 #' \cite{A Petersen and HG Müller (2019). "Fréchet regression for random objects with Euclidean predictors." An. Stat. 47, 691-719.}
 #' \cite{Z Lin (2019). " Riemannian Geometry of Symmetric Positive Definite Matrices via Cholesky Decomposition." Siam. J. Matrix. Anal, A. 40, 1353–1370.}
-#' @export
 
 GFRCovCholesky <- function(x, M, xout, optns = list()){
   

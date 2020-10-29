@@ -1,4 +1,5 @@
 #'@title Local Fréchet regression of conditional covariance matrices with Log-Cholesky and Cholesky metric
+#'@noRd
 #'@description Local Fréchet regression of covariance matrices with Euclidean predictors.
 #'
 #'@param x an n by p matrix of predictors.
