@@ -20,7 +20,9 @@ GloDenReg(
 
 \item{hin}{A list holding the histograms of the response corresponding to each row in \code{xin}.}
 
-\item{qin}{A matrix or list holding the quantile functions of the response. If \code{qin} is a matrix, each row holds the quantile function of the response taking values on \code{optns$qSup} corresponding to a row in \code{xin}.}
+\item{qin}{A matrix or list holding the quantile functions of the response. If \code{qin} is a matrix, each row holds the quantile function of the response taking values on \code{optns$qSup} corresponding to a row in \code{xin}.
+Note that only one of the three \code{yin}, \code{hin}, and \code{qin} needs to be input.
+If more than one of them are specified, \code{yin} overwrites \code{hin}, and \code{hin} overwrites \code{qin}.}
 
 \item{xout}{A k by p matrix or a vector of length k (if p=1) with output measurements of the predictors. Default is \code{xin}.}
 

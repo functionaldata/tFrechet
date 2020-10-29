@@ -20,7 +20,9 @@ LocDenReg(
 
 \item{hin}{A list holding the histograms of the response corresponding to each predictor value in \code{xin}.}
 
-\item{qin}{A matrix or list holding the quantile functions of the response. If \code{qin} is a matrix, each row holds the quantile function corresponding to a predictor value in \code{xin}.}
+\item{qin}{A matrix or list holding the quantile functions of the response. If \code{qin} is a matrix, each row holds the quantile function corresponding to a predictor value in \code{xin}.
+Note that only one of the three \code{yin}, \code{hin}, and \code{qin} needs to be input.
+If more than one of them are specified, \code{yin} overwrites \code{hin}, and \code{hin} overwrites \code{qin}.}
 
 \item{xout}{A numeric vector holding the output grid for the predictor. Default is \code{xin}.}
 
