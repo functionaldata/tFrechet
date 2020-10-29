@@ -1,14 +1,14 @@
 #' @title Fréchet means of densities.
 #' @description Obtain Fréchet means of densities with respect to \eqn{L^2}-Wasserstein distance.
-#' @param yin A matrix or list holding the sample of observations of the response. If \code{yin} is a matrix, each row holds the observations of the response corresponding to a row in \code{xin}.
-#' @param hin A list holding the histograms of the response corresponding to each row in \code{xin}.
-#' @param qin A matrix or list holding the quantile functions of the response. If \code{qin} is a matrix, each row holds the quantile function of the response taking values on \code{optns$qSup} corresponding to a row in \code{xin}.
+#' @param yin A matrix or list holding the sample of measurements for the observed distributions. If \code{yin} is a matrix, each row holds the measurements for one distribution.
+#' @param hin A list holding the histograms of an observed distribution.
+#' @param qin A matrix or list holding the quantile functions of the response. If \code{qin} is a matrix, each row holds the quantile function of an observed distribution taking values on \code{optns$qSup}.
 #' @param optns A list of options control parameters specified by \code{list(name=value)}.
 #' @details Available control options are \code{qSup}, \code{nqSup}, \code{lower}, \code{upper}, \code{bwDen}, \code{nRegGrid}, \code{delta}, \code{kernelDen}, \code{infSupport}, \code{outputGrid}. See \code{\link{LocDenReg}} for details.
 #' @return A list containing the following components:
-#' \item{dout}{A matrix or list holding the output densities corresponding to \code{xout}. If \code{dout} is a matrix, each row gives a density and the domain grid is given in \code{dSup}. If \code{dout} is a list, each element is a list of two components, \code{x} and \code{y}, giving the domain grid and density function values, respectively.}
+#' \item{dout}{A matrix or list holding the density of the Fréchet mean. If \code{dout} is a matrix, each row gives a density and the domain grid is given in \code{dSup}. If \code{dout} is a list, each element is a list of two components, \code{x} and \code{y}, giving the domain grid and density function values, respectively.}
 #' \item{dSup}{A numeric vector giving the domain grid of \code{dout} when it is a matrix.}
-#' \item{qout}{A matrix holding the quantile functions of the output densities. Each row corresponds to a value in \code{xout}.}
+#' \item{qout}{A matrix holding the quantile function of the Fréchet mean.}
 #' \item{qSup}{A numeric vector giving the domain grid of \code{qout}.}
 #' \item{optns}{A list of control options used.}
 #' @examples
@@ -22,10 +22,22 @@
 #' @export
 
 DenFMean <- function(yin=NULL, hin=NULL, qin=NULL, optns=list()) {
-  if (is.list(yin)) {
-    xin <- rep(1, length(yin))
-  } else if (is.matrix(yin)) {
-    xin <- rep(1, nrow(yin))
+  if (!is.null(yin)) {
+    if (is.list(yin)) {
+      xin <- rep(1, length(yin))
+    } else if (is.matrix(yin)) {
+      xin <- rep(1, nrow(yin))
+    }
+  } else {
+    if (!is.null(hin)) {
+      xin <- rep(1, length(hin))
+    } else {
+      if (is.list(qin)) {
+        xin <- rep(1, length(qin))
+      } else if (is.matrix(qin)) {
+        xin <- rep(1, nrow(qin))
+      }
+    }
   }
   res <- GloDenReg(xin = xin, yin = yin, hin = hin, qin = qin, optns = optns)
   if (is.list(res$dout)) {
