@@ -20,3 +20,6 @@ Once installed you can load the package with:
 ```
 library(frechet)
 ```
+
+## Acknowledgment
+The development of this package is supported by grants from NSF DMS-2014626, NIH ECHO and the Bill and Melinda Gates Foundation. 

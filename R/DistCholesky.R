@@ -11,7 +11,7 @@
 #' @return A list containing the following fields:
 #' \item{dist}{the distance between matrices \code{A} and \code{B}.}
 #' \item{optns}{A list containing the \code{optns} parameters utilized.}
-#' @example 
+#' @examples
 #' p <- 3
 #' a <- matrix(rnorm(p*p),p,p)
 #' b <- matrix(rnorm(p*p),p,p)

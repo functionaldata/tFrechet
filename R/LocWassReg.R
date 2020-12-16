@@ -5,7 +5,7 @@
 #' @param xin A n by p matrix holding the n observations of the predictor.
 #' @param qin An n by m matrix with values of quantile functions of which each row holds the quantile function values on an equispaced grid on [0, 1] of length m.
 #' @param xout A k by p matrix holding the k output predictor values.
-#' @param optns A list of options control parameters specified by \code{list(name=value)}. See `Details'.
+#' @param optns A list of control parameters specified by \code{list(name=value)}. See `Details'.
 #' @details Available control options are
 #' \describe{
 #' \item{bw}{A vector of length p containing the bandwidths of each predictor dimension.}
@@ -104,8 +104,8 @@ LocWassReg = function(xin, qin, xout, optns = list()){
     gx <- colMeans(qin * s)*n
     #res = do.call(quadprog::solve.QP, list(diag(m), gx, A, b0))
     #return(sort(res$solution))
-    res <- do.call(rosqp::solve_osqp,
-                   list(P=Pmat, q= -gx, A=Amat, l=b0, pars = rosqp::osqpSettings(verbose = FALSE)))
+    res <- do.call(osqp::solve_osqp,
+                   list(P=Pmat, q= -gx, A=Amat, l=b0, pars = osqp::osqpSettings(verbose = FALSE)))
     return(sort(res$x))
   })
   qout = t(qout)

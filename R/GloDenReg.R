@@ -7,7 +7,7 @@
 #' Note that only one of the three \code{yin}, \code{hin}, and \code{qin} needs to be input.
 #' If more than one of them are specified, \code{yin} overwrites \code{hin}, and \code{hin} overwrites \code{qin}.
 #' @param xout A k by p matrix or a vector of length k (if p=1) with output measurements of the predictors. Default is \code{xin}.
-#' @param optns A list of options control parameters specified by \code{list(name=value)}.
+#' @param optns A list of control parameters specified by \code{list(name=value)}.
 #' @details Available control options are \code{qSup}, \code{nqSup}, 
 #' \code{lower}, \code{upper}, \code{Rsquared}, \code{bwDen}, \code{ndSup}, \code{dSup}, 
 #' \code{delta}, \code{kernelDen}, \code{infSupport}, and \code{denLowerThreshold}. 

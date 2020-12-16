@@ -9,7 +9,9 @@ test_that("Works with fully observed distributions; p=1", {
     qnorm(c(1e-6,qSup,1-1e-6), x, sd)
   }))
   xout <- xin
-  res <- LocDenReg(xin=xin, qin=qin, xout=xout, optns = list(qSup = c(0,qSup,1)))
+  res <- LocDenReg(xin=xin, qin=qin, xout=xout,
+                   optns = list(qSup = c(0,qSup,1)))
+                   #optns = list(bwReg = 0.02, qSup = c(0,qSup,1)))
   qtrue <- t(sapply(xin, function(x) qnorm(qSup, mean = x, sd = sd)))
   expect_true(mean(sqrt(apply((qtrue - res$qout[,-c(1,length(res$qSup))])^2,
                               1, pracma::trapz, x = qSup))) / mean(qin) < 1e-4)
@@ -24,7 +26,9 @@ test_that("Works with discrete noisy measurements; p=1", {
   })
   xout <- xin
   qSup <- qbeta((1:99)/100,1/2,1/2)
-  res <- LocDenReg(xin=xin, yin=yin, xout=xout, optns = list(qSup = c(0,qSup,1)))
+  res <- LocDenReg(xin=xin, yin=yin, xout=xout,
+                   optns = list(qSup = c(0,qSup,1)))
+                   #optns = list(bwReg = 0.05, qSup = c(0,qSup,1)))
   qtrue <- t(sapply(xin, function(x) qnorm(qSup, mean = x, sd = sd)))
   expect_true(mean(sqrt(apply((qtrue - res$qout[,-c(1,length(res$qSup))])^2,
                               1, pracma::trapz, x = qSup))) / mean(unlist(yin)) < 2e-2)
@@ -38,7 +42,9 @@ test_that("Works with specifying outputGrid; p=1", {
   })
   xout <- xin
   dSup <- seq(-0.5,1.5,0.01)
-  res <- LocDenReg(xin=xin, yin=yin, xout=xout, optns=list(outputGrid = dSup))
+  res <- LocDenReg(xin=xin, yin=yin, xout=xout,
+                   optns=list(outputGrid = dSup))
+                   #optns=list(bwReg = 0.02, outputGrid = dSup))
   expect_true("dSup" %in% names(res))
   expect_equal(sum(abs(res$dSup - dSup)), 0)
 })

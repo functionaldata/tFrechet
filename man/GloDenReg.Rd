@@ -26,7 +26,7 @@ If more than one of them are specified, \code{yin} overwrites \code{hin}, and \c
 
 \item{xout}{A k by p matrix or a vector of length k (if p=1) with output measurements of the predictors. Default is \code{xin}.}
 
-\item{optns}{A list of options control parameters specified by \code{list(name=value)}.}
+\item{optns}{A list of control parameters specified by \code{list(name=value)}.}
 }
 \value{
 A list containing the following components:

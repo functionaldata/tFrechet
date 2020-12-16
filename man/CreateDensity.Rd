@@ -110,8 +110,8 @@ legend('topright',
 }
 \references{
 \itemize{
-\item \cite{HG Müller, JL Wang and WB Capra (1997). "From lifetables to hazard rates: The transformation approach." Biometrika 84, 881--892.}
-\item \cite{SJ Sheather and MC Jones (1991). "A reliable data-based bandwidth selection method for kernel density estimation." JRSS-B 53, 683--690.}
-\item \cite{HG Müller, U Stadtmüller, and T Schmitt. (1987) "Bandwidth choice and confidence intervals for derivatives of noisy data." Biometrika 74, 743--749.}
+\item \cite{H.-G. Müller, J.L. Wang and W.B. Capra (1997). "From lifetables to hazard rates: The transformation approach." Biometrika 84, 881--892.}
+\item \cite{S.J. Sheather and M.C. Jones (1991). "A reliable data-based bandwidth selection method for kernel density estimation." JRSS-B 53, 683--690.}
+\item \cite{H.-G. Müller, U. Stadtmüller, and T. Schmitt. (1987) "Bandwidth choice and confidence intervals for derivatives of noisy data." Biometrika 74, 743--749.}
 }
 }

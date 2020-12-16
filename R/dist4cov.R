@@ -6,8 +6,8 @@
 #' @param optns A list of options control parameters specified by \code{list(name=value)}. See `Details'.
 #' @details Available control options are 
 #' \describe{
-#' \item{metric}{Metric type choice, \code{"frobenius"}, \code{"power"}, \code{"log_cholesky"} and \code{"cholesky"} - default: \code{"frobenius"}, which corresponds to the power metric with \code{alpha} equal to 1.
-#' \item{alpha}{The power parameter for the power metric, which can be any non-negative number. Default is 1 which corresponds to frobenius metric.}
+#' \item{metric}{Metric type choice, \code{"frobenius"}, \code{"power"}, \code{"log_cholesky"} and \code{"cholesky"} - default: \code{"frobenius"}, which corresponds to the power metric with \code{alpha} equal to 1.}
+#' \item{alpha}{The power parameter for the power metric, which can be any non-negative number. Default is 1 which corresponds to Frobenius metric.}
 #' }
 #' @return A list containing the following fields:
 #' \item{dist}{the distance between covariance matrices \code{A} and \code{B}.}
@@ -23,7 +23,7 @@
 #' }
 #' A <- M[,,1]
 #' B <- M[,,2]
-#' covDistance <- CovFPowerDist(A=A, B=B, optns=list(metric="frobenius"))
+#' frobDist <- dist4cov(A=A, B=B, optns=list(metric="frobenius"))
 #' @references
 #' \itemize{
 #' \item \cite{Petersen, A. and Müller, H.-G. (2016). Fréchet integration and adaptive metric selection for interpretable covariances of multivariate functional data. Biometrika, 103, 103--120.}

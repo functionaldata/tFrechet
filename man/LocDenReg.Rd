@@ -14,7 +14,7 @@ LocDenReg(
 )
 }
 \arguments{
-\item{xin}{A n by p matrix holding the n observations of the predictor.}
+\item{xin}{An n by p matrix or a vector of length n if p=1 holding the n observations of the predictor.}
 
 \item{yin}{A matrix or list holding the sample of observations of the response. If \code{yin} is a matrix, each row holds the observations of the response corresponding to a predictor value in the corresponding row of \code{xin}.}
 
@@ -24,9 +24,9 @@ LocDenReg(
 Note that only one of the three \code{yin}, \code{hin}, and \code{qin} needs to be input.
 If more than one of them are specified, \code{yin} overwrites \code{hin}, and \code{hin} overwrites \code{qin}.}
 
-\item{xout}{A m by p matrix holding the m output predictor values. Default is \code{xin}.}
+\item{xout}{An m by p matrix or a vector of length m if p=1 holding the m output predictor values. Default is \code{xin}.}
 
-\item{optns}{A list of options control parameters specified by \code{list(name=value)}. See `Details'.}
+\item{optns}{A list of control parameters specified by \code{list(name=value)}. See `Details'.}
 }
 \value{
 A list containing the following components:
@@ -68,8 +68,8 @@ yin = lapply(xin, function(x) {
   rnorm(100, rnorm(1,x + x^2,0.005), 0.05)
 })
 qSup = seq(0,1,0.02)
-xout = seq(0,1,0.2)
-res1 <- LocDenReg(xin=xin, yin=yin, xout=xout, optns = list(bw = 0.12, qSup = qSup))
+xout = seq(0,1,0.1)
+res1 <- LocDenReg(xin=xin, yin=yin, xout=xout, optns = list(bwReg = 0.12, qSup = qSup))
 plot(res1)
 \donttest{
 xout <- xin

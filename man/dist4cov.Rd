@@ -22,7 +22,11 @@ A list containing the following fields:
 Distance computation between two covariance matrices
 }
 \details{
-
+Available control options are 
+\describe{
+\item{metric}{Metric type choice, \code{"frobenius"}, \code{"power"}, \code{"log_cholesky"} and \code{"cholesky"} - default: \code{"frobenius"}, which corresponds to the power metric with \code{alpha} equal to 1.}
+\item{alpha}{The power parameter for the power metric, which can be any non-negative number. Default is 1 which corresponds to Frobenius metric.}
+}
 }
 \examples{
 # M input as array
@@ -35,7 +39,7 @@ for (i in 1:2) {
 }
 A <- M[,,1]
 B <- M[,,2]
-covDistance <- CovFPowerDist(A=A, B=B, optns=list(metric="frobenius"))
+frobDist <- dist4cov(A=A, B=B, optns=list(metric="frobenius"))
 }
 \references{
 \itemize{

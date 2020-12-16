@@ -37,7 +37,6 @@
 #' @references
 #' \cite{A Petersen and HG Müller (2019). "Fréchet regression for random objects with Euclidean predictors." An. Stat. 47, 691-719.}
 #' \cite{Z Lin (2019). " Riemannian Geometry of Symmetric Positive Definite Matrices via Cholesky Decomposition." Siam. J. Matrix. Anal, A. 40, 1353–1370.}
-#' @export
 
 
 LFRCovCholesky <- function(x, M, xout, optns=list()){
