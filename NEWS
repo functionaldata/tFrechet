@@ -11,4 +11,6 @@ Minors:
 * Added warnings when redundant input is given in GloDenReg.R and LocDenReg.R
 
 
+frechet v0.1.0 (Release date: 19-June-2020)
+============
 * Initial release
