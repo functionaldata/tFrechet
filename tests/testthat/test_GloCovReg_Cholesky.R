@@ -1,18 +1,5 @@
 require(testthat)
-test_that('error: x must be a matrix', {
-  n=10 #sample size
-  m=5 # dimension of covariance matrices
-  M <- array(0,c(m,m,n))
-  for (i in 1:n){
-    y0=rnorm(m)
-    aux<-diag(m)+y0%*%t(y0)
-    M[,,i]<-aux
-  }
-  x=rnorm(n) #vector of predictor values
-  xout=matrix(runif(3)) #output predictor levels
-  optns = list(metric='log_cholesky')
-  expect_error(GloCovReg(x=x,M=M,xout=xout,optns=optns),"x must be a matrix")
-})
+
 
 test_that('error: x and xout must have same number of columns', {
   n=10 #sample size

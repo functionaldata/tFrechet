@@ -8,9 +8,9 @@
 #' @details Available control options are
 #' \describe{
 #' \item{corrOut}{Boolean indicating if output is shown as correlation or covariance matrix. Default is \code{FALSE} and corresponds to a covariance matrix.}
-#' \item{metric}{Metric type choice, \code{"frobenius"}, \code{"power"}, \code{"log_cholesky"}, \code{"cholesky"} - default: \code{"frobenius"} which corresponds to the power metric with \code{alpha} equal to 2.
+#' \item{metric}{Metric type choice, \code{"frobenius"}, \code{"power"}, \code{"log_cholesky"}, \code{"cholesky"} - default: \code{"frobenius"} which corresponds to the power metric with \code{alpha} equal to 1.
 #' For power (and Frobenius) metrics, either \code{y} or \code{M} must be input; \code{y} would override \code{M}. For Cholesky and log-Cholesky metrics, \code{M} must be input and \code{y} does not apply.}
-#' \item{alpha}{The power parameter for the power metric, which can be any non-negative integer. Default is 2 which corresponds to Frobenius metric.}
+#' \item{alpha}{The power parameter for the power metric. Default is 1 which corresponds to Frobenius metric.}
 #' }
 #' @return A \code{covReg} object --- a list containing the following fields:
 #' \item{xout}{An m by p matrix of output predictor levels.}

@@ -14,17 +14,19 @@ LocDenReg(
 )
 }
 \arguments{
-\item{xin}{A numeric vector holding the observations of the predictor.}
+\item{xin}{An n by p matrix or a vector of length n if p=1 holding the n observations of the predictor.}
 
-\item{yin}{A matrix or list holding the sample of observations of the response. If \code{yin} is a matrix, each row holds the observations of the response corresponding to a predictor value in \code{xin}.}
+\item{yin}{A matrix or list holding the sample of observations of the response. If \code{yin} is a matrix, each row holds the observations of the response corresponding to a predictor value in the corresponding row of \code{xin}.}
 
-\item{hin}{A list holding the histograms of the response corresponding to each predictor value in \code{xin}.}
+\item{hin}{A list holding the histograms of the response corresponding to each predictor value in the corresponding row of \code{xin}.}
 
-\item{qin}{A matrix or list holding the quantile functions of the response. If \code{qin} is a matrix, each row holds the quantile function corresponding to a predictor value in \code{xin}.}
+\item{qin}{A matrix or list holding the quantile functions of the response. If \code{qin} is a matrix, the support of the quantile functions should be the same (i.e., \code{optns$qSup}), and each row of \code{qin} holds the quantile function corresponding to a predictor value in the corresponding row of \code{xin}. If the quantile functions are evaluated on different grids, then \code{qin} should be a list, each element consisting of two components \code{x} and \code{y} holding the support grid and the corresponding values of the quantile functions, respectively.
+Note that only one of the three \code{yin}, \code{hin}, and \code{qin} needs to be input.
+If more than one of them are specified, \code{yin} overwrites \code{hin}, and \code{hin} overwrites \code{qin}.}
 
-\item{xout}{A numeric vector holding the output grid for the predictor. Default is \code{xin}.}
+\item{xout}{An m by p matrix or a vector of length m if p=1 holding the m output predictor values. Default is \code{xin}.}
 
-\item{optns}{A list of options control parameters specified by \code{list(name=value)}. See `Details'.}
+\item{optns}{A list of control parameters specified by \code{list(name=value)}. See `Details'.}
 }
 \value{
 A list containing the following components:
@@ -44,20 +46,20 @@ Local Fréchet regression for densities with respect to \eqn{L^2}-Wasserstein di
 \details{
 Available control options are
 \describe{
-\item{bwReg}{A scalar used as the bandwidth or a character indicating the selection method: \code{"CV"} (default) or \code{"GCV"}.}
+\item{bwReg}{A vector of length p used as the bandwidth for the Fréchet regression or \code{"CV"} (default), i.e., a data-adaptive selection done by cross-validation.}
 \item{kernelReg}{A character holding the type of kernel functions for local Fréchet regression for densities; \code{"rect"}, \code{"gauss"}, \code{"epan"}, \code{"gausvar"}, \code{"quar"} - default: \code{"gauss"}.}
 \item{qSup}{A numeric vector holding the grid on [0,1] quantile functions take value on. Default is an equidistant grid.}
 \item{nqSup}{A scalar giving the length of \code{qSup}. Default is 201.}
 \item{lower}{A scalar with the lower bound of the support of the distribution. Default is \code{NULL}.}
 \item{upper}{A scalar with the upper bound of the support of the distribution. Default is \code{NULL}.}
-\item{bwRange}{Bandwidth selection range if \code{bwReg} equals \code{"CV"} or \code{"GCV"}.}
-\item{bwDen}{The bandwidth value for the smoothed mean function; positive numeric - default: determine automatically based on the data-driven bandwidth selector proposed by Sheather and Jones (1991).}
-\item{ndSup}{The number of support points the kernel density estimation; numeric - default: 101.}
-\item{dSup}{User defined output grid for the support of kernel density estimation, it overrides \code{nRegGrid}; numeric - default: \code{NULL}}
-\item{delta}{The size of the bin to be used; numeric - default: \code{diff(range(y))/1000}. It only works when the raw sample is available.}
-\item{kernelDen}{A character holding the type of kernel functions for density estimation; \code{"rect"}, \code{"gauss"}, \code{"epan"}, \code{"gausvar"}, \code{"quar"} - default: \code{"gauss"}.}
-\item{infSupport}{logical if we expect the distribution to have infinite support or not; logical - default: \code{TRUE}}
-\item{denLowerThreshold}{\code{FALSE} or a positive value giving the lower threshold of the densities; default: \code{0.001 * mean(qin[,ncol(qin)] - qin[,1])}.}
+\item{bwRange}{A 2 by p matrix whose columns contain the bandwidth selection range for each corresponding dimension of the predictor \code{xin} for the case when \code{bwReg} equals \code{"CV"}. Default is \code{NULL} and is automatically chosen by a data-adaptive method.}
+\item{bwDen}{The bandwidth value used in \code{CreateDensity()} for density estimation; positive numeric - default: determine automatically based on the data-driven bandwidth selector proposed by Sheather and Jones (1991).}
+\item{ndSup}{The number of support points the kernel density estimation uses in \code{CreateDensity()}; numeric - default: 101.}
+\item{dSup}{User defined output grid for the support of kernel density estimation used in \code{CreateDensity()}, it overrides \code{nRegGrid}; numeric - default: \code{NULL}}
+\item{delta}{The size of the bin to be used used in \code{CreateDensity()}; numeric - default: \code{diff(range(y))/1000}. It only works when the raw sample is available.}
+\item{kernelDen}{A character holding the type of kernel functions used in \code{CreateDensity()} for density estimation; \code{"rect"}, \code{"gauss"}, \code{"epan"}, \code{"gausvar"}, \code{"quar"} - default: \code{"gauss"}.}
+\item{infSupport}{logical if we expect the distribution to have infinite support or not, used in \code{CreateDensity()} for density estimation; logical - default: \code{FALSE}}
+\item{denLowerThreshold}{\code{FALSE} or a positive value giving the lower threshold of the densities used in \code{CreateDensity()}; default: \code{0.001 * mean(qin[,ncol(qin)] - qin[,1])}.}
 }
 }
 \examples{
@@ -66,8 +68,8 @@ yin = lapply(xin, function(x) {
   rnorm(100, rnorm(1,x + x^2,0.005), 0.05)
 })
 qSup = seq(0,1,0.02)
-xout = seq(0,1,0.2)
-res1 <- LocDenReg(xin=xin, yin=yin, xout=xout, optns = list(bw = 0.12, qSup = qSup))
+xout = seq(0,1,0.1)
+res1 <- LocDenReg(xin=xin, yin=yin, xout=xout, optns = list(bwReg = 0.12, qSup = qSup))
 plot(res1)
 \donttest{
 xout <- xin

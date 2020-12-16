@@ -4,9 +4,14 @@
 #' @param yin A matrix or list holding the sample of observations of the response. If \code{yin} is a matrix, each row holds the observations of the response corresponding to a row in \code{xin}.
 #' @param hin A list holding the histograms of the response corresponding to each row in \code{xin}.
 #' @param qin A matrix or list holding the quantile functions of the response. If \code{qin} is a matrix, each row holds the quantile function of the response taking values on \code{optns$qSup} corresponding to a row in \code{xin}.
+#' Note that only one of the three \code{yin}, \code{hin}, and \code{qin} needs to be input.
+#' If more than one of them are specified, \code{yin} overwrites \code{hin}, and \code{hin} overwrites \code{qin}.
 #' @param xout A k by p matrix or a vector of length k (if p=1) with output measurements of the predictors. Default is \code{xin}.
-#' @param optns A list of options control parameters specified by \code{list(name=value)}.
-#' @details Available control options are \code{qSup}, \code{nqSup}, \code{lower}, \code{upper}, \code{Rsquared}, \code{bwDen}, \code{nRegGrid}, \code{delta}, \code{kernelDen}, \code{infSupport}, \code{outputGrid}. \code{Rsquared} is explained as follows and see \code{\link{LocDenReg}} for the other options.
+#' @param optns A list of control parameters specified by \code{list(name=value)}.
+#' @details Available control options are \code{qSup}, \code{nqSup}, 
+#' \code{lower}, \code{upper}, \code{Rsquared}, \code{bwDen}, \code{ndSup}, \code{dSup}, 
+#' \code{delta}, \code{kernelDen}, \code{infSupport}, and \code{denLowerThreshold}. 
+#' \code{Rsquared} is explained as follows and see \code{\link{LocDenReg}} for the other options.
 #' \describe{
 #' \item{Rsquared}{A logical variable indicating whether R squared would be returned. Default is \code{FALSE}.}
 #' }

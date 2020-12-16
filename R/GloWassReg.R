@@ -5,7 +5,7 @@
 #' @param xin An n by p matrix or a vector of length n (if p=1) with input measurements of the predictors.
 #' @param qin An n by m matrix with values of quantile functions of which each row holds the quantile function values on an equispaced grid on [0, 1].
 #' @param xout A k by p matrix or a vector of length k (if p=1) with output measurements of the predictors.
-#' @param optns A list of options control parameters specified by \code{list(name=value)}. See `Details'.
+#' @param optns A list of control parameters specified by \code{list(name=value)}. See `Details'.
 #' @details Available control options are
 #' \describe{
 #' \item{lower}{A scalar with the lower bound of the support of the distribution. Default is \code{NULL}.}
@@ -64,8 +64,8 @@ GloWassReg <- function(xin, qin, xout, optns=list()){
     #return(sort(res$solution)) #return(res$solution)
 
 
-    res <- do.call(rosqp::solve_osqp,
-                   list(P=Pmat, q= -gx, A=Amat, l=b0, pars = rosqp::osqpSettings(verbose = FALSE)))
+    res <- do.call(osqp::solve_osqp,
+                   list(P=Pmat, q= -gx, A=Amat, l=b0, pars = osqp::osqpSettings(verbose = FALSE)))
     return(sort(res$x))
   })
   qout <- t(qout)
@@ -86,8 +86,8 @@ GloWassReg <- function(xin, qin, xout, optns=list()){
         #res <- do.call(quadprog::solve.QP, list(diag(m), gx, A, b0))
         #return(sort(res$solution)) #return(res$solution)
 
-        res <- do.call(rosqp::solve_osqp,
-                       list(P=Pmat, q= -gx, A=Amat, l=b0, pars = rosqp::osqpSettings(verbose = FALSE)))
+        res <- do.call(osqp::solve_osqp,
+                       list(P=Pmat, q= -gx, A=Amat, l=b0, pars = osqp::osqpSettings(verbose = FALSE)))
         return(sort(res$x))
       })
       qin.est <- t(qin.est)

@@ -73,7 +73,16 @@ LFRCov  = function(x, y=NULL,M=NULL, xout,optns = list()){
     bwCov=optns$bwCov
   }
   bw2=bwCov
-
+  
+  if(!is.matrix(x)&!is.vector(x)){
+    stop('x must be a matrix or vector')
+  }
+  if(is.vector(x)){
+    x<- matrix(x,length(x))
+  }
+  if(is.vector(xout)){
+    xout<- matrix(xout,length(xout))
+  }
 
   if(!is.matrix(x)){
     stop('x must be a matrix')
@@ -159,13 +168,10 @@ LFRCov  = function(x, y=NULL,M=NULL, xout,optns = list()){
       }
       #CV for bw2 selection
       if(is.na(sum(bw2))){
-        delta=array(0,p)
-        for(j in 1:p){
-          delta[j]=(max(x[,j])-min(x[,j]))
-        }
         if(p==1){
+          bw_choice=SetBwRange(as.vector(x), as.vector(xout), kernel)
           objF=matrix(0,nrow=20,ncol=1)
-          aux1=as.matrix(seq(delta[1]*0.2,delta[1],length.out=20))
+          aux1=as.matrix(seq(bw_choice$min,bw_choice$max,length.out=20))
           for(i in 1:20){
             for(j in 1:dim(x)[1]){
               aux=as.matrix(Matrix::nearPD(computeLFR(setdiff(1:dim(x)[1],j),x[j],aux1[i]),corr = FALSE)$mat)-M[,,j]
@@ -176,9 +182,11 @@ LFRCov  = function(x, y=NULL,M=NULL, xout,optns = list()){
           bwCV=aux1[ind]
         }
         if(p==2){
+          bw_choice1=SetBwRange(as.vector(x[,1]), as.vector(xout[,1]), kernel)
+          bw_choice2=SetBwRange(as.vector(x[,2]), as.vector(xout[,2]), kernel)
           objF=matrix(0,nrow=10,ncol=10)
-          aux1=seq(delta[1]*0.2,delta[1],length.out=10)
-          aux2=seq(delta[2]*0.2,delta[2],length.out=10)
+          aux1=seq(bw_choice1$min,bw_choice1$max,length.out=10)
+          aux2=seq(bw_choice2$min,bw_choice2$max,length.out=10)
           for(i1 in 1:10){
             for(i2 in 1:10){
               for(j in 1:dim(x)[1]){

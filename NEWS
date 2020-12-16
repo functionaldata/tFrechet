@@ -1,1 +1,14 @@
+frechet v0.2.0 (Release date: 15-Dec-2020)
+=============
+Changes:
+* Allowed multivariate predictors for local Fréchet regression with distribution-valued responses in LocDenReg.R
+* Added functions to compute distances between distributions and covariance matrices in dist4den.R and dist4cov.R, respectively
+* Eliminated GCV selection of bandwidths in LocDenReg.R
+* Allowed alpha to be any non-negative numbers in GloCovReg.R and LocCovReg.R
+
+Minors:
+* Fixed a bug in DenFMean.R
+* Added warnings when redundant input is given in GloDenReg.R and LocDenReg.R
+
+
 * Initial release

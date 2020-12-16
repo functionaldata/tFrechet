@@ -2,25 +2,24 @@
 #'@noRd
 #'@description Local Fréchet regression of covariance matrices with Euclidean predictors.
 #'
-#'@param x An n by p matrix of predictors.
-#'@param M A q by q by n array (resp. a list of q by q matrices) where \code{M[,,i]} (resp. \code{M[[i]]}) contains the i-th covariance matrix of dimension q by q.
-#'@param xout An m by p matrix of output predictor levels.
+#'@param x an n by p matrix of predictors.
+#'@param M an q by q by n array (resp. a list of q by q matrices) where \code{M[,,i]} (resp. \code{M[[i]]}) contains the i-th covariance matrix of dimension q by q.
+#'@param xout an m by p matrix of output predictor levels.
 #'@param optns A list of options control parameters specified by \code{list(name=value)}. See `Details'.
-#'@details Available control options are
+#'@details Available control options are 
 #'\describe{
 #'\item{bwCov}{bandwidth for conditional covariance estimation. If \code{bwCov} is not provided, it is chosen by cross validation.}
 #'\item{kernel}{Name of the kernel function to be chosen from 'gauss', 'rect', 'epan', 'gausvar' and 'quar'. Default is 'gauss'.}
 #'\item{corrOut}{Boolean indicating if Mout is shown as correlation or covariance matrix. Default: \code{FALSE} for only a covariance matrix.}
 #'\item{metric}{Metric type choice, "log_cholesky", "cholesky" - default: \code{log_cholesky} for log Cholesky metric}
 #' }
-#'
+#' 
 #' @return A list containing the following fields:
 #' \item{xout}{An m by p matrix of output predictor levels.}
 #' \item{Mout}{A list of estimated conditional covariance matrices at \code{xout}.}
 #' \item{opts}{A list containing the \code{opts} parameters utilized.}
-#'
+#' 
 #' @examples
-#' \donttest{
 #' n=30 #sample size
 #' m=5 # dimension of covariance matrices
 #' x=cbind(matrix(rnorm(n),n),matrix(rnorm(n),n)) #vector of predictor values
@@ -34,28 +33,33 @@
 #' }
 #' xout=cbind(runif(5),runif(5)) #output predictor levels
 #' Covlist = LFRCovCholesky(x,M,xout)
-#'}
+#'
 #' @references
-#' \cite{Petersen, A. and Müller, H.-G. (2019). Fréchet regression for random objects with Euclidean predictors. The Annals of Statistics, 47(2), 691--719.}
-#' \cite{Lin, Z. (2019). Riemannian geometry of symmetric positive definite matrices via Cholesky decomposition. Siam. J. Matrix. Anal, A. 40, 1353–-1370.}
+#' \cite{A Petersen and HG Müller (2019). "Fréchet regression for random objects with Euclidean predictors." An. Stat. 47, 691-719.}
+#' \cite{Z Lin (2019). " Riemannian Geometry of Symmetric Positive Definite Matrices via Cholesky Decomposition." Siam. J. Matrix. Anal, A. 40, 1353–1370.}
 
 
 LFRCovCholesky <- function(x, M, xout, optns=list()){
-  if(!is.matrix(x)){
-    stop('x must be a matrix')
+  if(!is.matrix(x)&!is.vector(x)){
+    stop('x must be a matrix or vector')
   }
-  if(!is.matrix(xout)){
-    stop('xout must be a matrix')
+  if(!is.matrix(xout)&!is.vector(xout)){
+    stop('xout must be a matrix or vector')
   }
+  
+  if(is.vector(x)){x<- matrix(x,length(x)) }
+  if(is.vector(xout)){xout<- matrix(xout,length(xout))}
+  
   if(ncol(x) != ncol(xout)){
     stop('x and xout must have same number of columns')
   }
 
+  
   if(is.null(optns$bwCov)){
     bwCov = NA
   } else {
     bwCov = optns$bwCov
-    if(sum(bwCov<=0)>0){
+    if(min(bwCov)<=0){
       stop("bandwidth must be positive")
     }
   }
@@ -64,20 +68,20 @@ LFRCovCholesky <- function(x, M, xout, optns=list()){
     kernel= 'gauss'
   } else {
     kernel = optns$kernel
-  }
+  } 
 
   if(is.null(optns$corrOut)){
     corrOut = FALSE
   } else {
     corrOut = optns$corrOut
   }
-
+  
   if(is.null(optns$metric)){
     metric = 'log_cholesky'
   } else {
     metric =  optns$metric
   }
-
+  
   p = ncol(x)
   if(p>2){
     stop("The number of dimensions of the predictor x must be at most 2")
@@ -85,7 +89,7 @@ LFRCovCholesky <- function(x, M, xout, optns=list()){
   m = nrow(xout)
   n = nrow(x)
 
-
+   
   Kern=kerFctn(kernel)
   K = function(x,h){
     k = 1
@@ -97,18 +101,26 @@ LFRCovCholesky <- function(x, M, xout, optns=list()){
   if(is.null(M)){
     stop("M must be provided")
   }
-  if(is.array(M)){
-    M <- lapply(1:dim(M)[3], function(i) M[,,i])
+  
+  if(class(M) == 'array'){
+    MM = list()
+    if(class(M) == 'array'){
+      for (i in 1:dim(M)[3]) {
+        MM[[i]] = M[,,i]
+      }
+    }
+    M = lapply(MM, function(X) (X+t(X))/2)
   }else{
-    if(!is.list(M)){
+    if(!class(M)=="list"){
       stop('M must be an array or a list')
     }
+    M = lapply(M, function(X) (X+t(X))/2)
   }
+  
   if(nrow(x)!= length(M)){
     stop("the number of rows of x must be the same as the number of covariance matrices in M")
   }
-  M = lapply(M, function(X) (X+t(X))/2)
-
+  
   computeLFRSPD=function(idx,x0,bw2){
     #idx: index for x
     #x0 m-by-p matrix,
@@ -129,7 +141,7 @@ LFRCovCholesky <- function(x, M, xout, optns=list()){
     if(s == 0){
       stop('Bandwidth too small')
     }
-
+    
     Mout = list()
     MM = M[idx]
     n = length(idx)
@@ -146,7 +158,7 @@ LFRCovCholesky <- function(x, M, xout, optns=list()){
       }
       SS = U/s + diag(exp(E/s))
       Mout = t(SS)%*%SS
-
+      
     } else {
       L = lapply(MM, chol)
       U = 0
@@ -158,7 +170,7 @@ LFRCovCholesky <- function(x, M, xout, optns=list()){
 
     return(Mout)
   }
-
+  
   distance <- function(M1, M2){
     if(metric == 'log_cholesky'){
       LL1 = chol(M1); LL2 = chol(M2)
@@ -166,23 +178,20 @@ LFRCovCholesky <- function(x, M, xout, optns=list()){
       D1 = diag(LL1); D2 = diag(LL2)
       L = L1 - L2; D = log(D1) - log(D2)
       res = sqrt(sum(sum(L^2))+sum(D^2))
-    }else{
+    }else{ 
       L1 = chol(M1); L2 = chol(M2)
       L = L1 - L2;
       res = sqrt(sum(sum(L^2)))
     }
     return(res)
   }
-
+  
   #CV for bwCov selection
   if(is.na(sum(bwCov))){
-    delta=array(0,p)
-    for(j in 1:p){
-      delta[j]=(max(x[,j])-min(x[,j]))
-    }
     if(p==1){
+      bw_choice=SetBwRange(as.vector(x), as.vector(xout), kernel)
       objF=matrix(0,nrow=20,ncol=1)
-      aux1=as.matrix(seq(delta[1]*0.2,delta[1],length.out=20))
+      aux1=as.matrix(seq(bw_choice$min,bw_choice$max,length.out=20))
       for(i in 1:20){
         for(j in 1:dim(x)[1]){
           distj = distance(computeLFRSPD(setdiff(1:dim(x)[1],j),x[j],aux1[i]), M[[j]])
@@ -193,10 +202,12 @@ LFRCovCholesky <- function(x, M, xout, optns=list()){
       bwCV=aux1[ind]
     }
     if(p==2){
+      bw_choice1=SetBwRange(as.vector(x[,1]), as.vector(xout[,1]), kernel)
+      bw_choice2=SetBwRange(as.vector(x[,2]), as.vector(xout[,2]), kernel)
       if(n<=30){
         objF=matrix(0,nrow=6,ncol=6)
-        aux1=seq(delta[1]*0.2,delta[1],length.out=6)
-        aux2=seq(delta[2]*0.2,delta[2],length.out=6)
+        aux1=seq(bw_choice1$min,bw_choice1$max,length.out=6)
+        aux2=seq(bw_choice2$min,bw_choice2$max,length.out=6)
         for(i1 in 1:6){
           for(i2 in 1:6){
             for(j in 1:dim(x)[1]){
@@ -214,8 +225,8 @@ LFRCovCholesky <- function(x, M, xout, optns=list()){
           distance(computeLFRSPD(leaveIn,x[v,],c(aux1[i1],aux2[i2])),M[[v]])
         }
         objF=matrix(0,nrow=6,ncol=6)
-        aux1=seq(delta[1]*0.2,delta[1],length.out=6)
-        aux2=seq(delta[2]*0.2,delta[2],length.out=6)
+        aux1=seq(bw_choice1$min,bw_choice1$max,length.out=6)
+        aux2=seq(bw_choice2$min,bw_choice2$max,length.out=6)
         for(i1 in 1:6){
           for(i2 in 1:6){
             for(j in 1:10){
@@ -230,12 +241,13 @@ LFRCovCholesky <- function(x, M, xout, optns=list()){
     }
     bwCov=bwCV
   }
-
+  
+  
   Mout = list()
   for (j in 1:nrow(xout)) {
     Mout[[j]] = computeLFRSPD(1:dim(x)[1], xout[j,], bwCov)
   }
-
+  
   if(corrOut){
     for(j in 1:nrow(xout)){
       D=diag(1/sqrt(diag(Mout[[j]])))

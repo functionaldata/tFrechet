@@ -83,7 +83,17 @@ LFRCovPower= function(x,y=NULL,M=NULL, xout,optns = list()){
   if(alpha<0){
     stop('alpha must be non-negative')
   }
-
+  
+  if(!is.matrix(x)&!is.vector(x)){
+    stop('x must be a matrix or vector')
+  }
+  if(is.vector(x)){
+    x<- matrix(x,length(x))
+  }
+  if(is.vector(xout)){
+    xout<- matrix(xout,length(xout))
+  }
+  
   if(!is.matrix(x)){
     stop('x must be a matrix')
   }
@@ -136,25 +146,25 @@ LFRCovPower= function(x,y=NULL,M=NULL, xout,optns = list()){
     if(alpha>0){
       for(i in 1:length(idx)){
         P=eigen(M[,,idx[i]])$vectors
-        Lambd_alpha=diag(eigen(M[,,idx[i]])$values**alpha)
+        Lambd_alpha=diag(pmax(0,eigen(M[,,idx[i]])$values)**alpha)
         M_alpha=P%*%Lambd_alpha%*%t(P)
         M_hat[,,1]=M_hat[,,1]+sL[i]*M_alpha/s
       }
       M_hat[,,1]=as.matrix(Matrix::nearPD(M_hat[,,1],corr = FALSE)$mat)
       P=eigen(M_hat[,,1])$vectors
-      Lambd_alpha=diag(eigen(M_hat[,,1])$values**(1/alpha))
+      Lambd_alpha=diag(pmax(0,eigen(M_hat[,,1])$values)**(1/alpha))
       M_hat[,,1]=P%*%Lambd_alpha%*%t(P)
       M_hat[,,1]=as.matrix(Matrix::forceSymmetric(M_hat[,,1]))
     } else{
       for(i in 1:length(idx)){
         P=eigen(M[,,idx[i]])$vectors
-        Lambd_alpha=diag(log(eigen(M[,,idx[i]])$values))
+        Lambd_alpha=diag(log(pmax(1e-30,eigen(M[,,idx[i]])$values)))
         M_alpha=P%*%Lambd_alpha%*%t(P)
         M_hat[,,1]=M_hat[,,1]+sL[i]*M_alpha/s
       }
       M_hat[,,1]=as.matrix(Matrix::nearPD(M_hat[,,1],corr = FALSE)$mat)
       P=eigen(M_hat[,,1])$vectors
-      Lambd_alpha=diag(exp(eigen(M_hat[,,1])$values))
+      Lambd_alpha=diag(exp(pmax(0,eigen(M_hat[,,1])$values)))
       M_hat[,,1]=P%*%Lambd_alpha%*%t(P)
       M_hat[,,1]=as.matrix(Matrix::forceSymmetric(M_hat[,,1]))
     }
@@ -198,13 +208,10 @@ LFRCovPower= function(x,y=NULL,M=NULL, xout,optns = list()){
 
     #CV for bw selection
     if(is.na(sum(bw))){
-      delta=array(0,p)
-      for(j in 1:p){
-        delta[j]=(max(x[,j])-min(x[,j]))
-      }
       if(p==1){
+        bw_choice=SetBwRange(as.vector(x), as.vector(xout), kernel)
         objF=matrix(0,nrow=20,ncol=1)
-        aux1=as.matrix(seq(delta[1]*0.2,delta[1],length.out=20))
+        aux1=as.matrix(seq(bw_choice$min,bw_choice$max,length.out=20))
         for(i in 1:20){
           for(j in 1:dim(x)[1]){
             aux=computeLFR_originalSpace(setdiff(1:dim(x)[1],j),x[j],aux1[i])-M[,,j]
@@ -215,10 +222,12 @@ LFRCovPower= function(x,y=NULL,M=NULL, xout,optns = list()){
         bwCV=aux1[ind]
       }
       if(p==2){
+        bw_choice1=SetBwRange(as.vector(x[,1]), as.vector(xout[,1]), kernel)
+        bw_choice2=SetBwRange(as.vector(x[,2]), as.vector(xout[,2]), kernel)
         if(n<=30){
           objF=matrix(0,nrow=6,ncol=6)
-          aux1=seq(delta[1]*0.2,delta[1],length.out=6)
-          aux2=seq(delta[2]*0.2,delta[2],length.out=6)
+          aux1=seq(bw_choice1$min,bw_choice1$max,length.out=6)
+          aux2=seq(bw_choice2$min,bw_choice2$max,length.out=6)
           for(i1 in 1:6){
             for(i2 in 1:6){
               for(j in 1:dim(x)[1]){
@@ -237,8 +246,8 @@ LFRCovPower= function(x,y=NULL,M=NULL, xout,optns = list()){
             sum(diag(aux%*%t(aux)))
           }
           objF=matrix(0,nrow=6,ncol=6)
-          aux1=seq(delta[1]*0.2,delta[1],length.out=6)
-          aux2=seq(delta[2]*0.2,delta[2],length.out=6)
+          aux1=seq(bw_choice1$min,bw_choice1$max,length.out=6)
+          aux2=seq(bw_choice2$min,bw_choice2$max,length.out=6)
           for(i1 in 1:6){
             for(i2 in 1:6){
               for(j in 1:10){

@@ -1,6 +1,7 @@
 require(testthat)
 
 test_that('error: x and xout must have same number of columns', {
+  set.seed(1234321)
   n=200             # sample size
   t=seq(0,1,length.out=100)       # length of data
   x = cbind(rnorm(n),rnorm(n))
@@ -18,6 +19,7 @@ test_that('error: x and xout must have same number of columns', {
 })
 
 test_that('error: x and xout must have same number of columns', {
+  set.seed(1234321)
   n=200             # sample size
   t=seq(0,1,length.out=100)       # length of data
   x = cbind(rnorm(n),rnorm(n))
@@ -35,6 +37,7 @@ test_that('error: x and xout must have same number of columns', {
 })
 
 test_that('error: x and xout must have same number of columns', {
+  set.seed(1234321)
   #Example M input
   n=30 #sample size
   m=30 #dimension of covariance matrices
@@ -51,6 +54,7 @@ test_that('error: x and xout must have same number of columns', {
 
 
 test_that('error: the number of rows of x must be the same as the number of covariance matrices in M', {
+  set.seed(1234321)
   n=30 #sample size
   m=30 #dimension of covariance matrices
   M <- array(0,c(m,m,n+1))
@@ -65,6 +69,7 @@ test_that('error: the number of rows of x must be the same as the number of cova
 })
 
 test_that('error: the number of rows of x must be the same as the number of covariance matrices in M', {
+  set.seed(1234321)
   n=30 #sample size
   m=30 #dimension of covariance matrices
   M <- array(0,c(m,m,n+1))
@@ -79,6 +84,7 @@ test_that('error: the number of rows of x must be the same as the number of cova
 })
 
 test_that('Check correlation matrix output in the case p=2 with cross validation', {
+  set.seed(1234321)
   n=30 #sample size
   m=30 #dimension of covariance matrices
   M <- array(0,c(m,m,n))
@@ -94,6 +100,7 @@ test_that('Check correlation matrix output in the case p=2 with cross validation
 })
 
 test_that('Check correlation matrix output in the case p=2 with cross validation', {
+  set.seed(1234321)
   n=30 #sample size
   m=15 #dimension of covariance matrices
   M <- array(0,c(m,m,n))
@@ -108,7 +115,8 @@ test_that('Check correlation matrix output in the case p=2 with cross validation
   expect_equal(sum(diag(aux[[1]])),m)
 })
 
-test_that('Check case y as input works', {
+test_that('Check case y as input works power case', {
+  set.seed(1234321)
   n=200             # sample size
   t=seq(0,1,length.out=100)       # length of data
   x = matrix(runif(n),n)
@@ -126,7 +134,8 @@ test_that('Check case y as input works', {
   expect_equal(length(Cov_est$Mout),3)
 })
 
-test_that('Check case y as input works', {
+test_that('Check case y as input works frobenius', {
+  set.seed(1234321)
   n=200             # sample size
   t=seq(0,1,length.out=100)       # length of data
   x = matrix(runif(n),n)
@@ -145,6 +154,7 @@ test_that('Check case y as input works', {
 })
 
 test_that('Check case M as input works', {
+  set.seed(1234321)
   n=30 #sample size
   m=15 #dimension of covariance matrices
   M <- array(0,c(m,m,n))
@@ -204,4 +214,39 @@ test_that('Check Local Regression Simulated Setting Works (accurate estimate to 
     flag=0
   }
   expect_equal(flag,1)
+})
+
+test_that('Check case y as input works fractional power', {
+  set.seed(1234321)
+  n=200             # sample size
+  t=seq(0,1,length.out=100)       # length of data
+  x = matrix(runif(n),n)
+  theta1 = theta2 = array(0,n)
+  for(i in 1:n){
+    theta1[i] = rnorm(1,x[i],x[i]^2)
+    theta2[i] = rnorm(1,x[i]/2,(1-x[i])^2)
+  }
+  y = matrix(0,n,length(t))
+  phi1 = sqrt(3)*t
+  phi2 = sqrt(6/5)*(1-t/2)
+  y = theta1%*%t(phi1) + theta2 %*% t(phi2)
+  xout = matrix(c(0.25,0.5,0.75),3)
+  Cov_est=LocCovReg(x=x,y=y,xout=xout,optns=list(corrOut=FALSE,metric="power",alpha=1/2))
+  expect_equal(length(Cov_est$Mout),3)
+})
+
+test_that('Check case M as input works with fractional power', {
+  set.seed(1234321)
+  n=30 #sample size
+  m=15 #dimension of covariance matrices
+  M <- array(0,c(m,m,n))
+  for (i in 1:n){
+    y0=rnorm(m)
+    aux<-15*diag(m)+y0%*%t(y0)
+    M[,,i]<-aux
+  }
+  x=matrix(rnorm(n),n)
+  xout = matrix(c(0.25,0.5,0.75),3) #output predictor levels
+  Cov_est=LocCovReg(x=x,M=M,xout=xout,optns=list(corrOut=FALSE,metric="power",alpha=1/2))
+  expect_equal(length(Cov_est$Mout),3)
 })

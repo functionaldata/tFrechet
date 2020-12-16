@@ -7,19 +7,21 @@
 DenFMean(yin = NULL, hin = NULL, qin = NULL, optns = list())
 }
 \arguments{
-\item{yin}{A matrix or list holding the sample of observations of the response. If \code{yin} is a matrix, each row holds the observations of the response corresponding to a row in \code{xin}.}
+\item{yin}{A matrix or list holding the sample of measurements for the observed distributions. If \code{yin} is a matrix, each row holds the measurements for one distribution.}
 
-\item{hin}{A list holding the histograms of the response corresponding to each row in \code{xin}.}
+\item{hin}{A list holding the histograms of an observed distribution.}
 
-\item{qin}{A matrix or list holding the quantile functions of the response. If \code{qin} is a matrix, each row holds the quantile function of the response taking values on \code{optns$qSup} corresponding to a row in \code{xin}.}
+\item{qin}{A matrix or list holding the quantile functions of the response. If \code{qin} is a matrix, each row holds the quantile function of an observed distribution taking values on \code{optns$qSup}.
+Note that only one of the three \code{yin}, \code{hin}, and \code{qin} needs to be input.
+If more than one of them are specified, \code{yin} overwrites \code{hin}, and \code{hin} overwrites \code{qin}.}
 
 \item{optns}{A list of options control parameters specified by \code{list(name=value)}.}
 }
 \value{
 A list containing the following components:
-\item{dout}{A matrix or list holding the output densities corresponding to \code{xout}. If \code{dout} is a matrix, each row gives a density and the domain grid is given in \code{dSup}. If \code{dout} is a list, each element is a list of two components, \code{x} and \code{y}, giving the domain grid and density function values, respectively.}
+\item{dout}{A numeric vector holding the density of the Fréchet mean.}
 \item{dSup}{A numeric vector giving the domain grid of \code{dout} when it is a matrix.}
-\item{qout}{A matrix holding the quantile functions of the output densities. Each row corresponds to a value in \code{xout}.}
+\item{qout}{A numeric vector holding the quantile function of the Fréchet mean.}
 \item{qSup}{A numeric vector giving the domain grid of \code{qout}.}
 \item{optns}{A list of control options used.}
 }
@@ -27,7 +29,10 @@ A list containing the following components:
 Obtain Fréchet means of densities with respect to \eqn{L^2}-Wasserstein distance.
 }
 \details{
-Available control options are \code{qSup}, \code{nqSup}, \code{lower}, \code{upper}, \code{bwDen}, \code{nRegGrid}, \code{delta}, \code{kernelDen}, \code{infSupport}, \code{outputGrid}. See \code{\link{LocDenReg}} for details.
+Available control options are \code{qSup}, \code{nqSup}, 
+\code{bwDen}, \code{ndSup}, \code{dSup}, \code{delta}, 
+\code{kernelDen}, \code{infSupport}, and \code{denLowerThreshold}. 
+See \code{\link{LocDenReg}} for details.
 }
 \examples{
 xin = seq(0,1,0.05)

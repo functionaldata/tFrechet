@@ -1,6 +1,6 @@
 library(testthat)
 
-test_that("Works with fully observed distributions", {
+test_that("Works with fully observed distributions; p=1", {
   set.seed(1)
   xin <- seq(0,1,0.01)
   qSup <- qbeta((1:99)/100,1/2,1/2)
@@ -9,13 +9,15 @@ test_that("Works with fully observed distributions", {
     qnorm(c(1e-6,qSup,1-1e-6), x, sd)
   }))
   xout <- xin
-  res <- LocDenReg(xin=xin, qin=qin, xout=xout, optns = list(qSup = c(0,qSup,1)))
+  res <- LocDenReg(xin=xin, qin=qin, xout=xout,
+                   optns = list(qSup = c(0,qSup,1)))
+                   #optns = list(bwReg = 0.02, qSup = c(0,qSup,1)))
   qtrue <- t(sapply(xin, function(x) qnorm(qSup, mean = x, sd = sd)))
   expect_true(mean(sqrt(apply((qtrue - res$qout[,-c(1,length(res$qSup))])^2,
                               1, pracma::trapz, x = qSup))) / mean(qin) < 1e-4)
 })
 
-test_that("Works with discrete noisy measurements", {
+test_that("Works with discrete noisy measurements; p=1", {
   set.seed(1)
   xin <- seq(0,1,0.01)
   sd <- 0.1
@@ -24,13 +26,15 @@ test_that("Works with discrete noisy measurements", {
   })
   xout <- xin
   qSup <- qbeta((1:99)/100,1/2,1/2)
-  res <- LocDenReg(xin=xin, yin=yin, xout=xout, optns = list(qSup = c(0,qSup,1)))
+  res <- LocDenReg(xin=xin, yin=yin, xout=xout,
+                   optns = list(qSup = c(0,qSup,1)))
+                   #optns = list(bwReg = 0.05, qSup = c(0,qSup,1)))
   qtrue <- t(sapply(xin, function(x) qnorm(qSup, mean = x, sd = sd)))
   expect_true(mean(sqrt(apply((qtrue - res$qout[,-c(1,length(res$qSup))])^2,
                               1, pracma::trapz, x = qSup))) / mean(unlist(yin)) < 2e-2)
 })
 
-test_that("Works with specifying outputGrid", {
+test_that("Works with specifying outputGrid; p=1", {
   set.seed(1)
   xin <- seq(0,1,0.01)
   yin <- lapply(xin, function(x) {
@@ -38,12 +42,14 @@ test_that("Works with specifying outputGrid", {
   })
   xout <- xin
   dSup <- seq(-0.5,1.5,0.01)
-  res <- LocDenReg(xin=xin, yin=yin, xout=xout, optns=list(outputGrid = dSup))
+  res <- LocDenReg(xin=xin, yin=yin, xout=xout,
+                   optns=list(outputGrid = dSup))
+                   #optns=list(bwReg = 0.02, outputGrid = dSup))
   expect_true("dSup" %in% names(res))
   expect_equal(sum(abs(res$dSup - dSup)), 0)
 })
 
-test_that("Generates warnings when more than one of the three, yin, hin, and qin, are specified and priority order is yin, hin, qin.", {
+test_that("Generates warnings when more than one of the three, yin, hin, and qin, are specified and priority order is yin, hin, qin.; p=1", {
   set.seed(1)
   xin <- seq(0,1,0.01)
   yin <- lapply(xin, function(x) {
@@ -61,4 +67,38 @@ test_that("Generates warnings when more than one of the three, yin, hin, and qin
   expect_equal(sum(abs(res_y$qin - res_yh$qin)),0)
   expect_equal(sum(abs(res_y$qin - res_yq$qin)),0)
   expect_equal(sum(abs(res_h$qin - res_hq$qin)),0)
+})
+
+test_that("Works with fully observed distributions and providing bandwidth; p=2", {
+  set.seed(1)
+  xin <- cbind(runif(200),runif(200))
+  qSup <- qbeta((1:99)/100,1/2,1/2)
+  sd <- 0.1
+  qin=matrix(0,nrow=nrow(xin),ncol=(length(qSup)+2))
+  qtrue=matrix(0,nrow=nrow(xin),ncol=(length(qSup)))
+  for(i in 1:nrow(xin)){
+    qin[i,]=qnorm(c(1e-6,qSup,1-1e-6), mean=xin[i,1]^2+xin[i,2], sd=sd)
+    qtrue[i,]=qnorm(qSup, mean=xin[i,1]^2+xin[i,2], sd=sd)
+  }
+  xout <- xin
+  res <- LocDenReg(xin=xin, qin=qin, xout=xout, optns = list(qSup = c(0,qSup,1)))
+  expect_true(mean(sqrt(apply((qtrue - res$qout[,-c(1,length(res$qSup))])^2,
+                              1, pracma::trapz, x = qSup))) / mean(qin) < 1e-4)
+})
+
+test_that("Works with fully observed distributions; p=2", {
+  set.seed(1)
+  xin <- cbind(runif(200),runif(200))
+  qSup <- qbeta((1:99)/100,1/2,1/2)
+  sd <- 0.1
+  qin=matrix(0,nrow=nrow(xin),ncol=(length(qSup)+2))
+  qtrue=matrix(0,nrow=nrow(xin),ncol=(length(qSup)))
+  for(i in 1:nrow(xin)){
+    qin[i,]=qnorm(c(1e-6,qSup,1-1e-6), mean=xin[i,1]^2+xin[i,2], sd=sd)
+    qtrue[i,]=qnorm(qSup, mean=xin[i,1]^2+xin[i,2], sd=sd)
+  }
+  xout <- xin
+  res <- LocDenReg(xin=xin, qin=qin, xout=xout, optns = list(qSup = c(0,qSup,1),bwReg=c(0.05,0.05)))
+  expect_true(mean(sqrt(apply((qtrue - res$qout[,-c(1,length(res$qSup))])^2,
+                              1, pracma::trapz, x = qSup))) / mean(qin) < 1e-2)
 })

@@ -128,7 +128,11 @@ plot.denReg <- function(x, obj = NULL, prob = NULL,
       if (is.null(ylim)) ylim <- range(plotObj)
       if (is.null(xlim)) xlim <- range(plotGrid)
 
+      if (is.vector(plotObj)) {
+        plotObj <- matrix(plotObj, nrow = 1)
+      }
       n <- nrow(plotObj)
+      
       if (n == 1) {
         colPalette <- function(num) rep("black",num)
       } else {
