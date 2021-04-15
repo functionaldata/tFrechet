@@ -82,7 +82,7 @@ test_that('Check Global Regression Simulated Setting Works (accurate estimate to
     M[,,i]<-diag((2+x[i,])^(1/3))
   }
   Fmean=CovFMean(M=M,optns=list(metric="power",alpha=3))
-  
+
   aux1=sum(abs(Fmean$Mout[[1]]-diag(c(2,2)^(1/3))))
   if(aux1<=0.01){
     flag=1
@@ -101,7 +101,7 @@ test_that('Check Global Regression Simulated Setting Works (accurate estimate to
   for (i in 1:n){
     M[,,i]<- diag(exp(x[i,]))
   }
-  
+
   xout=cbind(0,0)
   M0 = diag(exp(as.vector(xout)))
   Fmean=CovFMean(M=M,optns=list(metric="log_cholesky"))
@@ -135,4 +135,101 @@ test_that('Check Global Regression Simulated Setting Works (accurate estimate to
     flag=0
   }
   expect_equal(flag,1)
+})
+
+
+
+
+test_that('Check unweighted Frobenius case works', {
+  set.seed(1234321)
+  n=5000 #sample size
+  m=2 # dimension of covariance matrices
+  M <- array(0,c(m,m,n))
+  x<- cbind(runif(n,min=-1,max=1),runif(n,min=-1,max=1))
+  for (i in 1:n){
+    M[,,i]<-diag((2+x[i,]))
+  }
+  weightsF=rep(1/n,n)
+  Fmean=CovFMean(M=M,optns=list(metric="frobenius",weights=weightsF))
+  cont=matrix(0,nrow=m,ncol=m)
+  for(i in 1:n){
+    cont=cont+M[,,i]
+  }
+  cont=cont/n
+  expect_true(sum(abs(cont-Fmean$Mout[[1]]))<1e-8)
+})
+
+test_that('Check weighted Frobenius case works', {
+  set.seed(1234321)
+  n=5000 #sample size
+  m=2 # dimension of covariance matrices
+  M <- array(0,c(m,m,n))
+  x<- cbind(runif(n,min=-1,max=1),runif(n,min=-1,max=1))
+  for (i in 1:n){
+    M[,,i]<-diag((2+x[i,]))
+  }
+  weightsF=n:1
+  weightsF=weightsF/sum(weightsF)
+  Fmean=CovFMean(M=M,optns=list(metric="frobenius",weights=weightsF))
+  cont=matrix(0,nrow=m,ncol=m)
+  for(i in 1:n){
+    cont=cont+M[,,i]*weightsF[i]
+  }
+  expect_true(sum(abs(cont-Fmean$Mout[[1]]))<1e-5)
+})
+
+test_that('Check weighted Frobenius using power input case works', {
+  set.seed(1234321)
+  n=5000 #sample size
+  m=2 # dimension of covariance matrices
+  M <- array(0,c(m,m,n))
+  x<- cbind(runif(n,min=-1,max=1),runif(n,min=-1,max=1))
+  for (i in 1:n){
+    M[,,i]<-diag((2+x[i,]))
+  }
+  weightsF=n:1
+  weightsF=weightsF/sum(weightsF)
+  Fmean=CovFMean(M=M,optns=list(metric="power",alpha=1,weights=weightsF))
+  cont=matrix(0,nrow=m,ncol=m)
+  for(i in 1:n){
+    cont=cont+M[,,i]*weightsF[i]
+  }
+  expect_true(sum(abs(cont-Fmean$Mout[[1]]))<1e-5)
+})
+
+test_that('Check weighted general power input case works', {
+  set.seed(1234321)
+  n=500 #sample size
+  m=2 # dimension of covariance matrices
+  M <- array(0,c(m,m,n))
+  x<- cbind(runif(n,min=-1,max=1),runif(n,min=-1,max=1))
+  for (i in 1:n){
+    M[,,i]<-diag((2+x[i,]))
+  }
+  idx=1:n%%2
+  weightsF=idx/sum(idx)
+  Fmean=CovFMean(M=M,optns=list(metric="power",alpha=2,weights=weightsF))
+  cont=matrix(0,nrow=m,ncol=m)
+  for(i in 1:n){
+    cont=cont+(M[,,i]%*%M[,,i])*weightsF[i]
+  }
+  expect_true(sum(abs(sqrt(cont)-Fmean$Mout[[1]]))<1e-4)
+})
+
+test_that('Check unweighted Frobenius using power input case works', {
+  set.seed(1234321)
+  n=5000 #sample size
+  m=2 # dimension of covariance matrices
+  M <- array(0,c(m,m,n))
+  x<- cbind(runif(n,min=-1,max=1),runif(n,min=-1,max=1))
+  for (i in 1:n){
+    M[,,i]<-diag((2+x[i,]))
+  }
+  weightsF=rep(1/n,n)
+  Fmean=CovFMean(M=M,optns=list(metric="power",alpha=1,weights=weightsF))
+  cont=matrix(0,nrow=m,ncol=m)
+  for(i in 1:n){
+    cont=cont+M[,,i]*weightsF[i]
+  }
+  expect_true(sum(abs(cont-Fmean$Mout[[1]]))<1e-5)
 })

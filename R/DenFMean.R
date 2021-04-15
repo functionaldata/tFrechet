@@ -10,6 +10,9 @@
 #' \code{bwDen}, \code{ndSup}, \code{dSup}, \code{delta}, 
 #' \code{kernelDen}, \code{infSupport}, and \code{denLowerThreshold}. 
 #' See \code{\link{LocDenReg}} for details.
+#' \describe{
+#' \item{weights}{A vector of weights to compute the weighted barycenter. The length of \code{weights} is equal to the sample size. Default is equal weights.}
+#' }
 #' @return A list containing the following components:
 #' \item{dout}{A numeric vector holding the density of the Fréchet mean.}
 #' \item{dSup}{A numeric vector giving the domain grid of \code{dout} when it is a matrix.}
@@ -44,7 +47,28 @@ DenFMean <- function(yin=NULL, hin=NULL, qin=NULL, optns=list()) {
       }
     }
   }
-  res <- GloDenReg(xin = xin, yin = yin, hin = hin, qin = qin, optns = optns)
+  if(!is.null(optns$weights)){
+    if(!is.vector(optns$weights)){
+      stop("weights should be a vector")
+    }
+    if(length(xin)!=length(optns$weights)){
+      stop("The length of weights cannot differ from the sample size")
+    }
+    if(sum(optns$weights<0)>0){
+      stop("weights must be non-negative")
+    }
+    if(abs(sum(optns$weights)-1)>1e-15){
+      stop("weights must sum to 1")
+    }
+    if(sum(abs(optns$weights-1/length(xin)))==0){
+      #Case of equal weights requires different call to GloDenReg function
+      res <- GloDenReg(xin = xin, yin = yin, hin = hin, qin = qin, optns = optns)
+    }else{
+      res <- GloDenReg(xin = optns$weights, yin = yin, hin = hin, qin = qin,xout=sum(optns$weights^2), optns = optns)
+    }
+  }else{
+    res <- GloDenReg(xin = xin, yin = yin, hin = hin, qin = qin, optns = optns)
+  }
   if (!is.vector(res$qout)) {
     res$qout <- as.vector(res$qout)
   }
