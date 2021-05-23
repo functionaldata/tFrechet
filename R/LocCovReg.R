@@ -66,8 +66,8 @@ LocCovReg= function(x,y=NULL,M=NULL,xout,optns = list()){
   if(!metric %in% c("frobenius","power","cholesky","log_cholesky")){
     stop("metric choice not supported.")
   }
-  if(metric=="frobenius") {
-    res <- LFRCov(x=x, y=y,M=M,xout=xout,optns = optns)
+  if(metric=="frobenius") { #Faster implementation using LFRCov instead of LFRCovPower for Frobenius case
+    res <- LFRCov(x=x, y=y,M=M,xout=xout,optns = optns) 
   } else if(metric=="power") {
     res <- LFRCovPower(x=x, y=y,M=M,xout=xout,optns = optns)
   } else{

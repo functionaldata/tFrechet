@@ -33,6 +33,9 @@ Available control options are \code{qSup}, \code{nqSup},
 \code{bwDen}, \code{ndSup}, \code{dSup}, \code{delta}, 
 \code{kernelDen}, \code{infSupport}, and \code{denLowerThreshold}. 
 See \code{\link{LocDenReg}} for details.
+\describe{
+\item{weights}{A vector of weights to compute the weighted barycenter. The length of \code{weights} is equal to the sample size. Default is equal weights.}
+}
 }
 \examples{
 xin = seq(0,1,0.05)
