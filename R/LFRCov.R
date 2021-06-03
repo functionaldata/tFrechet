@@ -186,7 +186,7 @@ LFRCov  = function(x, y=NULL,M=NULL, xout,optns = list()){
       if(sum(is.na(objF))==dim(objF)[1]*dim(objF)[2]){
         stop("Bandwidth too small in cross-validation search")
       }else{
-        ind=which(objF==min(objF))[1]
+        ind=which(objF==min(objF,na.rm=TRUE))[1]
         bwCV=aux1[ind]
       }
     }
@@ -212,7 +212,7 @@ LFRCov  = function(x, y=NULL,M=NULL, xout,optns = list()){
       if(sum(is.na(objF))==dim(objF)[1]*dim(objF)[2]){
         stop("Bandwidth too small in cross-validation search")
       }else{
-        ind=which(objF==min(objF),arr.ind = TRUE)
+        ind=which(objF==min(objF,na.rm=TRUE),arr.ind = TRUE)
         bwCV=c(aux1[ind[1]],aux2[ind[2]])
       }
     }
