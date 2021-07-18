@@ -3,10 +3,14 @@
 #'@param x an n by p matrix of predictors.
 #'@param y a list (length n) of $m$ by $m$ correlation matrix.
 #'@param xOut an nOut by p matrix of output predictor levels.
-#'@param metric choice of metric. 'frobenius' and 'power' are supported, corresponding to Frobenius metric and Euclidean power metric, repectively.
-#'@param alpha the power for Euclidean power metric.
-#'@param digits the integer indicating the number of decimal places (round) to be kept in the output. 
-#'@return A \code{corReg} object --- a list containing the follwoing fields:
+#'@param optns A list of options control parameters specified by \code{list(name=value)}. See `Details'.
+#'@details Available control options are
+#'\describe{
+#'\item{metric}{choice of metric. 'frobenius' and 'power' are supported, which corresponds to Frobenius metric and Euclidean power metric, repectively. Default is Frobenius metric}
+#'\item{alpha}{the power for Euclidean power metric. Default is $1$ which corresponds to Frobenius metric.}
+#'\item{digits}{the integer indicating the number of decimal places (round) to be kept in the output. Default is NULL, which means no round operation.}
+#'}
+#'@return A \code{corReg} object --- a list containing the follwing fields:
 #'\item{fit}{a list of estimated correlation matrices at \code{x}.}
 #'\item{predict}{a list of estimated correlation matrices at \code{xOut}. Included if \code{xOut} is not \code{NULL}.}
 #'\item{RSquare}{Fr\'{e}chet coefficient of determination.}
@@ -15,8 +19,7 @@
 #'\item{y}{the response used.}
 #'\item{x}{the predictor used.}
 #'\item{xOut}{the output predictor level used.}
-#'\item{metric}{the metric used.}
-#'\item{alpha}{the power used.}
+#'\item{optns}{the control options used.}
 #'@examples
 #'Generate simulation data
 #'n <- 100
@@ -33,16 +36,39 @@
 #'  diag(y[[i]]) <- 1
 #'}
 #'Frobenius metric
-#'fit1 <- GloCorReg(x, y, xOut, metric = 'frobenius', digits = 5)
+#'fit1 <- GloCorReg(x, y, xOut, 
+#'                  optns = list(metric = 'frobenius', digits = 5))
 #'Euclidean power metric
-#'fit2 <- GloCorReg(x, y, xOut, metric = 'power', alpha = .5, digits = 5)
+#'fit2 <- GloCorReg(x, y, xOut, 
+#'                  optns = list(metric = 'power', alpha = .5))
 #'@references
 #'\itemize{
 #'\item \cite{Petersen, A. and Müller, H.-G. (2019). Fréchet regression for random objects with Euclidean predictors. The Annals of Statistics, 47(2), 691--719.}
 #'}
 #'@export
 
-GloCorReg <- function(x, y, xOut = NULL, metric = 'frobenius', alpha = .5, digits = 2){
+GloCorReg <- function(x, y, xOut = NULL, optns = list()){
+  if(is.null(optns$metric)){
+    metric <- "frobenius"
+  } else {
+    metric <- optns$metric
+  }
+  if(!(metric %in% c("frobenius", "power"))){
+    stop("metric choice not supported.")
+  }
+  if(is.null(optns$alpha)){
+    alpha <- 1
+  } else{
+    alpha <- optns$alpha
+  }
+  if(alpha<0){
+    stop('alpha must be non-negative')
+  }
+  if(is.null(optns$digits)){
+    digits <- NA
+  } else {
+    digits <- optns$digits
+  }
   if(!is.matrix(x)){
     if(is.data.frame(x) | is.vector(x)) x <- as.matrix(x)
     else stop('x must be a matrix or a data frame')
@@ -56,6 +82,12 @@ GloCorReg <- function(x, y, xOut = NULL, metric = 'frobenius', alpha = .5, digit
   }
   else{
     nOut <- 0
+  }
+  if(ncol(x) != ncol(xOut)){
+    stop('x and xout must have the same number of columns')
+  }
+  if(nrow(x) != length(y)){
+    stop('x and y must have the same number of observations')
   }
   n <- nrow(x)# number of observations
   p <- ncol(x)# number of covariates
@@ -83,7 +115,7 @@ GloCorReg <- function(x, y, xOut = NULL, metric = 'frobenius', alpha = .5, digit
       qNew <- apply(yVec, 2, weighted.mean, w)# m^2
       temp <- as.matrix(Matrix::nearPD(matrix(qNew, ncol = m), corr = TRUE, maxit = 1000)$mat)
       temp <- (temp+t(temp))/2# symmetrize
-      temp <- round(temp, digits = digits)# round
+      if(!is.na(digits)) temp <- round(temp, digits = digits)# round
       fit[[i]] <- temp
       residuals[i] <- sqrt(sum((y[[i]]-temp)^2))
     }
@@ -97,13 +129,13 @@ GloCorReg <- function(x, y, xOut = NULL, metric = 'frobenius', alpha = .5, digit
         qNew <- apply(yVec, 2, weighted.mean, w)# m^2
         temp <- as.matrix(Matrix::nearPD(matrix(qNew, ncol = m), corr = TRUE, maxit = 1000)$mat)
         temp <- (temp+t(temp))/2# symmetrize
-        temp <- round(temp, digits = digits)# round
+        if(!is.na(digits)) temp <- round(temp, digits = digits)# round
         predict[[i]] <- temp
       }
-      rst <- list(fit = fit, predict = predict, RSquare = RSquare, AdjRSquare = AdjRSquare, residuals = residuals, y = y, x = x, xOut = xOut, metric = metric)
+      rst <- list(fit = fit, predict = predict, RSquare = RSquare, AdjRSquare = AdjRSquare, residuals = residuals, y = y, x = x, xOut = xOut, optns = optns)
     }
     else{
-      rst <- list(fit = fit, RSquare = RSquare, AdjRSquare = AdjRSquare, residuals = residuals, y = y, x = x, metric = metric)
+      rst <- list(fit = fit, RSquare = RSquare, AdjRSquare = AdjRSquare, residuals = residuals, y = y, x = x, optns = optns)
     }
   }
   else if(substr(metric, 1, 1)=="p"){
@@ -116,7 +148,7 @@ GloCorReg <- function(x, y, xOut = NULL, metric = 'frobenius', alpha = .5, digit
       qNew <- as.vector(U%*%diag(Lambda^(1/alpha))%*%t(U))# inverse power
       temp <- as.matrix(Matrix::nearPD(matrix(qNew, ncol = m), corr = TRUE, maxit = 1000)$mat)
       temp <- (temp+t(temp))/2# symmetrize
-      temp <- round(temp, digits = digits)# round
+      if(!is.na(digits)) temp <- round(temp, digits = digits)# round
       fit[[i]] <- temp
       residuals[i] <- sqrt(sum((y[[i]]-temp)^2))
     }
@@ -134,13 +166,13 @@ GloCorReg <- function(x, y, xOut = NULL, metric = 'frobenius', alpha = .5, digit
         qNew <- as.vector(U%*%diag(Lambda^(1/alpha))%*%t(U))# inverse power
         temp <- as.matrix(Matrix::nearPD(matrix(qNew, ncol = m), corr = TRUE, maxit = 1000)$mat)
         temp <- (temp+t(temp))/2# symmetrize
-        temp <- round(temp, digits = digits)# round
+        if(!is.na(digits)) temp <- round(temp, digits = digits)# round
         predict[[i]] <- temp
       }
-      rst <- list(fit = fit, predict = predict, RSquare = RSquare, AdjRSquare = AdjRSquare, residuals = residuals, y = y, x = x, xOut = xOut, metric = metric, alpha = alpha)
+      rst <- list(fit = fit, predict = predict, RSquare = RSquare, AdjRSquare = AdjRSquare, residuals = residuals, y = y, x = x, xOut = xOut, optns = optns)
     }
     else{
-      rst <- list(fit = fit, RSquare = RSquare, AdjRSquare = AdjRSquare, residuals = residuals, y = y, x = x, metric = metric, alpha = alpha)
+      rst <- list(fit = fit, RSquare = RSquare, AdjRSquare = AdjRSquare, residuals = residuals, y = y, x = x, optns = optns)
     }
   }
   class(rst) <- 'corReg'
