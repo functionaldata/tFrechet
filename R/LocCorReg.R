@@ -21,7 +21,7 @@
 #'\item{xOut}{the output predictor level used.}
 #'\item{optns}{the control options used.}
 #'@examples
-#'Generate simulation data
+#'# Generate simulation data
 #'n <- 100
 #'m <- 10
 #'d <- m*(m-1)/2
@@ -35,10 +35,10 @@
 #'  y[[i]] <- y[[i]] + t(y[[i]])
 #'  diag(y[[i]]) <- 1
 #'}
-#'Frobenius metric
+#'# Frobenius metric
 #'fit1 <- LocCorReg(x, y, xOut, 
 #'                  optns = list(metric = 'frobenius', digits = 2))
-#'Euclidean power metric
+#'# Euclidean power metric
 #'fit2 <- LocCorReg(x, y, xOut, 
 #'                  optns = list(metric = 'power', alpha = .5, 
 #'                               kernel = 'epan', bw = 0.08))
