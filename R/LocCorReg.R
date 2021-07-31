@@ -1,15 +1,15 @@
-#'@title Local Fr$\'{e}$chet regression for correlation matrices
-#'@description Local Fr$\'{e}$chet regression for correlation matrices with Euclidean predictors.
+#'@title Local Fréchet regression for correlation matrices
+#'@description Local Fréchet regression for correlation matrices with Euclidean predictors.
 #'@param x an n by p matrix of predictors.
-#'@param y a list (length n) of $m$ by $m$ correlation matrix.
+#'@param y a list (length n) of \eqn{m} by \eqn{m} correlation matrix.
 #'@param xOut an nOut by p matrix of output predictor levels.
 #'@param optns A list of options control parameters specified by \code{list(name=value)}. See `Details'.
 #'@details Available control options are
 #'\describe{
-#'\item{metric}{choice of metric. 'frobenius' and 'power' are supported, which corresponds to Frobenius metric and Euclidean power metric, repectively. Default is Frobenius metric}
-#'\item{alpha}{the power for Euclidean power metric. Default is $1$ which corresponds to Frobenius metric.}
-#'\item{kernel}{choice of kernel. 'gauss', 'uniform', and 'epan' are supported, corresponding to Gaussian kernel, uniform kernel, and Epanechnikov kernel, respectively. Default is 'gauss'.}
-#'\item{bw}{bandwidth for local Fr\'{e}chet regression, if not entered it would be chosen from cross validation.}
+#'\item{metric}{choice of metric. 'frobenius' and 'power' are supported, which corresponds to Frobenius metric and Euclidean power metric, repectively. Default is Frobenius metric.}
+#'\item{alpha}{the power for Euclidean power metric. Default is 1 which corresponds to Frobenius metric.}
+#'\item{kernel}{Name of the kernel function to be chosen from 'gauss', 'rect', 'epan', 'gausvar' and 'quar'. Default is 'gauss'.}
+#'\item{bw}{bandwidth for local Fréchet regression, if not entered it would be chosen from cross validation.}
 #'\item{digits}{the integer indicating the number of decimal places (round) to be kept in the output. Default is NULL, which means no round operation.}
 #'}
 #'@return A \code{corReg} object --- a list containing the follwing fields:
@@ -55,7 +55,7 @@ LocCorReg <- function(x, y, xOut = NULL, optns = list()){
     metric <- optns$metric
   }
   if(!(metric %in% c("frobenius", "power"))){
-    stop("metric choice not supported.")
+    stop("metric choice not supported")
   }
   if(is.null(optns$kernel)){
     kernel <- 'gauss'
@@ -89,25 +89,28 @@ LocCorReg <- function(x, y, xOut = NULL, optns = list()){
       if(is.data.frame(xOut) | is.vector(xOut)) xOut <- as.matrix(xOut)
       else stop('xOut must be a matrix or a data frame')
     }
+    if(ncol(x) != ncol(xOut)){
+      stop('x and xOut must have the same number of columns')
+    }
     nOut <- nrow(xOut)# number of predictions
   }
   else{
     nOut <- 0
   }
-  if(ncol(x) != ncol(xOut)){
-    stop('x and xout must have the same number of columns')
-  }
   if(nrow(x) != length(y)){
-    stop('x and y must have the same number of observations')
+    stop('the number of rows in x must be the same as the number of correlation matrices in y')
   }
   n <- nrow(x)# number of observations
   p <- ncol(x)# number of covariates
+  if(p > 2){
+    stop('local method is designed to work in low dimensional case (p is either 1 or 2)')
+  }
   if(!is.na(sum(bw))){
     if(sum(bw<=0)>0){
       stop("bandwidth must be positive")
     }
     if(length(bw) != p){
-      stop('Dimension of bandwidth does not agree with x')
+      stop('dimension of bandwidth does not agree with x')
     }
   }
   m <- ncol(y[[1]])# dimension of the correlation matrix
@@ -121,45 +124,14 @@ LocCorReg <- function(x, y, xOut = NULL, optns = list()){
     })
     yAlphaVec <- matrix(unlist(yAlpha), ncol = m^2, byrow = TRUE)# n by m^2
   }
-  if(p > 3){
-    warning('Local method is designed to work in low dimensional case, the result might be unstable.')
-  }
   # define different kernels
-  K_Gaussian <- function(x, h){
-    x <- as.vector(x)
-    p <- length(x)
+  Kern <- kerFctn(kernel)
+  K <- function(x, h){
     k <- 1
     for(i in 1:p){
-      k <- k*1/sqrt(2*pi)*exp(-(x[i]/h[i])^2/2)/h[i]
+      k <- k*Kern(x[i]/h[i])
     }
     return(as.numeric(k))
-  }
-  K_Uniform <- function(x, h){
-    x <- as.vector(x)
-    p <- length(x)
-    k <- 1
-    for(i in 1:p){
-      k <- k*as.numeric(abs(x[i]/h[i])<=1)/2/h[i]
-    }
-    return(as.numeric(k))
-  }
-  K_Epanechnikov <- function(x, h){
-    x <- as.vector(x)
-    p <- length(x)
-    k <- 1
-    for(i in 1:p){
-      k <- k*(abs(x[i]/h[i])<=1)*3/4*(1-(x[i]/h[i])^2)/h[i]
-    }
-    return(as.numeric(k))
-  }
-  if(substr(kernel, 1, 1) == 'g'){
-    K <- K_Gaussian
-  } else if(substr(kernel, 1, 1) == 'u'){
-    K <- K_Uniform
-  } else if(substr(kernel, 1, 1) == 'e'){
-    K <- K_Epanechnikov
-  } else{
-    stop('Valid Kernels are Gaussian, Uniform and Epanechnikov')
   }
   
   # choose bandwidth by cross-validation

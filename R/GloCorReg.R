@@ -1,20 +1,20 @@
-#'@title Global Fr$\'{e}$chet regression for correlation matrices
-#'@description Global Fr$\'{e}$chet regression for correlation matrices with Euclidean predictors.
+#'@title Global Fréchet regression for correlation matrices
+#'@description Global Fréchet regression for correlation matrices with Euclidean predictors.
 #'@param x an n by p matrix of predictors.
-#'@param y a list (length n) of $m$ by $m$ correlation matrix.
+#'@param y a list (length n) of \eqn{m} by \eqn{m} correlation matrix.
 #'@param xOut an nOut by p matrix of output predictor levels.
 #'@param optns A list of options control parameters specified by \code{list(name=value)}. See `Details'.
 #'@details Available control options are
 #'\describe{
-#'\item{metric}{choice of metric. 'frobenius' and 'power' are supported, which corresponds to Frobenius metric and Euclidean power metric, repectively. Default is Frobenius metric}
-#'\item{alpha}{the power for Euclidean power metric. Default is $1$ which corresponds to Frobenius metric.}
+#'\item{metric}{choice of metric. 'frobenius' and 'power' are supported, which corresponds to Frobenius metric and Euclidean power metric, repectively. Default is Frobenius metric.}
+#'\item{alpha}{the power for Euclidean power metric. Default is 1 which corresponds to Frobenius metric.}
 #'\item{digits}{the integer indicating the number of decimal places (round) to be kept in the output. Default is NULL, which means no round operation.}
 #'}
 #'@return A \code{corReg} object --- a list containing the follwing fields:
 #'\item{fit}{a list of estimated correlation matrices at \code{x}.}
 #'\item{predict}{a list of estimated correlation matrices at \code{xOut}. Included if \code{xOut} is not \code{NULL}.}
-#'\item{RSquare}{Fr\'{e}chet coefficient of determination.}
-#'\item{AdjRSquare}{adjusted Fr\'{e}chet coefficient of determination.}
+#'\item{RSquare}{Fréchet coefficient of determination.}
+#'\item{AdjRSquare}{adjusted Fréchet coefficient of determination.}
 #'\item{residuals}{Frobenius distance between the true and fitted correlation matrices.}
 #'\item{y}{the response used.}
 #'\item{x}{the predictor used.}
@@ -54,7 +54,7 @@ GloCorReg <- function(x, y, xOut = NULL, optns = list()){
     metric <- optns$metric
   }
   if(!(metric %in% c("frobenius", "power"))){
-    stop("metric choice not supported.")
+    stop("metric choice not supported")
   }
   if(is.null(optns$alpha)){
     alpha <- 1
@@ -78,16 +78,16 @@ GloCorReg <- function(x, y, xOut = NULL, optns = list()){
       if(is.data.frame(xOut) | is.vector(xOut)) xOut <- as.matrix(xOut)
       else stop('xOut must be a matrix or a data frame')
     }
+    if(ncol(x) != ncol(xOut)){
+      stop('x and xOut must have the same number of columns')
+    }
     nOut <- nrow(xOut)# number of predictions
   }
   else{
     nOut <- 0
   }
-  if(ncol(x) != ncol(xOut)){
-    stop('x and xout must have the same number of columns')
-  }
   if(nrow(x) != length(y)){
-    stop('x and y must have the same number of observations')
+    stop('the number of rows in x must be the same as the number of correlation matrices in y')
   }
   n <- nrow(x)# number of observations
   p <- ncol(x)# number of covariates
