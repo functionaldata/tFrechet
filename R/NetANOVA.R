@@ -77,7 +77,7 @@ NetANOVA <- function(Ly = NULL, group = NULL, optns = list()) {
     pvalAsy <- 1 - pchisq(bootRes$t0, df = k - 1)
     res <- list(pvalAsy = pvalAsy, pvalBoot = pvalBoot, optns = optns)
   } else {
-    t0 <- NetANOVAStatistic(data, 1:length(group), sizes, qSup)
+    t0 <- NetANOVAStatistic(data, 1:length(group), sizes)
     pvalAsy <- 1 - pchisq(t0, df = k - 1)
     res <- list(pvalAsy = pvalAsy, optns = optns)
   }
