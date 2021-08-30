@@ -1,4 +1,4 @@
-#' @title Fréchet ANOVA for densities
+#' @title Fréchet ANOVA for Densities
 #' @description Fréchet analysis of variance for densities with respect to 
 #'   \eqn{L^2}-Wasserstein distance.
 #' @param Ly a list of \eqn{n} vectors containing the observed values for each 
@@ -9,9 +9,9 @@
 #' @param group a vector containing the group memberships of the corresponding 
 #'   densities/quantiles in \code{Ly}.
 #' @param optns a list of control parameters specified by 
-#'   \code{list(name=value)}. See `Details`.
+#'   \code{list(name = value)}. See `Details`.
 #' @details Note that the type of functions representing the distributions 
-#'   in \code{Ly} should be the same---either all are density functions, 
+#'   in \code{Ly} should be the same --- either all are density functions, 
 #'   or all are quantile functions.
 #'
 #' If all support grids in \code{Lx} are the same, \code{qSup} will be set as 

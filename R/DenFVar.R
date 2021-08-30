@@ -1,5 +1,5 @@
-#' @title Fréchet variance of densities
-#' @description Obtain Fréchet variance of densities with respect to
+#' @title Fréchet Variance for Densities
+#' @description Obtain Fréchet variance for densities with respect to
 #'   \eqn{L^2}-Wasserstein distance.
 #' @param Ly a list of \eqn{n} vectors containing the observed values for each
 #'   density/quantile function. See `Details`.
@@ -26,6 +26,7 @@
 #' }
 #' @return A list containing the following fields:
 #' \item{DenFVar}{a scalar holding the Fréchet variance.}
+#' \item{DenFMean}{a vector of the same length of \code{qSup} holding the Fréchet mean.}
 #' \item{qSup}{a numeric vector holding the support grid used.}
 #' \item{optns}{the control options used.}
 #' @examples
@@ -115,10 +116,10 @@ DenFVar <- function(Ly = NULL, Lx = NULL, optns = list()) {
       qSup <- Lx[[1]]
     }
   }
-  DenFMean <- rowMeans(matrix(unlist(Ly), nrow = length(Ly[[1]]), ncol = n))
-  DenFVar <- mean(sapply(Ly, function(Lyi) {
-    pracma::trapz(qSup, (Lyi - DenFMean)^2)
+  mup <- rowMeans(matrix(unlist(Ly), nrow = length(Ly[[1]]), ncol = n))
+  Vp <- mean(sapply(Ly, function(Lyi) {
+    pracma::trapz(qSup, (Lyi - mup)^2)
   }))
-  res <- list(DenFVar = DenFVar, qSup = qSup, optns = optns)
+  res <- list(DenFVar = Vp, DenFMean = mup, qSup = qSup, optns = optns)
   res
 }

@@ -1,6 +1,6 @@
 library(testthat)
 
-test_that("works with density samples", {
+test_that("works for density samples", {
   set.seed(1)
   n <- 100
   alpha <- runif(n, min = 1, max = 2)
@@ -14,7 +14,7 @@ test_that("works with density samples", {
   expect_equal((res$DenFVar - 0.0044)^2 < 1e-6, TRUE)
 })
 
-test_that("works with quantile samples", {
+test_that("works for quantile samples", {
   set.seed(1)
   n <- 100
   mu <- rnorm(n, mean = 0, sd = 0.5)

@@ -1,5 +1,5 @@
 #' @description Helper function computing bootstrap replications of
-#'   the Fréchet ANOVA test statistics for graph Laplacian matrices.
+#'   the Fréchet ANOVA test statistics for networks.
 #' @noRd
 
 NetANOVAStatistic <- function(data, indices, sizes) {

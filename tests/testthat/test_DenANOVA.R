@@ -62,6 +62,29 @@ test_that("works if the two populations are the same", {
   expect_equal(res$pvalAsy > .05 & res$pvalBoot > .05, TRUE)
 })
 
+test_that("works for density samples", {
+  set.seed(1)
+  n1 <- 100
+  n2 <- 100
+  alpha1 <- runif(n1, min = 1, max = 2)
+  beta1 <- runif(n1, min = 1, max = 2)
+  alpha2 <- runif(n2, min = 2, max = 3)
+  beta2 <- runif(n2, min = 2, max = 3)
+  Lx <- seq(0, 1, 0.01)
+  Y1 <- lapply(1:n1, function(i) dbeta(Lx, shape1 = alpha1[i], 
+                                       shape2 = beta1[i]))
+  Y2 <- lapply(1:n2, function(i) dbeta(Lx, shape1 = alpha2[i], 
+                                       shape2 = beta2[i]))
+  Ly <- c(Y1, Y2)
+  # normalize each Ly[[i]] to ensure that it integrates to 1
+  Ly <- t(fdadensity::normaliseDensities(matrix(unlist(Ly), nrow = n1 + n2, 
+                                                byrow = TRUE), Lx))
+  Ly <- split(Ly, col(Ly))
+  group <- c(rep(1, n1), rep(2, n2))
+  res <- DenANOVA(Ly, Lx, group, optns = list(boot = TRUE))
+  expect_equal(res$pvalAsy < 1e-5 & res$pvalBoot < 1e-5, TRUE)
+})
+
 test_that("Ly and Lx should have the same length", {
   set.seed(1)
   n1 <- 100

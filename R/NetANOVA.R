@@ -1,12 +1,14 @@
-#' @title Fréchet ANOVA for graph Laplacian matrices
-#' @description Fréchet analysis of variance for graph Laplacian matrices 
-#'   with respect to Frobenius distance.
-#' @param Ly a list (length \eqn{n}) of \eqn{m} by \eqn{m} 
-#'   graph Laplacian matrices.
+#' @title Fréchet ANOVA for Networks
+#' @description Fréchet analysis of variance for graph Laplacian matrices, 
+#'   covariance matrices, or correlation matrices 
+#'   with respect to the Frobenius distance.
+#' @param Ly a list (length \eqn{n}) of \eqn{m} by \eqn{m} matrices, 
+#'   which can be either graph Laplacian matrices or covariance matrices 
+#'   or correlation matrices. 
 #' @param group a vector containing the group memberships of the corresponding 
-#'   graph Laplacian amttrices in \code{Ly}.
+#'   matrices in \code{Ly}.
 #' @param optns a list of control parameters specified by 
-#'   \code{list(name=value)}. See `Details`.
+#'   \code{list(name = value)}. See `Details`.
 #' @details Available control options are:
 #' \describe{
 #' \item{boot}{logical, also compute bootstrap \eqn{p}-value if \code{TRUE}. 
