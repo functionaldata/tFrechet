@@ -1,6 +1,6 @@
 library(testthat)
 
-test_that("works for networks from the stochatic block model with different preferential matrices", {
+test_that("works for networks from the stochastic block model with different preferential matrices", {
   set.seed(1)
   n1 <- 30
   n2 <- 30
@@ -164,4 +164,26 @@ test_that("Ly and group should have the same length", {
   group <- c(rep(1, n1), rep(2, n2), 1)
   expect_error(NetANOVA(Ly, group), 
                "Ly and group should have the same length")
+})
+
+test_that("works for array input", {
+  set.seed(1)
+  n1 <- 30
+  n2 <- 30
+  C1 <- cbind(c(0.8, 0.3, 0.2), c(0.3, 0.6, 0.1), c(0.2, 0.1, 0.75)) # 3 groups in sbm
+  C2 <- matrix(c(0.9, 0.2, 0.2, 0.6), 2, 2) # 2 groups in sbm
+  Y1 <- lapply(1:n1, function(i) {
+    igraph::laplacian_matrix(igraph::sample_sbm(n = 20, pref.matrix = C1, 
+                                                block.sizes = c(5, 5, 10)), 
+                             sparse = FALSE)
+  })
+  Y2 <- lapply(1:n2, function(i) {
+    igraph::laplacian_matrix(igraph::sample_sbm(n = 20, pref.matrix = C2, 
+                                                block.sizes = c(10, 10)), 
+                             sparse = FALSE)
+  })
+  Ly <- array(unlist(c(Y1, Y2)), c(20, 20, n1 + n2))
+  group <- c(rep(1, n1), rep(2, n2))
+  res <- NetANOVA(Ly, group, optns = list(boot = TRUE))
+  expect_equal(res$pvalAsy < 1e-5 & res$pvalBoot < 1e-5, TRUE)
 })

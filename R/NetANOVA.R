@@ -2,24 +2,24 @@
 #' @description Fréchet analysis of variance for graph Laplacian matrices, 
 #'   covariance matrices, or correlation matrices 
 #'   with respect to the Frobenius distance.
-#' @param Ly a list (length \eqn{n}) of \eqn{m} by \eqn{m} matrices, 
-#'   which can be either graph Laplacian matrices or covariance matrices 
-#'   or correlation matrices. 
-#' @param group a vector containing the group memberships of the corresponding 
+#' @param Ly A list (length n) of m by m matrices or a m by m by n array where
+#'   \code{Ly[, , i]} contains an m by m matrix, which can be either graph 
+#'   Laplacian matrices or covariance matrices or correlation matrices.
+#' @param group A vector containing the group memberships of the corresponding 
 #'   matrices in \code{Ly}.
-#' @param optns a list of control parameters specified by 
+#' @param optns A list of control parameters specified by 
 #'   \code{list(name = value)}. See `Details`.
 #' @details Available control options are:
 #' \describe{
-#' \item{boot}{logical, also compute bootstrap \eqn{p}-value if \code{TRUE}. 
+#' \item{boot}{Logical, also compute bootstrap \eqn{p}-value if \code{TRUE}. 
 #'   Default is \code{FALSE}.}
-#' \item{R}{the number of bootstrap replicates. Only used when \code{boot} 
+#' \item{R}{The number of bootstrap replicates. Only used when \code{boot} 
 #'   is \code{TRUE}. Default is 1000.}
 #' }
 #' @return A \code{NetANOVA} object --- a list containing the following fields:
-#' \item{pvalAsy}{a scalar holding the asymptotic \eqn{p}-value.}
-#' \item{pvalBoot}{a scalar holding the bootstrap \eqn{p}-value.}
-#' \item{optns}{the control options used.}
+#' \item{pvalAsy}{A scalar holding the asymptotic \eqn{p}-value.}
+#' \item{pvalBoot}{A scalar holding the bootstrap \eqn{p}-value.}
+#' \item{optns}{The control options used.}
 #' @examples
 #' set.seed(1)
 #' n1 <- 100
@@ -52,7 +52,11 @@ NetANOVA <- function(Ly = NULL, group = NULL, optns = list()) {
     stop("requires the input of both Ly and group")
   }
   if (!is.list(Ly)) {
-    stop("Ly should be a list")
+    if (is.array(Ly)) {
+      Ly <- lapply(seq(dim(Ly)[3]), function(i) Ly[, , i])
+    } else {
+      stop("Ly must be a list or an array")
+    }
   }
   if (length(Ly) != length(group)) {
     stop("Ly and group should have the same length")

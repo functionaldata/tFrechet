@@ -2,12 +2,12 @@
 #' @description Obtain Fréchet variance for graph Laplacian matrices, 
 #'   covariance matrices, or correlation matrices 
 #'   with respect to the Frobenius distance.
-#' @param Ly a list (length \eqn{n}) of \eqn{m} by \eqn{m} matrices, 
-#'   which can be either graph Laplacian matrices or covariance matrices 
-#'   or correlation matrices. 
+#' @param Ly A list (length n) of m by m matrices or a m by m by n array where
+#'   \code{Ly[, , i]} contains an m by m matrix, which can be either graph 
+#'   Laplacian matrices or covariance matrices or correlation matrices.
 #' @return A list containing the following fields:
-#' \item{NetFVar}{a scalar holding the Fréchet variance.}
-#' \item{NetFMean}{a matrix holding the Fréchet mean.}
+#' \item{NetFVar}{A scalar holding the Fréchet variance.}
+#' \item{NetFMean}{A matrix holding the Fréchet mean.}
 #' @examples
 #' set.seed(1)
 #' n <- 100
@@ -24,7 +24,11 @@ NetFVar <- function(Ly = NULL) {
     stop("requires the input of Ly")
   }
   if (!is.list(Ly)) {
-    stop("Ly should be a list")
+    if (is.array(Ly)) {
+      Ly <- lapply(seq(dim(Ly)[3]), function(i) Ly[, , i])
+    } else {
+      stop("Ly must be a list or an array")
+    }
   }
   if (length(unique(sapply(Ly, length))) > 1) {
     stop("each matrix in Ly should be of the same dimension")

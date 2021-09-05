@@ -17,7 +17,7 @@ test_that("works for location differences between the populations", {
   Ly <- c(Y1, Y2)
   Lx <- qSup
   group <- c(rep(1, n1), rep(2, n2))
-  res <- DenANOVA(Ly, Lx, group, optns = list(fctn_type = "quantile", boot = TRUE))
+  res <- DenANOVA(qin = Ly, supin = Lx, group = group, optns = list(boot = TRUE))
   expect_equal(res$pvalAsy < 1e-5 & res$pvalBoot < 1e-5, TRUE)
 })
 
@@ -38,7 +38,7 @@ test_that("works for scale differences between the populations", {
   Ly <- c(Y1, Y2)
   Lx <- qSup
   group <- c(rep(1, n1), rep(2, n2))
-  res <- DenANOVA(Ly, Lx, group, optns = list(fctn_type = "quantile", boot = TRUE))
+  res <- DenANOVA(qin = Ly, supin = Lx, group = group, optns = list(boot = TRUE))
   expect_equal(res$pvalAsy < 1e-5 & res$pvalBoot < 1e-5, TRUE)
 })
 
@@ -58,7 +58,7 @@ test_that("works if the two populations are the same", {
   Ly <- c(Y1, Y2)
   Lx <- qSup
   group <- c(rep(1, n1), rep(2, n2))
-  res <- DenANOVA(Ly, Lx, group, optns = list(fctn_type = "quantile", boot = TRUE))
+  res <- DenANOVA(qin = Ly, supin = Lx, group = group, optns = list(boot = TRUE))
   expect_equal(res$pvalAsy > .05 & res$pvalBoot > .05, TRUE)
 })
 
@@ -81,11 +81,11 @@ test_that("works for density samples", {
                                                 byrow = TRUE), Lx))
   Ly <- split(Ly, col(Ly))
   group <- c(rep(1, n1), rep(2, n2))
-  res <- DenANOVA(Ly, Lx, group, optns = list(boot = TRUE))
+  res <- DenANOVA(din = Ly, supin = Lx, group = group, optns = list(boot = TRUE))
   expect_equal(res$pvalAsy < 1e-5 & res$pvalBoot < 1e-5, TRUE)
 })
 
-test_that("Ly and Lx should have the same length", {
+test_that("the number of support grids in supin is not equal to the number of observed distributions in qin", {
   set.seed(1)
   n1 <- 100
   n2 <- 100
@@ -101,11 +101,11 @@ test_that("Ly and Lx should have the same length", {
   Ly <- c(Y1, Y2)
   Lx <- rep(list(qSup), n1 + n2 + 1)
   group <- c(rep(1, n1), rep(2, n2))
-  expect_error(DenANOVA(Ly, Lx, group, optns = list(fctn_type = "quantile")), 
-               "Ly and Lx should have the same length")
+  expect_error(DenANOVA(qin = Ly, supin = Lx, group = group), 
+               "the number of support grids in supin is not equal to the number of observed distributions in qin")
 })
 
-test_that("Ly and group should have the same length", {
+test_that("the number of elements in group must equal the number of observed distributions", {
   set.seed(1)
   n1 <- 100
   n2 <- 100
@@ -121,11 +121,11 @@ test_that("Ly and group should have the same length", {
   Ly <- c(Y1, Y2)
   Lx <- rep(list(qSup), n1 + n2)
   group <- c(rep(1, n1), rep(2, n2), 1)
-  expect_error(DenANOVA(Ly, Lx, group, optns = list(fctn_type = "quantile")), 
-               "Ly and group should have the same length")
+  expect_error(DenANOVA(qin = Ly, supin = Lx, group = group), 
+               "the number of elements in group must equal the number of observed distributions")
 })
 
-test_that("each vector in Ly and its corresponding vector in Lx should have the same length", {
+test_that("the number of support points must be equal to the number of observations for each quantile function in qin", {
   set.seed(1)
   n1 <- 100
   n2 <- 100
@@ -142,6 +142,6 @@ test_that("each vector in Ly and its corresponding vector in Lx should have the 
   Lx <- rep(list(qSup), n1 + n2)
   Lx[[1]] <- c(Lx[[1]], 1)
   group <- c(rep(1, n1), rep(2, n2))
-  expect_error(DenANOVA(Ly, Lx, group, optns = list(fctn_type = "quantile")), 
-               "each vector in Ly and its corresponding vector in Lx should have the same length")
+  expect_error(DenANOVA(qin = Ly, supin = Lx, group = group), 
+               "the number of support points must be equal to the number of observations for each quantile function in qin")
 })
