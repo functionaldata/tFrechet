@@ -4,7 +4,7 @@
 #' @param yin A matrix or data frame or list holding the sample of measurements 
 #'   for the observed distributions. If \code{yin} is a matrix or data frame, 
 #'   each row holds the measurements for one distribution.
-#' @param hin A list holding the histograms for the observed distributions. See \
+#' @param hin A list holding the histograms for the observed distributions.
 #' @param din A matrix or data frame or list holding the density functions. 
 #'   If \code{din} is a matrix or data frame, each row of \code{din} holds 
 #'   the density function for one distribution.
@@ -64,7 +64,8 @@
 #' }
 #' @return A \code{DenANOVA} object --- a list containing the following fields:
 #' \item{pvalAsy}{a scalar holding the asymptotic \eqn{p}-value.}
-#' \item{pvalBoot}{a scalar holding the bootstrap \eqn{p}-value.}
+#' \item{pvalBoot}{a scalar holding the bootstrap \eqn{p}-value.
+#'   Returned if \code{optns$boot} is TRUE.}
 #' \item{optns}{the control options used.}
 #' @examples
 #' set.seed(1)

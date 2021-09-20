@@ -101,7 +101,7 @@ test_that("works for correlation matrices", {
     diag(y) <- 1
     y
   })
-  Y1 <- lapply(1:n2, function(i) {
+  Y2 <- lapply(1:n2, function(i) {
     yVec <- rbeta(d, shape1 = alpha2, shape2 = beta2)
     y <- matrix(0, nrow = m, ncol = m)
     y[lower.tri(y)] <- yVec
@@ -141,7 +141,7 @@ test_that("works for more than two groups", {
   Ly <- c(Y1, Y2, Y3)
   group <- c(rep(1, n1), rep(2, n2), rep(3, n3))
   res <- NetANOVA(Ly, group, optns = list(boot = TRUE))
-  expect_equal(res$pvalAsy < 1e-5 & res$pvalBoot < 1e-5, TRUE)
+  expect_equal(res$pvalAsy < 0.05 & res$pvalBoot < 0.05, TRUE)
 })
 
 test_that("Ly and group should have the same length", {

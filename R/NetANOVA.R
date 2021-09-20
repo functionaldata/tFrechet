@@ -18,7 +18,8 @@
 #' }
 #' @return A \code{NetANOVA} object --- a list containing the following fields:
 #' \item{pvalAsy}{A scalar holding the asymptotic \eqn{p}-value.}
-#' \item{pvalBoot}{A scalar holding the bootstrap \eqn{p}-value.}
+#' \item{pvalBoot}{A scalar holding the bootstrap \eqn{p}-value. 
+#'   Returned if \code{optns$boot} is TRUE.}
 #' \item{optns}{The control options used.}
 #' @examples
 #' set.seed(1)
@@ -61,25 +62,27 @@ NetANOVA <- function(Ly = NULL, group = NULL, optns = list()) {
   if (length(Ly) != length(group)) {
     stop("Ly and group should have the same length")
   }
+  if (length(unique(sapply(Ly, length))) > 1) {
+    stop("each matrix in Ly should be of the same dimension")
+  }
+  if (any(sapply(Ly, function(Lyi) nrow(Lyi) != ncol(Lyi)))) {
+    stop("each matrix in Ly should be a square matrix")
+  }
   if (is.null(optns$boot)) {
-    boot <- FALSE
-  } else {
-    boot <- optns$boot
+    optns$boot <- FALSE
   }
   if (is.null(optns$R)) {
-    R <- 1000
-  } else {
-    R <- optns$R
+    optns$R <- 1000
   }
   n <- length(Ly)
   sizes <- as.vector(table(group))
   k <- length(sizes) # number of groups
   data <- Ly[order(group)]
   # data <- unlist(split(Ly, group), recursive = FALSE)
-  if (boot) {
+  if (optns$boot) {
     bootRes <- boot::boot(data = data, statistic = NetANOVAStatistic, 
-                          R = R, sizes = sizes)
-    pvalBoot <- length(which(bootRes$t > bootRes$t0)) / R
+                          R = optns$R, sizes = sizes)
+    pvalBoot <- length(which(bootRes$t > bootRes$t0)) / optns$R
     pvalAsy <- 1 - pchisq(bootRes$t0, df = k - 1)
     res <- list(pvalAsy = pvalAsy, pvalBoot = pvalBoot, optns = optns)
   } else {

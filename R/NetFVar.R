@@ -33,7 +33,7 @@ NetFVar <- function(Ly = NULL) {
   if (length(unique(sapply(Ly, length))) > 1) {
     stop("each matrix in Ly should be of the same dimension")
   }
-  if (any(sapply(Ly, function(Lyi) nrow(Lyi) != col(Lyi)))) {
+  if (any(sapply(Ly, function(Lyi) nrow(Lyi) != ncol(Lyi)))) {
     stop("each matrix in Ly should be a square matrix")
   }
   n <- length(Ly)
