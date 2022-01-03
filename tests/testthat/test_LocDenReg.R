@@ -69,7 +69,7 @@ test_that("Generates warnings when more than one of the three, yin, hin, and qin
   expect_equal(sum(abs(res_h$qin - res_hq$qin)),0)
 })
 
-test_that("Works with fully observed distributions and providing bandwidth; p=2", {
+test_that("Works with fully observed distributions and without providing bandwidth; p=2", {
   set.seed(1)
   xin <- cbind(runif(200),runif(200))
   qSup <- qbeta((1:99)/100,1/2,1/2)
@@ -83,7 +83,7 @@ test_that("Works with fully observed distributions and providing bandwidth; p=2"
   xout <- xin
   res <- LocDenReg(xin=xin, qin=qin, xout=xout, optns = list(qSup = c(0,qSup,1)))
   expect_true(mean(sqrt(apply((qtrue - res$qout[,-c(1,length(res$qSup))])^2,
-                              1, pracma::trapz, x = qSup))) / mean(qin) < 1e-4)
+                              1, pracma::trapz, x = qSup))) / mean(qin) < 1e-3)
 })
 
 test_that("Works with fully observed distributions; p=2", {

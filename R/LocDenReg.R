@@ -320,9 +320,9 @@ LocDenReg <- function(xin=NULL, yin=NULL, hin=NULL, qin=NULL, xout=NULL, optns=l
 
 # set up bandwidth range
 SetBwRange <- function(xin, xout, kernel_type) {
-  xinSt <- sort(xin)
-  bw.min <- max(diff(xinSt), xinSt[2] - min(xout), max(xout) - xinSt[length(xin)-1])*1.1 / (ifelse(kernel_type == "gauss", 3, 1) * ifelse(kernel_type == "gausvar", 2.5, 1))
-  bw.max <- diff(range(xin))/3 / (ifelse(kernel_type == "gauss", 3, 1) * ifelse(kernel_type == "gausvar", 2.5, 1))
+  xinSt <- unique(sort(xin))
+  bw.min <- max(diff(xinSt), xinSt[2] - min(xout), max(xout) - xinSt[length(xinSt)-1])*1.1
+  bw.max <- diff(range(xin))/3
   if (bw.max < bw.min) {
     if (bw.min > bw.max*3/2) {
       #warning("Data is too sparse.")
