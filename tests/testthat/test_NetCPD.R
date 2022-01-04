@@ -18,8 +18,8 @@ test_that("works for networks from the stochastic block model with different pre
                              sparse = FALSE)
   })
   Ly <- c(Y1, Y2)
-  res <- NetCPD(Ly, optns = list(boot = TRUE))
-  expect_equal(res$pvalAsy < 1e-5 & res$pvalBoot < 1e-5, TRUE)
+  res <- NetCPD(Ly)
+  expect_equal(res$pvalAsy < 1e-5, TRUE)
 })
 
 test_that("works for scale-free networks from the Barabasi-Albert model with different powers of the preferential attachment", {
@@ -39,7 +39,7 @@ test_that("works for scale-free networks from the Barabasi-Albert model with dif
                              sparse = FALSE)
   })
   Ly <- c(Y1, Y2)
-  res <- NetCPD(Ly, optns = list(boot = TRUE))
+  res <- NetCPD(Ly)
   expect_equal(res$pvalAsy < 1e-3, TRUE)
 })
 
@@ -60,8 +60,8 @@ test_that("works if the two populations are the same", {
                              sparse = FALSE)
   })
   Ly <- c(Y1, Y2)
-  res <- NetCPD(Ly, optns = list(boot = TRUE))
-  expect_equal(res$pvalAsy > .05 & res$pvalBoot > .05, TRUE)
+  res <- NetCPD(Ly)
+  expect_equal(res$pvalAsy > .05, TRUE)
 })
 
 test_that("works for covariance matrices", {
@@ -76,8 +76,8 @@ test_that("works for covariance matrices", {
     U %*% diag(rexp(10, 1:10)) %*% t(U)
   })
   Ly <- c(Y1, Y2)
-  res <- NetCPD(Ly, optns = list(boot = TRUE))
-  expect_equal(res$pvalAsy < 1e-1 & res$pvalBoot < 1e-1, TRUE)
+  res <- NetCPD(Ly)
+  expect_equal(res$pvalAsy < 1e-1, TRUE)
 })
 
 test_that("works for correlation matrices", {
@@ -107,8 +107,8 @@ test_that("works for correlation matrices", {
     y
   })
   Ly <- c(Y1, Y2)
-  res <- NetCPD(Ly, optns = list(boot = TRUE))
-  expect_equal(res$pvalAsy < 1e-5 & res$pvalBoot < 1e-5, TRUE)
+  res <- NetCPD(Ly)
+  expect_equal(res$pvalAsy < 1e-5, TRUE)
 })
 
 test_that("works for array input", {
@@ -128,6 +128,6 @@ test_that("works for array input", {
                              sparse = FALSE)
   })
   Ly <- array(unlist(c(Y1, Y2)), c(20, 20, n1 + n2))
-  res <- NetCPD(Ly, optns = list(boot = TRUE))
-  expect_equal(res$pvalAsy < 1e-5 & res$pvalBoot < 1e-5, TRUE)
+  res <- NetCPD(Ly)
+  expect_equal(res$pvalAsy < 1e-5, TRUE)
 })
