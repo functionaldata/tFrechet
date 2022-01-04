@@ -16,8 +16,8 @@ test_that("works for location differences", {
   })
   Ly <- c(Y1, Y2)
   Lx <- qSup
-  res <-DenCPD(qin = Ly, supin = Lx, optns = list(boot = TRUE))
-  expect_equal(res$pvalAsy < 1e-5 & res$pvalBoot < 1e-5, TRUE)
+  res <- DenCPD(qin = Ly, supin = Lx)
+  expect_equal(res$pvalAsy < 1e-5, TRUE)
 })
 
 test_that("works for scale differences", {
@@ -36,8 +36,8 @@ test_that("works for scale differences", {
   })
   Ly <- c(Y1, Y2)
   Lx <- qSup
-  res <- DenCPD(qin = Ly, supin = Lx, optns = list(boot = TRUE))
-  expect_equal(res$pvalAsy < 1e-5 & res$pvalBoot < 1e-5, TRUE)
+  res <- DenCPD(qin = Ly, supin = Lx)
+  expect_equal(res$pvalAsy < 1e-5, TRUE)
 })
 
 test_that("works if the two populations are the same", {
@@ -55,8 +55,8 @@ test_that("works if the two populations are the same", {
   })
   Ly <- c(Y1, Y2)
   Lx <- qSup
-  res <- DenCPD(qin = Ly, supin = Lx, optns = list(boot = TRUE))
-  expect_equal(res$pvalAsy > .05 & res$pvalBoot > .05, TRUE)
+  res <- DenCPD(qin = Ly, supin = Lx)
+  expect_equal(res$pvalAsy > .05, TRUE)
 })
 
 test_that("works for density samples", {
@@ -77,8 +77,8 @@ test_that("works for density samples", {
   Ly <- t(fdadensity::normaliseDensities(matrix(unlist(Ly), nrow = n1 + n2, 
                                                 byrow = TRUE), Lx))
   Ly <- split(Ly, col(Ly))
-  res <- DenCPD(din = Ly, supin = Lx, optns = list(boot = TRUE))
-  expect_equal(res$pvalAsy < 1e-5 & res$pvalBoot < 1e-5, TRUE)
+  res <- DenCPD(din = Ly, supin = Lx)
+  expect_equal(res$pvalAsy < 1e-5, TRUE)
 })
 
 test_that("the number of support grids in supin is not equal to the number of observed distributions in qin", {
