@@ -1,5 +1,5 @@
 #' @title Generalized Fréchet integrals of covariance matrix
-#' @description Calculating generalized Fréchet integrals of covariance 
+#' @description Calculating generalized Fréchet integrals of covariance (equipped with Frobenius norm) 
 #' @param phi eigenfunction along which we want to project the network
 #' @param t_out support of phi
 #' @param X three dimension array of dimension length(t_out) x m x m, where X[i,,] is an m x m covariance matrix. 
