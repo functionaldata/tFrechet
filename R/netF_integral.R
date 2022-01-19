@@ -1,5 +1,5 @@
 #' @title Generalized Fréchet integrals of network 
-#' @description Calculating generalized Fréchet integrals of networks(equipped with Frobenius norm of adjacency matrices) 
+#' @description Calculating generalized Fréchet integrals of networks (equipped with Frobenius norm of adjacency matrices with zero diagonal elements and non negative off diagonal elements.) 
 #' @param phi eigenfunction along which we want to project the network
 #' @param t_out support of phi
 #' @param X three dimension array of dimension length(t_out) x m x m, where X[i,,] is an m x m network adjacency matrix. The diagonal elements of adjacency matrices are zero and the off diagonal entries lie between zero and U.
@@ -100,10 +100,8 @@ netF_integral <- function(phi, t_out, X, U){
   }
   g_mini[m,m] <- fdapace::trapzRcpp(t_out, phi * X[,m,m])
   # we project the global minimizer g_mini to the space of adjacency matrices with zero diagonal elements and 
-  # non negative off diagonal elements. In our simulation, we assume that
-  # the space comprises of all matrices whose weights are greater than or
-  # equal to 0 and less than or equal to U. For more complex representations, this step needs to be
-  # modified.
+  # non negative off diagonal elements. In the paper, the author assumes that the space comprises of all matrices 
+  # whose weights are greater than or equal to 0 and less than or equal to U. For more complex representations, this step needs to be modified.
   
   g_mini[g_mini<0] <- 0
   g_mini[g_mini>U] <- U
