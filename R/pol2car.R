@@ -7,7 +7,7 @@
 #' @examples
 #' pol2car(c(1, 0, pi/4)) # should equal c(1,0,1)/sqrt(2)
 #' pol2car(c(1, pi, 0)) # should equal c(-1,0,0)
-#' @noRd
+#' @export
 pol2car <- function(p) {
   d <- length(p)
   if (d < 2) stop("p must have at least 2 elements.")
