@@ -14,10 +14,10 @@ SpheGeoDist <- function(y1,y2) {
   if (abs(length(y1) - length(y2)) > 0) {
     stop("y1 and y2 should be of the same length.")
   }
-  if ( !all.equal(l2norm(y1),1) ) {
+  if ( !isTRUE( all.equal(l2norm(y1),1) ) ) {
     stop("y1 is not a unit vector.")
   }
-  if ( !all.equal(l2norm(y2),1) ) {
+  if ( !isTRUE( all.equal(l2norm(y2),1) ) ) {
     stop("y2 is not a unit vector.")
   }
   y1 = y1 / l2norm(y1)

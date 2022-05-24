@@ -28,7 +28,7 @@ LocSpheGeoReg <- function(xin, yin, xout, optns = list()) {
     
     objFctn = function(y){
       # y <- y / l2norm(y)
-      if ( !all.equal(l2norm(y),1) ) {
+      if ( ! isTRUE( all.equal(l2norm(y),1) ) ) {
         return(list(value = Inf))
       }
       f = mean(s * sapply(1:n, function(i) SpheGeoDist(yin[i,], y)^2))
