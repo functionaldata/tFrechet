@@ -24,7 +24,7 @@ GloSpheGeoReg <- function(xin, yin, xout) {
     }
     
     objFctn = function(y){
-      if ( !all.equal(l2norm(y),1) ) {
+      if ( ! isTRUE( all.equal(l2norm(y),1) ) ) {
         return(list(value = Inf))
       }
       f = mean(s * sapply(1:n, function(i) SpheGeoDist(yin[i,], y)^2))
