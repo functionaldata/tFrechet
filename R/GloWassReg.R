@@ -24,9 +24,9 @@ GloWassReg <- function(xin, qin, xout, optns=list()){
     xout <- as.matrix(xout)
   }
   if(nrow(xin)!=nrow(qin))
-    stop("xin and qin should have the same number of rows.")
+    stop("The numbers of observations in xin and qin are not the same.")
   if(ncol(xin)!=ncol(xout))
-    stop("xin and xout should have the same number of columns.")
+    stop("The numbers of variables in xin and xout are not the same.")
   if(optns$Rsquared & is.null(optns$qSup)){
     warning("optns$qSup is missing and taking the default value.")
   }
