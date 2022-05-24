@@ -1,13 +1,14 @@
-#' @title Generate a "natural" frame (orthonormal basis) for the tangent space at \code{x} on the unit sphere.
-#' @param x A unit vector of length d.
-#' @return A d-by-(d-1) matrix where columns hold the orthonormal basis of the tangent space at \code{x} on the unit sphere.
+#' Generate a "natural" frame (orthonormal basis)
+#' @description Generate a "natural" frame (orthonormal basis) for the tangent space at \code{x} on the unit sphere.
+#' @param x A unit vector of length \eqn{d}.
+#' @return A \eqn{d}-by-\eqn{(d-1)} matrix where columns hold the orthonormal basis of the tangent space at \code{x} on the unit sphere.
 #' @details The first \eqn{(i+1)} elements of the \eqn{i}th basis vector are given by 
 #' \eqn{\sin\theta_i\prod_{j=1}^{i-1}\cos\theta_j}, \eqn{\sin\theta_i\sin\theta_1 \prod_{j=2}^{i-1}\cos\theta_j},
 #' \eqn{\sin\theta_i\sin\theta_2 \prod_{j=3}^{i-1}\cos\theta_j}, \eqn{\dots}, \eqn{\sin\theta_i\sin\theta_{i-1}}, \eqn{-\cos\theta_i}, respectively.
 #' The rest elements (if any) of the \eqn{i}th basis vector are all zero.
 #' @examples
 #' frameSphere(c(1,0,0,0))
-#' @noRd
+#' @export
 frameSphere <- function(x) {
   theta <- car2pol(x)[-1]
   d <- length(x)

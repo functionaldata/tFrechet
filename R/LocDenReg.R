@@ -37,6 +37,7 @@
 #' \item{optns}{A list of control options used.}
 #'
 #' @examples
+#' \donttest{
 #' xin = seq(0,1,0.05)
 #' yin = lapply(xin, function(x) {
 #'   rnorm(100, rnorm(1,x + x^2,0.005), 0.05)
@@ -45,7 +46,7 @@
 #' xout = seq(0,1,0.1)
 #' res1 <- LocDenReg(xin=xin, yin=yin, xout=xout, optns = list(bwReg = 0.12, qSup = qSup))
 #' plot(res1)
-#'\donttest{
+#'
 #' xout <- xin
 #' hin = lapply(yin, function(y) hist(y, breaks = 50))
 #' res2 <- LocDenReg(xin=xin, hin=hin, xout=xout, optns = list(qSup = qSup))

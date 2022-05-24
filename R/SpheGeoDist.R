@@ -11,14 +11,13 @@
 #'@export
 
 SpheGeoDist <- function(y1,y2) {
-  tol <- 1e-6 # Distance that the L2 norms of y1 and y2 are allowed to be away from 1.
   if (abs(length(y1) - length(y2)) > 0) {
     stop("y1 and y2 should be of the same length.")
   }
-  if (abs(l2norm(y1)-1) > tol) {
+  if ( !all.equal(l2norm(y1),1) ) {
     stop("y1 is not a unit vector.")
   }
-  if (abs(l2norm(y2)-1) > tol) {
+  if ( !all.equal(l2norm(y2),1) ) {
     stop("y2 is not a unit vector.")
   }
   y1 = y1 / l2norm(y1)

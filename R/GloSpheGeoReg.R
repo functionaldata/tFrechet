@@ -1,33 +1,29 @@
 # using trust package and perturbation for initial value
 
-LocSpheGeoReg <- function(xin, yin, xout, optns = list()) {
+GloSpheGeoReg <- function(xin, yin, xout) {
   k = length(xout)
   n = length(xin)
   m = ncol(yin)
   
-  bw <- optns$bw
-  ker <- kerFctn(optns$kernel)
+  xbar <- colMeans(xin)
+  Sigma <- cov(xin) * (n-1) / n
+  invSigma <- solve(Sigma)
   
   yout = sapply(1:k, function(j){
-    mu0 = mean(ker((xout[j] - xin) / bw))
-    mu1 = mean(ker((xout[j] - xin) / bw) * (xin - xout[j]))
-    mu2 = mean(ker((xout[j] - xin) / bw) * (xin - xout[j])^2)
-    s = ker((xout[j] - xin) / bw) * (mu2 - mu1 * (xin - xout[j])) /
-      (mu0 * mu2 - mu1^2)
+    s <- 1 + t(t(xin) - xbar) %*% invSigma %*% (xout[j,] - xbar)
+    s <- as.vector(s)
     
     # initial guess
     y0 = colMeans(yin*s)
     y0 = y0 / l2norm(y0)
-    if (sum(sapply(1:n, function(i) sum(yin[i,]*y0))[ker((xout[j] - xin) / bw)>0] > 1-1e-8)){
-    #if (sum( is.infinite (sapply(1:n, function(i) (1 - sum(yin[i,]*y0)^2)^(-0.5) )[ker((xout[j] - xin) / bw)>0] ) ) +
-    #   sum(sapply(1:n, function(i) 1 - sum(yin[i,] * y0)^2 < 0)) > 0){
-      # return(y0)
-      y0 = y0 + rnorm(3) * 1e-3
+    if (sum(sapply(1:n, function(i) sum(yin[i,]*y0)) > 1-1e-8)){
+      #if (sum( is.infinite (sapply(1:n, function(i) (1 - sum(yin[i,]*y0)^2)^(-0.5) )[ker((xout[j] - xin) / bw)>0] ) ) + 
+      #   sum(sapply(1:n, function(i) 1 - sum(yin[i,] * y0)^2 < 0)) > 0){
+      y0[1] = y0[1] + 1e-3
       y0 = y0 / l2norm(y0)
     }
     
     objFctn = function(y){
-      # y <- y / l2norm(y)
       if ( !all.equal(l2norm(y),1) ) {
         return(list(value = Inf))
       }
@@ -40,9 +36,8 @@ LocSpheGeoReg <- function(xin, yin, xout, optns = list()) {
       h = 2 * apply(res, 1:2, mean)
       return(list(value=f, gradient=g, hessian=h))
     }
-    res = trust::trust(objFctn, y0, 0.1, 1e5)
-    # res = trust::trust(objFctn, y0, 0.1, 1)
-    return(res$argument / l2norm(res$argument))
+    res = trust::trust(objFctn, y0, 0.1, 1)
+    return(res$argument)
   })
   return(t(yout))
 }
