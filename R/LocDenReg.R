@@ -265,7 +265,7 @@ LocDenReg <- function(xin=NULL, yin=NULL, hin=NULL, qin=NULL, xout=NULL, optns=l
     }
   }
 
-  if (is.null(optnsReg$bw)) {
+  if (!("bw"%in%names(optnsReg))) {
     optnsReg$bw <- "CV"
   }
   if (!is.numeric(optnsReg$bw)) {
@@ -322,7 +322,9 @@ LocDenReg <- function(xin=NULL, yin=NULL, hin=NULL, qin=NULL, xout=NULL, optns=l
 # set up bandwidth range
 SetBwRange <- function(xin, xout, kernel_type) {
   xinSt <- unique(sort(xin))
-  bw.min <- max(diff(xinSt), xinSt[2] - min(xout), max(xout) - xinSt[length(xinSt)-1])*1.1
+  bw.min <- max(diff(xinSt), xinSt[2] - min(xout), max(xout) -
+                  xinSt[length(xin)-1])*1.1 / (ifelse(kernel_type == "gauss", 3, 1) *
+                                                 ifelse(kernel_type == "gausvar", 2.5, 1))
   bw.max <- diff(range(xin))/3
   if (bw.max < bw.min) {
     if (bw.min > bw.max*3/2) {
@@ -366,7 +368,7 @@ bwCV <- function(xin, qin, xout, optns) {
 
     qfit <- lapply(seq_len(numFolds), function(foldidx) {
       testidx <- which(folds == foldidx)
-      res <- LocWassReg(xin = xin[-testidx,], qin = qin[-testidx,], xout = xin[testidx,],
+      res <- LocWassReg(xin = matrix(xin[-testidx,],ncol=p,byrow=TRUE), qin = matrix(qin[-testidx,],ncol=ncol(qin),byrow=TRUE), xout = matrix(xin[testidx,],ncol=p,byrow=TRUE),
                         optns = optns1)
       res # each row is a qt function
     })
@@ -422,7 +424,7 @@ bwCV <- function(xin, qin, xout, optns) {
   if(p==1){
     res <- optimize(f = objFctn, interval = bwRange[,1])$minimum
   }else{
-    res <- optim(par=rowMeans(bwRange),fn=objFctn,lower=bwRange[,1],upper=bwRange[,2],method='L-BFGS-B')$par
+    res <- optim(par=colMeans(bwRange),fn=objFctn,lower=bwRange[1,],upper=bwRange[2,],method='L-BFGS-B')$par
   }
   res
 }
