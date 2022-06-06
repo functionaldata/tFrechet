@@ -16,7 +16,8 @@ GloSpheGeoReg <- function(xin, yin, xout) {
     # initial guess
     y0 = colMeans(yin*s)
     y0 = y0 / l2norm(y0)
-    if (sum(sapply(1:n, function(i) sum(yin[i,]*y0)) > 1-1e-8)){
+    if ( any( sapply( 1:n, function(i) isTRUE( all.equal( sum(yin[i,]*y0), 1 ) ) ) ) ){
+    # if (sum(sapply(1:n, function(i) sum(yin[i,]*y0)) > 1-1e-8)){
       #if (sum( is.infinite (sapply(1:n, function(i) (1 - sum(yin[i,]*y0)^2)^(-0.5) )[ker((xout[j] - xin) / bw)>0] ) ) + 
       #   sum(sapply(1:n, function(i) 1 - sum(yin[i,] * y0)^2 < 0)) > 0){
       y0[1] = y0[1] + 1e-3
