@@ -83,7 +83,45 @@ test_that("Works with fully observed distributions and without providing bandwid
   xout <- xin
   res <- LocDenReg(xin=xin, qin=qin, xout=xout, optns = list(qSup = c(0,qSup,1)))
   expect_true(mean(sqrt(apply((qtrue - res$qout[,-c(1,length(res$qSup))])^2,
-                              1, pracma::trapz, x = qSup))) / mean(qin) < 1e-3)
+                              1, pracma::trapz, x = qSup))) / mean(qin) < 3e-2)
+})
+
+test_that("Works with fully observed distributions when only providing 2D bandwidth range; p=2", {
+  set.seed(1)
+  xin <- cbind(runif(200),runif(200))
+  qSup <- qbeta((1:99)/100,1/2,1/2)
+  sd <- 0.1
+  qin=matrix(0,nrow=nrow(xin),ncol=(length(qSup)+2))
+  qtrue=matrix(0,nrow=nrow(xin),ncol=(length(qSup)))
+  for(i in 1:nrow(xin)){
+    qin[i,]=qnorm(c(1e-6,qSup,1-1e-6), mean=xin[i,1]^2+xin[i,2], sd=sd)
+    qtrue[i,]=qnorm(qSup, mean=xin[i,1]^2+xin[i,2], sd=sd)
+  }
+  xout <- xin
+  res <- LocDenReg(xin=xin, qin=qin, xout=xout, optns = list(qSup = c(0,qSup,1),
+                                                             bwRange=cbind(c(0.01,0.08),c(0.01,0.1))))
+  expect_true(mean(sqrt(apply((qtrue - res$qout[,-c(1,length(res$qSup))])^2,
+                              1, pracma::trapz, x = qSup))) / mean(qin) < 1e-2)
+})
+
+test_that("bw found by CV is in range when providing fully observed distributions and 2D bandwidth range; p=2", {
+  set.seed(1)
+  xin <- cbind(runif(200),runif(200))
+  qSup <- qbeta((1:99)/100,1/2,1/2)
+  sd <- 0.1
+  qin=matrix(0,nrow=nrow(xin),ncol=(length(qSup)+2))
+  qtrue=matrix(0,nrow=nrow(xin),ncol=(length(qSup)))
+  for(i in 1:nrow(xin)){
+    qin[i,]=qnorm(c(1e-6,qSup,1-1e-6), mean=xin[i,1]^2+xin[i,2], sd=sd)
+    qtrue[i,]=qnorm(qSup, mean=xin[i,1]^2+xin[i,2], sd=sd)
+  }
+  xout <- xin
+  bandwidthRange=cbind(c(0.01,0.08),c(0.01,0.1))
+  res <- LocDenReg(xin=xin, qin=qin, xout=xout, optns = list(qSup = c(0,qSup,1),
+                                                             bwRange=bandwidthRange))
+  
+  expect_true((res$optns$bwReg[1]>=bandwidthRange[1,1])&(res$optns$bwReg[1]<=bandwidthRange[2,1])&
+                (res$optns$bwReg[2]>=bandwidthRange[1,2])&(res$optns$bwReg[2]<=bandwidthRange[2,2]))
 })
 
 test_that("Works with fully observed distributions; p=2", {
