@@ -28,7 +28,6 @@
 #'   tau[i]=alpha1+beta1*X[i]+truncnorm::rtruncnorm(1, a=-0.3, b=0.3, mean = 0, sd = 1.0)
 #' }
 #' Ni_n=matrix(0,nrow=n,ncol=1)
-#' Qi_hat=matrix(0,nrow=n,ncol=length(gridQ))
 #' u0=0.4
 #' u1=0.5
 #' u2=0.05
@@ -152,7 +151,7 @@ GloPointPrReg <- function(xin=NULL, tin=NULL,T0=NULL, xout=NULL, optns=list()) {
   
   quantile_GFR = t(sapply(1:k, function(j){
     s = 1 + t(t(xin) - xbar) %*% invSigma %*% (xout[j,] - xbar)
-    s = as.vector(s)
+    s = as.vector(s)/n
     gx = (s %*% Qi_hat)
     res = do.call(quadprog::solve.QP, list(diag(m), gx, A, b0))
     return(sort(res$solution))

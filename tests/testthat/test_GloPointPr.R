@@ -14,7 +14,6 @@ test_that("Works with p=1 and no options", {
     tau[i]=alpha1+beta1*X[i]+truncnorm::rtruncnorm(1, a=-0.3, b=0.3, mean = 0, sd = 1.0)
   }
   Ni_n=matrix(0,nrow=n,ncol=1)
-  Qi_hat=matrix(0,nrow=n,ncol=length(gridQ))
   u0=0.4
   u1=0.5
   u2=0.05
@@ -48,7 +47,6 @@ test_that("Works with p=2 and no options", {
     tau[i]=alpha1+beta1*X[i,1]+0.5*beta1*X[i,2]+truncnorm::rtruncnorm(1, a=-0.3, b=0.3, mean = 0, sd = 1.0)
   }
   Ni_n=matrix(0,nrow=n,ncol=1)
-  Qi_hat=matrix(0,nrow=n,ncol=length(gridQ))
   u0=0.4
   u1=0.5
   u2=0.05
@@ -84,7 +82,6 @@ test_that("Works with specifying dSup and p=2", {
     tau[i]=alpha1+beta1*X[i,1]+0.5*beta1*X[i,2]+truncnorm::rtruncnorm(1, a=-0.3, b=0.3, mean = 0, sd = 1.0)
   }
   Ni_n=matrix(0,nrow=n,ncol=1)
-  Qi_hat=matrix(0,nrow=n,ncol=length(gridQ))
   u0=0.4
   u1=0.5
   u2=0.05
