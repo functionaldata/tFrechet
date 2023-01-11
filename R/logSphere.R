@@ -6,7 +6,7 @@
 logSphere <- function(base, x) {
   tg <- (x - sum(x * base) * base)
   tgNorm <- l2norm(tg)
-  if ( !is.na(tgNorm) & all.equal(tgNorm, 0) ) {
+  if ( !is.na(tgNorm) & isTRUE( all.equal(tgNorm, 0) ) ) {
     rep( 0,length(base) )
   } else {
     tg / l2norm(tg) * SpheGeoDist(base,x)
