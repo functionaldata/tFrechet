@@ -9,9 +9,11 @@
 #' @param optns A list of options control parameters specified by \code{list(name=value)}. See `Details'.
 #' @details Available control options are
 #' \describe{
-#' \item{userBwMu}{The bandwidth value for the smoothed mean function; positive numeric - default: determine automatically based on the data-driven bandwidth selector proposed by Sheather and Jones (1991)}
+#' \item{userBwMu}{The bandwidth value for the smoothed mean function; positive numeric value. }
+#' \item{bwMethod}{The method to estimate the bandwidth value for the smoothed mean function when \code{userBwMu} is missing; "ruleOfThumb", "CV" - default: "ruleOfThumb", which is based on the data-driven bandwidth selector proposed by Sheather and Jones (1991).}
 #' \item{nRegGrid}{The number of support points the KDE; numeric - default: 101.}
 #' \item{delta}{The size of the bin to be used; numeric - default: \code{diff(range(y))/1000}. It only works when the raw sample is available.}
+#' \item{zeroPct}{percentage of zero bins in the histogram construction. It only works when the raw sample is available and delta is missing from user}
 #' \item{kernel}{smoothing kernel choice, \code{"rect"}, \code{"gauss"}, \code{"epan"}, \code{"gausvar"}, \code{"quar"} - default: \code{"gauss"}.}
 #' \item{infSupport}{logical if we expect the distribution to have infinite support or not; logical - default: \code{FALSE}.}
 #' \item{outputGrid}{User defined output grid for the support of the KDE, it overrides \code{nRegGrid}; numeric - default: \code{NULL}.}
@@ -95,9 +97,9 @@
 #' @export
 
 CreateDensity <- function(y=NULL, histogram=NULL, freq=NULL, bin=NULL, optns = list()){
-
+  
   if (is.null(y)==TRUE) {
-
+    
     if (is.null(histogram)==FALSE) {
       if (is.null(histogram$breaks)) {
         mids <- histogram$mids
@@ -107,22 +109,22 @@ CreateDensity <- function(y=NULL, histogram=NULL, freq=NULL, bin=NULL, optns = l
         }
         bin[length(mids)+1] <- mids[length(mids)]+(mids[length(mids)]-mids[length(mids)-1])/2
       } else bin <- histogram$breaks
-
+      
       freq <- histogram$counts
     }
-
+    
     if (is.null(freq)==TRUE) {
-
+      
       if ((length(freq)+1)!=length(bin)) {
         stop('length(bin) should equal to length(freq)+1.')
       }
-
+      
       # mids <- c()
       # for (i in 1:length(freq)) {
       #   mids[i] <- (bin[i]+bin[i+1])/2
       # }
     }
-
+    
     y <- c()
     for (i in 1:length(freq)) {
       if (freq[i]!=0) {
@@ -131,38 +133,74 @@ CreateDensity <- function(y=NULL, histogram=NULL, freq=NULL, bin=NULL, optns = l
       }
     }
   }
-
+  
   if(is.null(optns$kernel)){
     kernel = 'gauss'
   } else {
     kernel =  optns$kernel
   }
-
+  
+  if(is.null(optns$bwMethod)){
+    bwMethod = 'ruleOfThumb'
+  }else{
+    bwMethod = optns$bwMethod
+  }
+  
+  if(is.null(optns$zeroPct)){
+    zeroPct = 0.5
+  }else{
+    zeroPct = optns$zeroPct
+  }
+  
   if(is.null(optns$delta)){
-    delta = diff(range(y))/1000
+    #delta = diff(range(y))/1000
     #delta = max(c( diff(range(y))/1000, min(diff(sort(unique(y)))) ))
+    delta_R = (max(y) - min(y))/2
+    delta_L =  0
+    epsilon = 1e-3
+    maxIter = 1e3
+    iter = 0
+    p = zeroPct + 1
+    
+    while((abs(p - zeroPct) > epsilon) & (iter<maxIter)){
+      delta_M = (delta_R+delta_L) / 2
+      histgrid = c(seq( min(y), max(y), by = delta_M) - delta_M*0.5, max(y)+delta_M*0.5)
+      if(  (max(y)+delta_M*0.5) > histgrid[length(histgrid)] ){
+        histgrid[length(histgrid)] =  max(y)+delta_M*0.5;
+      }
+      histObj =  hist(y, breaks = histgrid, plot = FALSE)
+      p = sum(histObj$counts == 0)/length(histObj$counts)
+      if(p < zeroPct){
+        delta_R = delta_M
+      }else{
+        delta_L = delta_M
+      }
+      iter = iter + 1
+    }
+    delta = delta_M
+    
   } else {
     delta = optns$delta
   }
-
+  
   if(is.null(optns$nRegGrid)){
     nRegGrid = 101
   } else {
     nRegGrid = optns$nRegGrid
   }
-
+  
   if(is.null(optns$outputGrid)){
     outputGrid = NULL
   } else {
     outputGrid = optns$outputGrid
   }
-
+  
   if(is.null(optns$infSupport)){
     infSupport = FALSE
   } else {
     infSupport = optns$infSupport
   }
-
+  
   N = length(y)
   #histgrid = seq( min(y)-delta*0.5, max(y)+delta*0.5, by = delta );
   histgrid = c(seq( min(y), max(y), by = delta) - delta*0.5, max(y)+delta*0.5)
@@ -174,19 +212,20 @@ CreateDensity <- function(y=NULL, histogram=NULL, freq=NULL, bin=NULL, optns = l
   yin = histObj$density; xin = histObj$mids
   #yin = histObj$counts[1:M-1] / N / delta;
   #xin = seq( min(y), max(y), by = delta);
-
+  
   if( is.null(optns$userBwMu)){
-
-    densTmp <- density(y,kernel='epanechnikov')
-    bw <- 2*densTmp$bw
-    #bw <- 2*densTmp$bw
-
-    # bwCV = fdapace:::CVLwls1D(y = yin, t = xin, kernel = kernel, npoly = 1, nder = 0, dataType = 'Dense', kFolds = 5)
-    # bw <- bwCV
+    if(bwMethod == 'ruleOfThumb'){
+      densTmp <- density(y,kernel='epanechnikov')
+      bw <- 2*densTmp$bw
+      #bw <- 2*densTmp$bw
+    }else{
+      bwCV = fdapace:::CVLwls1D(y = yin, t = xin, kernel = kernel, npoly = 1, nder = 0, dataType = 'Dense', kFolds = 5)
+      bw <- bwCV
+    }
   } else {
     bw = optns$userBwMu
   }
-
+  
   densObj <- list()
   densObj$bw <- bw
   densObj$x <- outputGrid
@@ -210,19 +249,14 @@ CreateDensity <- function(y=NULL, histogram=NULL, freq=NULL, bin=NULL, optns = l
     } else qpad2 <- numeric()
     xinNew <- c(qpad1,xin,qpad2)
     yinNew <- c(rep(0,length(qpad1)),yin,rep(0,length(qpad2)))
-
+    
     # note that Lwls1D requires xin to be at least of length 6
     mu = fdapace::Lwls1D(bw = bw, kernel_type = kernel, win = rep(1,length(xinNew)), xin = xinNew, yin = yinNew, xout = densObj$x)
   }
   mu[mu<0] = 0
   #densObj$y = mu / fdapace:::trapzRcpp(densObj$x, mu)
   densObj$y = mu / pracma::trapz(densObj$x, mu)
-
+  
   return(densObj)
 }
-
-
-
-
-
 
