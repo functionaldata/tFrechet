@@ -1,4 +1,4 @@
-partial_glob_CORE = function(xin, tin, qin, xout, tout, optns = list()){ #ker = ker.gauss, bw_t= NULL, lower=NULL, upper=NULL){
+partGloWassCore = function(xin, tin, qin, xout, tout, optns = list()){ #ker = ker.gauss, bw_t= NULL, lower=NULL, upper=NULL){
   
   if(!is.list(xin)){
     stop('xin must be a list')
@@ -33,9 +33,9 @@ partial_glob_CORE = function(xin, tin, qin, xout, tout, optns = list()){ #ker = 
   }
   
   if(!is.null(tout)){
-    if(!is.vector(tout)){
-      stop('tout if enterted by the user must be a vector')
-    }
+    if(!is.numeric(tout)){
+      stop('tout if enterted by the user must be a number')
+    }
   }
   
   if(is.null(optns$bw_t)){
@@ -54,12 +54,9 @@ partial_glob_CORE = function(xin, tin, qin, xout, tout, optns = list()){ #ker = 
   n = length(xin)
   m = ncol(qin[[1]])
   p = ncol(xin[[1]])
-  #ni = nrow(qin[[1]]) 
-  
-  #n = length(xin)
-  #m = ncol(qin)
-  #nn = n/length(tin)
-  
+
+
+##get the weights for the time-varying density regression    
   getLFRweights=function(x0, t0){
     Kt <- lapply(1:n, function(ind) ker((tin[[ind]] - t0)/ optns$bw_t))
     t <- lapply(1:n, function(ind) (tin[[ind]] - t0))
@@ -124,7 +121,7 @@ partial_glob_CORE = function(xin, tin, qin, xout, tout, optns = list()){ #ker = 
   Pmat <- as(diag(m), "sparseMatrix")
   Amat <- as(t(A), "sparseMatrix")
   
-  
+  ##For any points xout (in dimesnion p), and tout (a number), compute the output quantile function
   compute_res = function(xout,tout,qin){
     n = length(qin)
     ss=getLFRweights(xout,tout)
@@ -143,6 +140,7 @@ partial_glob_CORE = function(xin, tin, qin, xout, tout, optns = list()){ #ker = 
     qout = sort(res$x)
     return(qout)
   }
+  ##if either of tout or xout is NULL, compute the output quantile function at the inputted xin and/or tin  
   if(!is.null(tout) & !is.null(xout)){
     qout = compute_res(xout, tout, qin) 
   }
@@ -171,7 +169,7 @@ partial_glob_CORE = function(xin, tin, qin, xout, tout, optns = list()){ #ker = 
   return(qout)
 }
 
-
+##For selecting the bandwidth in the t-direction by CV
 SetBwRange <- function(xin, xout,kernel_type) {
   xinSt <- unique(sort(unlist(xin)))
   bw.min <- max(diff(xinSt), xinSt[2] - min(xout), max(xout) -
@@ -215,7 +213,7 @@ bwCV_pgm <- function(xin, tin, qin, xout, tout, optns = optns){
       res = lapply(testidx_t, function(k){
         ni = nrow(xin[[k]])
         rr = t(sapply(1:ni, function(j){
-          partial_glob_CORE(xin = xin[-k], tin = tin[-k], qin = qin[-k],
+          partGloWassCore(xin = xin[-k], tin = tin[-k], qin = qin[-k],
                             xout = xin[[k]][j,],
                             tout = tin[[k]][j],
                             optns = optns1)
