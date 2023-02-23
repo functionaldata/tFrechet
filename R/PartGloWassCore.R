@@ -1,4 +1,4 @@
-partGloWassCore = function(xin, tin, qin, xout, tout, optns = list()){ #ker = ker.gauss, bw_t= NULL, lower=NULL, upper=NULL){
+PartGloWassCore = function(xin, tin, qin, xout, tout, optns = list()){ #ker = ker.gauss, bw_t= NULL, lower=NULL, upper=NULL){
   
   if(!is.list(xin)){
     stop('xin must be a list')
@@ -213,7 +213,7 @@ bwCV_pgm <- function(xin, tin, qin, xout, tout, optns = optns){
       res = lapply(testidx_t, function(k){
         ni = nrow(xin[[k]])
         rr = t(sapply(1:ni, function(j){
-          partGloWassCore(xin = xin[-k], tin = tin[-k], qin = qin[-k],
+          PartGloWassCore(xin = xin[-k], tin = tin[-k], qin = qin[-k],
                             xout = xin[[k]][j,],
                             tout = tin[[k]][j],
                             optns = optns1)
