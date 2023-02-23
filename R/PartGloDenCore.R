@@ -23,8 +23,7 @@
 #' If more than one of them are specified, \code{yin} overwrites \code{hin}, and \code{hin} overwrites \code{qin}.
 #' @param xout is either NULL or is a vector with the same dimension as any element of the list \code{xin}
 #' if \code{xout} is NULL, the model is fitted at each point of \code{xin}.
-#' @param tout is either NULL or is a vector with the same dimension as any element of the list \code{tin}
-#' if \code{xout} is NULL, the model is fitted at each point of \code{tin}.
+#' @param tout is either NULL or is a real number; if \code{tout} is NULL, the model is fitted at each point of \code{tin}.
 #' @details Available control options are
 #' \describe{
 #' \item{bw_t}{A scalar used as the bandwidth for the local regression fit in the time direction or \code{"CV"} (default), i.e., a data-adaptive selection done by cross-validation.}
@@ -45,7 +44,7 @@
 #' }
 #' @return A list containing the following components:
 #' \item{xout}{Input \code{xout}. If \code{xout} was NULL return \code{xin}}
-#' \item{xout}{Input \code{xout}. If \code{tout} was NULL return \code{tin}}
+#' \item{tout}{Input \code{tout}. If \code{tout} was NULL return \code{tin}}
 #' \item{dout}{A matrix or list holding the output densities corresponding to \code{xout} and \code{tout}.
 #' \code{dout} list of list holding the time-varying density functions corresponding to \code{xout} at the time point \cdoe{tout},
 #' each element of the sub-list consisting of two components \code{x} and \code{y}, giving the domain grid and density function values, respectively.}
@@ -54,6 +53,7 @@
 #' Each element of \code{qout} is a  matrix with rows corresponding to a value in \code{tout}.}
 #' \item{qSup}{A numeric vector giving the domain grid of \code{qout}.}
 #' \item{xin}{Input \code{xin}.}
+#' \item{tin}{Input \code{tin}.}
 #' \item{din}{Densities corresponding to the input \code{yin}, \code{hin} or \code{qin} for each suject and each time point of observation}
 #' \item{qin}{Quantile functions corresponding to the input \code{yin}, \code{hin} or \code{qin}.}
 #' \item{optns}{A list of control options used.}
@@ -125,7 +125,7 @@
 #'  qSup <- seq(0,1,length.out = m)
 #'  optns = list(bw_t = .1, kernelReg = "gauss", lower = NULL,upper = NULL,
 #'               qSup =qSup,nqSup =  100, bwRange = NULL, diff_qSup = FALSE)
-#'  res = partial_glob_den_CORE(xin, tin, qin = qin, xout = xout, tout = tout, optns = optns)
+#'  res = PartGloDenCore(xin, tin, qin = qin, xout = xout, tout = tout, optns = optns)
 #'  plot(res$qout)
 #'  plot(res$dout$x, res$dout$y)
 #'  nobs = 100
@@ -149,10 +149,10 @@
 #'   })
 #' })
 #' optns = list(bw_t = .1, kernelReg = "gauss", lower = NULL,upper = NULL, qSup =qSup)
-#' res = partial_glob_den_CORE(xin, tin, yin = yin, optns = optns)
+#' res = PartGloDenCore(xin, tin, yin = yin, optns = optns)
 #' plot(res$qout[[1]][2,])
 #' plot(res$dout[[1]][[2]]$x, res$dout[[1]][[2]]$y)
-#' res = partial_glob_den_CORE(xin, tin, hin = hin, tout = .3, optns = optns)
+#' res = PartGloDenCore(xin, tin, hin = hin, tout = .3, optns = optns)
 #' plot(res$qout[[1]][2,])
 #' plot(res$dout[[1]][[2]]$x, res$dout[[1]][[2]]$y)
 #' }
@@ -162,7 +162,7 @@
 
 
 
-partial_glob_den_CORE <- function(xin = NULL, tin = NULL, 
+PartGloDenCore <- function(xin = NULL, tin = NULL, 
                                   qin = NULL, yin = NULL, hin = NULL,
                                   xout = NULL, tout = NULL, optns = list()){
   
@@ -245,8 +245,8 @@ partial_glob_den_CORE <- function(xin = NULL, tin = NULL,
   }
   
   if(!is.null(tout)){
-    if(!is.vector(tout)){
-      stop('tout if enterted by the user must be a vector')
+    if(!is.numeric(tout)){
+      stop('tout if enterted by the user must be a number')
     }
   }
   
@@ -411,7 +411,8 @@ partial_glob_den_CORE <- function(xin = NULL, tin = NULL,
   }
   ######
   
-  #bwReg A vector of length p used as the bandwidth for the Fréchet regression or \code{"CV"} (default), i.e., a data-adaptive selection done by cross-validation.}
+  #bwReg is a number p used as the bandwidth for the Fréchet regression in the t-direction
+  ##or \code{"CV"} (default), i.e., a data-adaptive selection done by cross-validation.}
   if (!("bw_t"%in%names(optnsReg))) {
     optnsReg$bw_t <- "CV"
   }
@@ -431,7 +432,7 @@ partial_glob_den_CORE <- function(xin = NULL, tin = NULL,
     }
   }
   optns$bw_t <- optnsReg$bw_t
-  qout <- partial_glob_CORE(xin, tin, qin, xout, tout, optns = optnsReg)
+  qout <- PartGloWassCore(xin, tin, qin, xout, tout, optns = optnsReg)
   
   if (!is.null(optnsDen$ndSup))
     names(optnsDen)[which(names(optnsDen) == "ndSup")] <- "nRegGrid"
