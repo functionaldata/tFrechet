@@ -3,27 +3,37 @@
 #' the global dependence of the response on the predictor and the local dependence on the time direction
 #' through weighted Frechet means.
 #' @param xin A list holding the time-varying real predictors. 
-#' Each element of \code{xin} is a matrix where the rows hold the predictor values at each time point in the corresponding element of \code{tin} and
+#' Each element of \code{xin} is a matrix where the rows hold the predictor values at each time 
+#' point in the corresponding element of \code{tin} and
 #' the number of columns is same as the predictor dimension.
 #' @param tin A list holding the time points at which the response and predictors are observed.
 #' Each element of \code{tin} is a vector holding the time points for each subject.
 #' @param qin A list holding the quantile functions of the time-varying response. 
-#' Each element of \code{qin} is a matrix where the rows holds the quantile function at  each time point in the corresponding element of \code{tin} and 
+#' Each element of \code{qin} is a matrix where the rows holds the quantile function at  each time 
+#' point in the corresponding element of \code{tin} and 
 #' the number of columns is same as the length of the support for the quantile functions-
 #' the support of the quantile functions should be the same (i.e., \code{optns$qSup}).
-#' jth row of the ith element of \code{qin} qin holds the quantile response corresponding to jth row of the ith element of \code{xin}.
-#' If the quantile functions are evaluated on different grids (i.e., \code{optns$diff_qSup} == TRUE}),
-#' \code{qin} should be a list of list holding the time-varying quantile functions corresponding to \code{xin} at the time point \cdoe{tin},
-#' each element of the sub-list consisting of two components \code{x} and \code{y} holding the support grid and the corresponding values of the quantile functions, respectively.
+#' jth row of the ith element of \code{qin} holds the quantile response corresponding to jth row of
+#' the ith element of \code{xin}.
+#' If the quantile functions are evaluated on different grids (i.e., \code{optns$diff_qSup} is TRUE),
+#' \code{qin} should be a list of list holding the time-varying quantile functions 
+#' corresponding to \code{xin} at the time point \code{tin},
+#' each element of the sub-list consisting of two components \code{x} and \code{y} holding the 
+#' support grid and the corresponding values of the quantile functions, respectively.
 #' @param yin A list holding the sample of observations of the time-varying response.
-#' Each element of \code{yin} is a matrix where the rows holds the response observations at  each time point in the corresponding element of \code{tin}.
+#' Each element of \code{yin} is a matrix where the rows holds the response observations at  
+#' each time point in the corresponding element of \code{tin}.
 #' @param hin A list holding the histograms of the  time-varying response.
-#' #' Each element of \code{hin} is a list of histograms of the response observations at each time point in the corresponding element of \code{tin}. the response observations at  each time point in the corresponding element of \code{tin}.
+#' Each element of \code{hin} is a list of histograms of the response observations at each time 
+#' point in the corresponding element of \code{tin}. the response observations at  each time point 
+#' in the corresponding element of \code{tin}.
 #' Note that only one of the three \code{yin}, \code{hin}, and \code{qin} needs to be input.
-#' If more than one of them are specified, \code{yin} overwrites \code{hin}, and \code{hin} overwrites \code{qin}.
+#' If more than one of them are specified, \code{yin} overwrites \code{hin}, and \code{hin} 
+#' overwrites \code{qin}.
 #' @param xout is either NULL or is a vector with the same dimension as any element of the list \code{xin}
 #' if \code{xout} is NULL, the model is fitted at each point of \code{xin}.
-#' @param tout is either NULL or is a real number; if \code{tout} is NULL, the model is fitted at each point of \code{tin}.
+#' @param tout is either NULL or is a real number; if \code{tout} is NULL, the model is fitted at 
+#' each point of \code{tin}.
 #' @details Available control options are
 #' \describe{
 #' \item{bw_t}{A scalar used as the bandwidth for the local regression fit in the time direction or \code{"CV"} (default), i.e., a data-adaptive selection done by cross-validation.}
@@ -46,7 +56,7 @@
 #' \item{xout}{Input \code{xout}. If \code{xout} was NULL return \code{xin}}
 #' \item{tout}{Input \code{tout}. If \code{tout} was NULL return \code{tin}}
 #' \item{dout}{A matrix or list holding the output densities corresponding to \code{xout} and \code{tout}.
-#' \code{dout} list of list holding the time-varying density functions corresponding to \code{xout} at the time point \cdoe{tout},
+#' \code{dout} list of list holding the time-varying density functions corresponding to \code{xout} at the time point \code{tout},
 #' each element of the sub-list consisting of two components \code{x} and \code{y}, giving the domain grid and density function values, respectively.}
 #' \item{dSup}{A numeric vector giving the domain grid of each sub-list of the list \code{dout}}
 #' \item{qout}{A list holding the quantile functions of the output densities corresponding to a value in \code{xout},
@@ -59,12 +69,12 @@
 #' \item{optns}{A list of control options used.}
 #' @examples
 #' \donttest{
-#'  n =  50; m = 100; K = 10; dim = 2
+#'  n =  50; m = 100; K = 3; dim = 2
 #'  e_val_fn = function(x,k){
-#'    phi1 = function(x) -cos(pi*x/10)/sqrt(5) First eigenfunction from PACE paper. Domain is [0,10]
+#'    phi1 = function(x) -cos(pi*x/10)/sqrt(5) ##First eigenfunction from PACE paper. Domain is [0,10]
 #'    phi_k = function(x, k) sin((2*k - 1)*pi*x/10)/sqrt(5)
-#'    mu = function(x) x+sin(x); mean function
-#'    lamb1 = seq(8,1,length.out = 7)
+#'    mu = function(x) x+sin(x); ##mean function
+#'    lamb1 = seq(4,1,length.out = max((K-3),1)) ##seq(8,1,length.out = 7)
 #'    lamb = .7^(k-1)
 #'    return(list(phi1 = phi1, phi_k = phi_k, mu = mu, lamb1 = lamb1, lamb = lamb))
 #'  }
@@ -80,7 +90,7 @@
 #'      T[[i]] = runif(N,0,1)
 #'      X_tilde[[i]]  = replicate(dim,{
 #'        L = rnorm(K,0,1)
-#'        xi[i,] = sqrt(Lambda)%*%L  rnorm(dim(Lambda)[1]) Generate true scores
+#'        xi[i,] = sqrt(Lambda)%*%L  ##rnorm(dim(Lambda)[1]) Generate true scores
 #'        phi = matrix(0, nrow = N, ncol = K)
 #'        phi[,1] = sapply(T[[i]], function(x) e_val_fn(x, K)$phi1(x))
 #'        for( j in 2:K){
@@ -92,20 +102,20 @@
 #'    }
 #'    return(list(X_tilde = X_tilde , T = T))
 #'  }
-#'   calculates true quantile model at given x and t values
+#'   ##calculates true quantile model at given x and t values
 #'  true_reg = function(x,t){
-#'    zeta_xt = .1 + .2*x + .5*t^2 
-#'    nu_xt = .6 + .2*sin(10*pi*t)
+#'    zeta_xt = x + .5*t^2 
+#'    nu_xt = .6 + .1*sin(10*pi*t)
 #'    reg =  zeta_xt+  nu_xt * qnorm(seq(0.01,.99,length.out = m))
 #'    reg = sort(reg,decreasing = FALSE)
 #'    return(reg)
 #'  }
-#'   function to generate quantiles
+#'   ##function to generate quantiles
 #'  gen_quantile = function(x,t){
-#'    mu_given = rnorm(n = 1, mean = .1 + .2%*%x + .5*t^2 , .1)
-#'    sig_given = rgamma(1,shape = ((.6 + .2*sin(10*pi*t))^2/.1), scale = (.1/(.6 + .2*sin(10*pi*t))))
+#'    mu_given = rnorm(n = 1, mean = x + .5*t^2 , .1)
+#'    sig_given = rgamma(1,shape = ((.6 + .1*sin(10*pi*t))^2/.1), scale = (.1/(.6 + .1*sin(10*pi*t))))
 #'    Q_Y = mu_given + sig_given*qnorm(seq(0.01,.99,length.out = m))
-#'    dens_Y = qf2pdf(Q_Y)
+#'    dens_Y = frechet:::qf2pdf(Q_Y)
 #'    return(Q_Y)
 #'  }
 #'  data = generateData_K(n,K)
@@ -130,10 +140,9 @@
 #'  plot(res$dout$x, res$dout$y)
 #'  nobs = 100
 #'  gen_yin = function(x,t){
-#'   mu_given = rnorm(n = 1, mean = .1 + .2%*%x + .5*t^2 , .1)
-#'   sig_given = rgamma(1,shape = ((.6 + .2*sin(10*pi*t))^2/.1), scale = (.1/(.6 + .2*sin(10*pi*t))))
+#'   mu_given = rnorm(n = 1, mean = x + .5*t^2 , .1)
+#'   sig_given = rgamma(1,shape = ((.6 + .1*sin(10*pi*t))^2/.1), scale = (.1/(.6 + .1*sin(10*pi*t))))
 #'   Y = rnorm(nobs,mu_given ,sig_given)
-#'   dens_Y = qf2pdf(Q_Y)
 #'   return(Y)
 #' }
 #' yin = lapply(1:n, function(i){
@@ -245,7 +254,7 @@ PartGloDenCore <- function(xin = NULL, tin = NULL,
   }
   
   if(!is.null(tout)){
-    if(!is.numeric(tout)){
+    if(!is.vector(tout)){
       stop('tout if enterted by the user must be a number')
     }
   }

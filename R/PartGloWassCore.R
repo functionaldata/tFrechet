@@ -33,9 +33,9 @@ PartGloWassCore = function(xin, tin, qin, xout, tout, optns = list()){ #ker = ke
   }
   
   if(!is.null(tout)){
-    if(!is.numeric(tout)){
-      stop('tout if enterted by the user must be a number')
-    }
+    if(!is.vector(tout)){
+      stop('tout if enterted by the user must be a number')
+      }
   }
   
   if(is.null(optns$bw_t)){
@@ -249,10 +249,10 @@ bwCV_pgm <- function(xin, tin, qin, xout, tout, optns = optns){
     if (min(optns$bwRange) < min(bwRange)) {
       message("Minimum bandwidth is too small and has been reset.")
     }else{
-      bwRange[1,1] <- min(optns$bwRange)
+      bwRange[1] <- min(optns$bwRange)
     }
     if (max(optns$bwRange) >  min(bwRange)) {
-      bwRange[2,1] <- max(optns$bwRange)
+      bwRange[2] <- max(optns$bwRange)
     }else {
       message("Maximum bandwidth is too small and has been reset.")
     }
