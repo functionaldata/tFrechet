@@ -38,6 +38,7 @@ The current version only supports the log-quantile density (LQD) transformation 
 \examples{
 library(MASS)
 
+### generating random samples
 g1 <- function (u, x1) sin(2*pi*u) * (2*x1 - 1)
 g2 <- function (u, x2) sin(2*pi*u) * sin(2*pi*x2)
 
@@ -77,8 +78,10 @@ h0 <- 0.05
 h <- c(0.075, 0.075)
 densSup <- c(0, 1)
 
+
+### component function estimation
 # smooth backfitting
-estDensityFAM <- DensityFAM (Ly, X, x, h0, h, densSup)
+estDensityFAM <- DensityFAM(Ly = Ly, X = X, x = x, h0 = h0, h = h, densSup = densSup)
 
 # lqd evaluation grid
 lqdGrid <- estDensityFAM$lqdGrid
@@ -88,11 +91,7 @@ lqdGridLen <- length(lqdGrid)
 densGrid <- estDensityFAM$densGrid
 densGridLen <- length(densGrid)
 
-# LQD estimates
-g0Sbf <- estDensityFAM$lqdSbfMean
-gjSbf <- estDensityFAM$LlqdSbfComp
-
-# true LQD evaluation
+# true LQD component functions
 g1Eval <- g2Eval <- matrix(nrow = lqdGridLen, ncol = M)
 for (l in 1:lqdGridLen) {
   for (m in 1:M) {
@@ -101,11 +100,11 @@ for (l in 1:lqdGridLen) {
   }
 }
 
-# density estimates
-dens0Sbf <- estDensityFAM$densSbfMean
-densjSbf <- estDensityFAM$LdensSbfComp
+# LQD component function estimates
+g0Sbf <- estDensityFAM$lqdSbfMean
+gjSbf <- estDensityFAM$LlqdSbfComp
 
-# true density evaluation
+# true density component functions
 dens1Eval <- dens2Eval <- matrix(nrow = densGridLen, ncol = M)
 for (m in 1:M) {
   dens1Eval[,m] <- fdadensity::lqd2dens(lqd = g1Eval[,m],
@@ -116,7 +115,11 @@ for (m in 1:M) {
                                         dSup = densGrid)
 }
 
-# graphical illustration of LQD estimates
+# density component function estimates
+dens0Sbf <- estDensityFAM$densSbfMean
+densjSbf <- estDensityFAM$LdensSbfComp
+
+# graphical illustration of LQD component function estimates
 par(mfrow = c(2,2))
 par(mar=rep(0.5, 4)+0.1)
 persp(lqdGrid, x[,1], g1Eval,
@@ -143,8 +146,7 @@ persp(lqdGrid, x[,2], gjSbf[[2]],
       border = NA, shade = 0.5,
       ticktype = 'detailed')
 
-
-# graphical illustration of density inversions
+# graphical illustration of density component function estimates
 par(mfrow = c(2,2))
 par(mar=rep(0.5, 4)+0.1)
 persp(densGrid, x[,1], dens1Eval,
@@ -170,6 +172,49 @@ persp(densGrid, x[,2], densjSbf[[2]],
       xlab = '\n y', ylab = '\n x1', zlab = '\n\n SBF estimate \n (Inversion of g0 + g2)',
       border = NA, shade = 0.5,
       ticktype = 'detailed')
+
+
+### fitted density responses
+# smooth backfitting
+fitDensityFAM <- DensityFAM(Ly = Ly, X = X, h0 = h0, h = h, densSup = densSup)
+
+# lqd evaluation grid
+lqdGrid <- fitDensityFAM$lqdGrid
+lqdGridLen <- length(lqdGrid)
+
+# density evaluation grid
+densGrid <- fitDensityFAM$densGrid
+densGridLen <- length(densGrid)
+
+# fitted LQD component functions
+g0SBFit <- fitDensityFAM$lqdSbfMean
+gjSBFit <- fitDensityFAM$LlqdSbfComp
+
+# fitted density responses
+densSBFit <- lapply(1:n, 
+                    function (i) {
+                      gSBFit <- g0SBFit + gjSBFit[[1]][,i] + gjSBFit[[2]][,i]
+                      densSBFit_i <- fdadensity::lqd2dens(lqd = gSBFit, 
+                                                          lqSup = lqdGrid,
+                                                          dSup = densGrid)
+                      return (densSBFit_i)
+                    }
+)
+
+# graphical illustration of fitted density responses
+set.seed(1)
+ind <- sample(1:n, 12)
+par(mfrow = c(3, 4))
+par(mar=c(4, 4, 4, 1)+0.1)
+for (i in ind) {
+  hist_i <- hist(Ly[[i]], plot = FALSE)
+  hist(Ly[[i]], probability = TRUE, 
+       ylim = range(c(hist_i$density, densSBFit[[i]])),
+       xlab = 'Y',
+       main = paste(i, '-th random sample \n with X = (', round(X[i,1],2), ', ', round(X[i,2],2), ')', sep = ''))
+  lines(densGrid, densSBFit[[i]], col = 2, lwd = 2)
+}
+
 }
 \references{
 \cite{Han, K., Mueller, H.-G., and Park, B. U. (2020), "Additive functional regression for densities as responses", Journal of the American Statistical Association , 115 (530), pp.997-1010.}
