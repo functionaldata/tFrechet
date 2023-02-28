@@ -31,13 +31,12 @@
 #' g <- function (u, x) g1(u, x[1]) + g2(u, x[2])
 #' 
 #' GenLqdNoise <- function (u, e) e[1]*sin(pi*u) + e[2]*sin(2*pi*u) 
+#' GenQdensResp <- function (u, x, e) exp(g(u, x) + GenLqdNoise(u, e))
 #' 
-#' GenQdResp <- function (u, x, e) exp(g(u, x) + GenLqdNoise(u, e))
-#' 
-#' GenCondQResp <- function (u, x, e) {
+#' GenQuantileResp <- function (u, x, e) {
 #'   
-#'   tmp1 <- integrate(GenQdResp, lower = 0, upper = u, x = x, e = e)$value
-#'   tmp2 <- integrate(GenQdResp, lower = 0, upper = 1, x = x, e = e)$value
+#'   tmp1 <- integrate(GenQdensResp, lower = 0, upper = u, x = x, e = e)$value
+#'   tmp2 <- integrate(GenQdensResp, lower = 0, upper = 1, x = x, e = e)$value
 #'   
 #'   return (tmp1 / tmp2)
 #' }
@@ -53,7 +52,7 @@
 #' for (i in 1:n) {
 #'   U_i <- runif(N)
 #'   E_i <- c(rnorm(1, 0, 0.1), rnorm(1, 0, 0.05))
-#'   Ly[[i]] <- sapply(1:N, function (l) GenCondQResp(U_i[l], X[i,], E_i))
+#'   Ly[[i]] <- sapply(1:N, function (l) GenQuantileResp(U_i[l], X[i,], E_i))
 #' }
 #' 
 #' M <- 51
