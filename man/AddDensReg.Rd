@@ -39,12 +39,13 @@ The current version only supports the log-quantile density (LQD) transformation 
 \examples{
 library(MASS)
 
-### generating random samples
+# additive component functions
 g1 <- function (u, x1) sin(2*pi*u) * (2*x1 - 1)
 g2 <- function (u, x2) sin(2*pi*u) * sin(2*pi*x2)
 
 g <- function (u, x) g1(u, x[1]) + g2(u, x[2])
 
+# generating random samples from conditional quantile functions
 GenLqdNoise <- function (u, e) e[1]*sin(pi*u) + e[2]*sin(2*pi*u) 
 GenQdensResp <- function (u, x, e) exp(g(u, x) + GenLqdNoise(u, e))
 
@@ -78,8 +79,7 @@ hu <- 0.05
 hx <- c(0.075, 0.075)
 dSup <- c(0, 1)
 
-
-### component function estimation
+# estimating the functional additive model
 estAddDensReg <- AddDensReg(Ly = Ly, X = X, x = x, hu = hu, hx = hx, dSup = dSup)
 
 # true LQD component functions
@@ -164,8 +164,7 @@ persp(estAddDensReg$densGrid, x2, densjSbf[[2]],
       border = NA, shade = 0.5,
       ticktype = 'detailed')
 
-
-### fitted density responses
+# fitted density responses
 fitAddDensReg <- AddDensReg(Ly = Ly, X = X, hu = hu, hx = hx, dSup = dSup)
 
 # fitted LQD component functions
