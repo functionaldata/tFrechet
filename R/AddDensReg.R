@@ -50,8 +50,8 @@
 #' }
 #' 
 #' set.seed(999)
-#' n <- 100
-#' N <- 200
+#' n <- 150
+#' N <- 250
 #' 
 #' Sigma <- matrix(c(1, 0.5, 0.5, 1), nrow = 2, ncol = 2)
 #' X <- pnorm(mvrnorm(n, rep(0, 2), Sigma))
@@ -175,7 +175,7 @@
 #' )
 #' 
 #' # graphical illustration of fitted density responses
-#' set.seed(1)
+#' set.seed(999)
 #' ind <- sample(1:n, 12)
 #' par(mfrow = c(3, 4))
 #' par(mar=c(4, 4, 4, 1)+0.1)
@@ -294,7 +294,7 @@ AddDensReg <- function (Ly, X, x = NULL, hu = NULL, hx = NULL, dSup = NULL) {
                         )
   
   # density response reconstruction
-  message('Estimating density resopnses...')
+  message('Estimating density resopnses...(1/4)')
   Ldens <- lapply(1:n,
                 function (i) {
                   f_i <- fdadensity::CreateDensity(y = normalizeLy[[i]], 
@@ -306,7 +306,7 @@ AddDensReg <- function (Ly, X, x = NULL, hu = NULL, hx = NULL, dSup = NULL) {
   densMat <- matrix(unlist(Ldens), nrow = n, ncol = densGridLen, byrow = TRUE)
   
   # LQD transformation
-  message('Transforming density resopnses...')
+  message('Transforming density resopnses...(2/4)')
   Llqd <- lapply(1:n, 
                   function (i) {
                     
@@ -341,7 +341,7 @@ AddDensReg <- function (Ly, X, x = NULL, hu = NULL, hx = NULL, dSup = NULL) {
   lqdSmoothMat <- matrix(unlist(LlqdSmooth), nrow = n, ncol = lqdGridLen, byrow = TRUE)
   
   # smooth backfitting
-  message('Smooth backfitting...')
+  message('Smooth backfitting...(3/4)')
   g0Sbf <- c()
   gjSbf <- lapply(1:d,
                     function (j) {
@@ -369,7 +369,7 @@ AddDensReg <- function (Ly, X, x = NULL, hu = NULL, hx = NULL, dSup = NULL) {
   }
   
   # LQD inversion to density
-  message('Inverting to density resopnses...')
+  message('Inverting to density resopnses...(4/4)')
   dens0Sbf <- fdadensity::lqd2dens(lqd = g0Sbf,
                                    lqSup = lqdGrid,
                                    dSup = densGrid)

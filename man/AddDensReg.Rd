@@ -58,8 +58,8 @@ GenQuantileResp <- function (u, x, e) {
 }
 
 set.seed(999)
-n <- 100
-N <- 200
+n <- 150
+N <- 250
 
 Sigma <- matrix(c(1, 0.5, 0.5, 1), nrow = 2, ncol = 2)
 X <- pnorm(mvrnorm(n, rep(0, 2), Sigma))
@@ -183,7 +183,7 @@ densSBFit <- lapply(1:n,
 )
 
 # graphical illustration of fitted density responses
-set.seed(1)
+set.seed(999)
 ind <- sample(1:n, 12)
 par(mfrow = c(3, 4))
 par(mar=c(4, 4, 4, 1)+0.1)
