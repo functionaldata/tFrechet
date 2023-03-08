@@ -74,8 +74,7 @@ GloWassReg <- function(xin, qin, xout, optns=list()){
     return(list(qout=qout))
   } else {
     qMean <- colMeans(qin)
-    if (k == n) {
-      if (sum(abs(xout-xin)) > 1e-10*length(xout))
+    if (k == n & sum(abs(xout-xin)) <= 1e-10*length(xout)) {
         qin.est <- qout
     } else {
       qin.est <- sapply(1:n, function(j){
