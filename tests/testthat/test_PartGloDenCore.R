@@ -1,9 +1,9 @@
-rm(list = ls())
-setwd(dirname(rstudioapi::getActiveDocumentContext()$path))
+#rm(list = ls())
+#setwd(dirname(rstudioapi::getActiveDocumentContext()$path))
 library(devtools)
 library(testthat)
-devtools::load_all("../../R/")
-devtools::document("../../R")
+#devtools::load_all("../../R/")
+#devtools::document("../../R")
 
 n =  50; m = 100; K = 2; dim = 2
 e_val_fn = function(x,k){
