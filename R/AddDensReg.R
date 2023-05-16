@@ -91,10 +91,10 @@
 #' dens1Eval <- dens2Eval <- matrix(nrow = length(estAddDensReg$densGrid), ncol = M)
 #' for (m in seq(M)) {
 #'   dens1Eval[,m] <- fdadensity::lqd2dens(lqd = g1Eval[,m],
-#'                                         lqSup = estAddDensReg$lqdGrid,
+#'                                         lqdSup = estAddDensReg$lqdGrid,
 #'                                         dSup = estAddDensReg$densGrid)
 #'   dens2Eval[,m] <- fdadensity::lqd2dens(lqd = g2Eval[,m],
-#'                                         lqSup = estAddDensReg$lqdGrid,
+#'                                         lqdSup = estAddDensReg$lqdGrid,
 #'                                         dSup = estAddDensReg$densGrid)
 #' }
 #' 
@@ -168,7 +168,7 @@
 #'                     function (i) {
 #'                       gSBFit <- g0SBFit + gjSBFit[[1]][,i] + gjSBFit[[2]][,i]
 #'                       densSBFit_i <- fdadensity::lqd2dens(lqd = gSBFit, 
-#'                                                           lqSup = fitAddDensReg$lqdGrid,
+#'                                                           lqdSup = fitAddDensReg$lqdGrid,
 #'                                                           dSup = fitAddDensReg$densGrid)
 #'                       return (densSBFit_i)
 #'                     }
@@ -297,7 +297,7 @@ AddDensReg <- function (Ly, X, x = NULL, hu = NULL, hx = NULL, dSup = NULL) {
   message('Estimating density resopnses...(1/4)')
   Ldens <- lapply(1:n,
                 function (i) {
-                  f_i <- fdadensity::CreateDensity(y = normalizeLy[[i]], 
+                  f_i <- frechet::CreateDensity(y = normalizeLy[[i]], 
                                                    optns = list(outputGrid = densGrid))$y  
                   return (f_i)
                 }
@@ -319,7 +319,7 @@ AddDensReg <- function (Ly, X, x = NULL, hu = NULL, hx = NULL, dSup = NULL) {
                     
                     lqd_i <- fdadensity::dens2lqd(dens = f_i, 
                                                   dSup = densGrid,
-                                                  lqSup = lqdGrid)
+                                                  lqdSup = lqdGrid)
                     return (lqd_i)
                   }
                  )
@@ -371,7 +371,7 @@ AddDensReg <- function (Ly, X, x = NULL, hu = NULL, hx = NULL, dSup = NULL) {
   # LQD inversion to density
   message('Inverting to density resopnses...(4/4)')
   dens0Sbf <- fdadensity::lqd2dens(lqd = g0Sbf,
-                                   lqSup = lqdGrid,
+                                   lqdSup = lqdGrid,
                                    dSup = densGrid)
   densjSbf <- lapply(1:d, 
                       function (j) {
@@ -383,7 +383,7 @@ AddDensReg <- function (Ly, X, x = NULL, hu = NULL, hx = NULL, dSup = NULL) {
     for (j in 1:d) {
       
       densSbf_j <- fdadensity::lqd2dens(lqd = gjSbfAddMean[[j]][, m],
-                                        lqSup = lqdGrid,
+                                        lqdSup = lqdGrid,
                                         dSup = densGrid)
       
       densjSbf[[j]][, m] <- fdapace::Lwls1D(bw = hu,
@@ -409,6 +409,3 @@ AddDensReg <- function (Ly, X, x = NULL, hu = NULL, hx = NULL, dSup = NULL) {
                )
           )
 }
-
-
-
