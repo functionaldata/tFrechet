@@ -99,10 +99,10 @@ gjSbf <- estAddDensReg$LlqdSbfComp
 dens1Eval <- dens2Eval <- matrix(nrow = length(estAddDensReg$densGrid), ncol = M)
 for (m in seq(M)) {
   dens1Eval[,m] <- fdadensity::lqd2dens(lqd = g1Eval[,m],
-                                        lqSup = estAddDensReg$lqdGrid,
+                                        lqdSup = estAddDensReg$lqdGrid,
                                         dSup = estAddDensReg$densGrid)
   dens2Eval[,m] <- fdadensity::lqd2dens(lqd = g2Eval[,m],
-                                        lqSup = estAddDensReg$lqdGrid,
+                                        lqdSup = estAddDensReg$lqdGrid,
                                         dSup = estAddDensReg$densGrid)
 }
 
@@ -176,7 +176,7 @@ densSBFit <- lapply(1:n,
                     function (i) {
                       gSBFit <- g0SBFit + gjSBFit[[1]][,i] + gjSBFit[[2]][,i]
                       densSBFit_i <- fdadensity::lqd2dens(lqd = gSBFit, 
-                                                          lqSup = fitAddDensReg$lqdGrid,
+                                                          lqdSup = fitAddDensReg$lqdGrid,
                                                           dSup = fitAddDensReg$densGrid)
                       return (densSBFit_i)
                     }
