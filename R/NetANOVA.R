@@ -22,6 +22,7 @@
 #'   Returned if \code{optns$boot} is TRUE.}
 #' \item{optns}{The control options used.}
 #' @examples
+#' \donttest{
 #' set.seed(1)
 #' n1 <- 100
 #' n2 <- 100
@@ -42,6 +43,7 @@
 #' res <- NetANOVA(Ly, group, optns = list(boot = TRUE))
 #' res$pvalAsy # returns asymptotic pvalue
 #' res$pvalBoot # returns bootstrap pvalue
+#' }
 #' @references
 #' \itemize{
 #' \item \cite{Dubey, P. and Müller, H.G., 2019. Fréchet analysis of variance for random objects. Biometrika, 106(4), pp.803-821.}

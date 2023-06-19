@@ -72,6 +72,7 @@
 #'   Returned if \code{optns$boot} is TRUE.}
 #' \item{optns}{the control options used.}
 #' @examples
+#' \donttest{
 #' set.seed(1)
 #' n1 <- 100
 #' n2 <- 200
@@ -91,6 +92,7 @@
 #' res$tau # returns the estimated change point
 #' res$pvalAsy # returns asymptotic pvalue
 #' res$pvalBoot # returns bootstrap pvalue
+#' } 
 #' @references
 #' \itemize{
 #' \item \cite{Dubey, P. and Müller, H.G., 2020. Fréchet change-point detection. The Annals of Statistics, 48(6), pp.3312-3335.}

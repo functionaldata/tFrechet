@@ -45,9 +45,12 @@ Description: Provides implementation of statistical methods for random objects
 License: BSD_3_clause + file LICENSE
 LazyData: false
 Imports:
+    boot,
     corrplot,
+    e1071,
     fdadensity,
     fdapace (>= 0.5.5),
+    igraph,
     Matrix,
     methods,
     pracma,
