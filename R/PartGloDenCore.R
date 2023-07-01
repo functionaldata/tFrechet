@@ -220,7 +220,7 @@ PartGloDenCore <- function(xin = NULL, tin = NULL,
     }
   }
   
-  
+  n = length(xin)
   if(length(unique(
     sapply(1:length(xin), function(ind) ncol(xin[[ind]]) )
   )) !=1){
@@ -258,7 +258,7 @@ PartGloDenCore <- function(xin = NULL, tin = NULL,
       stop('tout if enterted by the user must be a number')
     }
   }
-  
+
   if(any(sapply(1:n, function(ind) nrow(xin[[ind]]))<2)){
     stop('The data is too sparse')
   }

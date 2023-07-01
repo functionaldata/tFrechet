@@ -1,3 +1,33 @@
+#' @title Partially global concurrent object regresion- core functionality
+#' @noRd
+#' @description Concurrent object regression (CORE) model for time-varying density responses and time-varying real covariates, by modeling
+#' the global dependence of the response on the predictor and the local dependence on the time direction
+#' through weighted Frechet means.
+#' @param xin A list holding the time-varying real predictors. 
+#' Each element of \code{xin} is a matrix where the rows hold the predictor values at each time point in the corresponding element of \code{tin} and
+#' the number of columns is same as the predictor dimension.
+#' @param tin A list holding the time points at which the response and predictors are observed.
+#' Each element of \code{tin} is a vector holding the time points for each subject.
+#' @param qin A list holding the quantile functions of the time-varying response. 
+#' Each element of \code{qin} is a matrix where the rows holds the quantile function at  each time 
+#' point in the corresponding element of \code{tin} and 
+#' the number of columns is same as the length of the support for the quantile functions-
+#' the support of the quantile functions should be the same (i.e., \code{optns$qSup}).
+#' jth row of the ith element of \code{qin} holds the quantile response corresponding to jth row of
+#' the ith element of \code{xin}.
+#' @param xout is either NULL or is a vector with the same dimension as any element of the list \code{xin}
+#' if \code{xout} is NULL, the model is fitted at each point of \code{xin}.
+#' @param tout is either NULL or is a real number; if \code{tout} is NULL, the model is fitted at 
+#' each point of \code{tin}.
+#' @param optns A list of control parameters specified by \code{list(name=value)}. See `Details'.
+#' @details Available control options are
+#' \describe{
+#' \item{bw_t}{A scalar used as the bandwidth for the local regression fit in the time direction or \code{"CV"} (default), i.e., a data-adaptive selection done by cross-validation.}
+#' \item{kernelReg}{A character holding the type of kernel functions for local regression in the time direction; \code{"rect"}, \code{"gauss"}, \code{"epan"}, \code{"gausvar"}, \code{"quar"} - default: \code{"gauss"}.}
+#' \item{lower}{A scalar with the lower bound of the support of the distribution. Default is \code{NULL}.}
+#' \item{upper}{A scalar with the upper bound of the support of the distribution. Default is \code{NULL}.}
+#' \item{qSup}{A numeric vector holding the grid on [0,1] quantile functions take value on, if the time-varying responses have same support. Default is an equidistant grid.}
+#' }
 PartGloWassCore = function(xin, tin, qin, xout, tout, optns = list()){ #ker = ker.gauss, bw_t= NULL, lower=NULL, upper=NULL){
   
   if(!is.list(xin)){
@@ -9,7 +39,7 @@ PartGloWassCore = function(xin, tin, qin, xout, tout, optns = list()){ #ker = ke
   if(!is.list(tin)){
     stop('tin must be a list')
   }
-  
+  n = length(xin)
   if(length(unique(
     sapply(1:length(xin), function(ind) ncol(xin[[ind]]) )
   )) !=1){
@@ -35,7 +65,7 @@ PartGloWassCore = function(xin, tin, qin, xout, tout, optns = list()){ #ker = ke
   if(!is.null(tout)){
     if(!is.vector(tout)){
       stop('tout if enterted by the user must be a number')
-      }
+    }
   }
   
   if(is.null(optns$bw_t)){
@@ -50,13 +80,29 @@ PartGloWassCore = function(xin, tin, qin, xout, tout, optns = list()){ #ker = ke
   }
   ker <- frechet:::kerFctn(optns$kernelReg)
   
+  if (!is.null(optns$qSup)) {
+    if (min(optns$qSup) != 0 | max(optns$qSup) - 1 != 0)
+      stop ("optns$qSup must have minimum 0 and maximum 1.")
+    if (sum(duplicated(optns$qSup)) > 0) {
+      optns$qSup <- unique(optns$qSup)
+      warning ("optns$qSup has duplicated elements which has been removed.")
+    }
+    if (is.unsorted(optns$qSup)) {
+      optns$qSup <- sort(optns$qSup)
+      warning ("optns$qSup has been reordered to be increasing.")
+    }
+  } else {
+    optns$qSup <- seq(0,1,length.out = ncol(qin[[1]]))
+    warning ("optns$qSup is missing and is set by default as an equidistant grid on [0,1] with length equal to the number of columns in list qin.")
+  }
+  qSup <- optns$qSup
   
   n = length(xin)
   m = ncol(qin[[1]])
   p = ncol(xin[[1]])
-
-
-##get the weights for the time-varying density regression    
+  
+  
+  ##get the weights for the time-varying density regression    
   getLFRweights=function(x0, t0){
     Kt <- lapply(1:n, function(ind) ker((tin[[ind]] - t0)/ optns$bw_t))
     t <- lapply(1:n, function(ind) (tin[[ind]] - t0))
@@ -69,8 +115,8 @@ PartGloWassCore = function(xin, tin, qin, xout, tout, optns = list()){ #ker = ke
       Ly = lapply(1:n, function(ind) xin[[ind]][,j])
       Lt = lapply(1:n, function(ind)  sort(tin[[ind]]))
       bw_mu = suppressWarnings(fdapace:::CVLwls1D(Ly, Lt, kernel= "gauss", 
-                                 npoly=1, nder=0, dataType= "sparse", kFolds = 5, 
-                                 useBW1SE = FALSE))
+                                                  npoly=1, nder=0, dataType= "sparse", kFolds = 5, 
+                                                  useBW1SE = FALSE))
       
       xin_vec = as.vector(unlist(Ly))[order(as.vector(unlist(Lt)))]
       tin_vec = sort(as.vector(unlist(Lt)))
@@ -186,6 +232,7 @@ SetBwRange <- function(xin, xout,kernel_type) {
 }
 
 bwCV_pgm <- function(xin, tin, qin, xout, tout, optns = optns){
+  n = length(xin)
   tin_vec = sapply(1:n, function(ind) mean(tin[[ind]])) #rowMeans(tin)
   compareRange_t <- (tin_vec  > (min(tin_vec ) + diff(range(tin_vec))/5)) & 
     (tin_vec  < (max(tin_vec ) - diff(range(tin_vec ))/5))
@@ -214,10 +261,10 @@ bwCV_pgm <- function(xin, tin, qin, xout, tout, optns = optns){
         ni = nrow(xin[[k]])
         rr = t(sapply(1:ni, function(j){
           PartGloWassCore(xin = xin[-k], tin = tin[-k], qin = qin[-k],
-                            xout = xin[[k]][j,],
-                            tout = tin[[k]][j],
-                            optns = optns1)
-                           # ker = ker.gauss, bw_t, lower=NULL, upper=NULL)
+                          xout = xin[[k]][j,],
+                          tout = tin[[k]][j],
+                          optns = optns1)
+          # ker = ker.gauss, bw_t, lower=NULL, upper=NULL)
         }))
         return(rr)
       })
