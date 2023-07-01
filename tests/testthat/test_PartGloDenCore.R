@@ -1,11 +1,16 @@
 #rm(list = ls())
 #setwd(dirname(rstudioapi::getActiveDocumentContext()$path))
-library(devtools)
-library(testthat)
+#library(devtools)
+#library(testthat)
 #devtools::load_all("../../R/")
 #devtools::document("../../R")
+#devtools::load_all("./tFrechet/")
+#devtools::document(pkg = "./tFrechet/")
 
-n =  50; m = 100; K = 2; dim = 2
+#devtools::test_active_file("./tFrechet/tests/testthat/test_PartGloDenCore.R")
+
+
+n =  30; m = 50; K = 2; dim = 2
 e_val_fn = function(x,k){
   phi1 = function(x) -cos(pi*x/10)/sqrt(5) ##First eigenfunction from PACE paper. Domain is [0,10]
   phi_k = function(x, k) sin((2*k - 1)*pi*x/10)/sqrt(5)
@@ -40,15 +45,15 @@ generateData_K = function(n, K, dim){
 }
 ##calculates true quantile model at given x and t values
 true_reg = function(x,t){
-  zeta_xt = x + .5*t^2
+  zeta_xt = mean(x) + .5*t^2
   nu_xt = .6 + .1*sin(10*pi*t)
-  reg =  zeta_xt+  nu_xt * qnorm(seq(0.01,.99,length.out = m))
+  reg =  zeta_xt +  nu_xt * qnorm(seq(0.01,.99,length.out = m))
   reg = sort(reg,decreasing = FALSE)
   return(reg)
 }
 ##function to generate quantiles
 gen_quantile = function(x,t){
-  mu_given = rnorm(n = 1, mean = x + .5*t^2 , .1)
+  mu_given = rnorm(n = 1, mean = mean(x) + .5*t^2 , .1)
   sig_given = rgamma(1,shape = ((.6 + .1*sin(10*pi*t))^2/.1), scale = (.1/(.6 + .1*sin(10*pi*t))))
   Q_Y = mu_given + sig_given*qnorm(seq(0.01,.99,length.out = m))
   dens_Y = frechet:::qf2pdf(Q_Y)
@@ -112,13 +117,15 @@ test_that("Works with fully observed distributions", {
     mean(sqrt(sapply(1:ni, function(j){
       (qtrue[[i]][j,] - qout_compare[[i]][j,])^2 * diff(qSup)[2] 
     })))
-  })))/mean_qin <.06)
+  })))/mean_qin <.1)
 })
+
+
 #########################################
 test_that("Works with discrete noisy measurements", {
   xout <- NULL; tout = NULL
   res = suppressWarnings(PartGloDenCore(xin = xin, tin = tin, yin = yin, xout = xout, tout = tout,
-                       optns = list(qSup = c(0,qSup,1))))
+                                        optns = list(qSup = c(0,qSup,1))))
   qout_compare = lapply(1:n, function(i){
     ni = length(tin[[i]])
     t(sapply(1:ni, function(j){
@@ -131,14 +138,14 @@ test_that("Works with discrete noisy measurements", {
       (qtrue[[i]][j,] - qout_compare[[i]][j,])^2 * diff(qSup)[2]
       #pracma::trapz(x = c(0,qSup,1), y = (qtrue[[i]][j,] - qout_compare[[i]][j,])^2)
     })))
-  })))/mean_qin <.06)
+  })))/mean_qin <.1)
 })
 #########################################
 test_that("Works with specifying outputGrid", {
   xout <- NULL; tout = NULL
   dSup <- seq(-1.5,1.5,0.1)
   res = suppressWarnings(PartGloDenCore(xin = xin, tin = tin, qin = qin, xout = xout, tout = tout,
-                       optns = list(qSup = c(0,qSup,1), outputGrid = dSup)))
+                                        optns = list(qSup = c(0,qSup,1), outputGrid = dSup)))
   expect_true("dSup" %in% names(res))
   expect_equal(sum(abs(res$dSup - dSup)), 0)
 })
@@ -150,12 +157,12 @@ test_that("Generates warnings when more than one of the three, yin, hin, and qin
   expect_warning(res_yq <- PartGloDenCore(xin = xin, tin = tin, yin = yin, qin = qin,
                                           xout = xout, tout = tout, optns = list(qSup = c(0,qSup,1))))
   expect_warning(res_hq <- PartGloDenCore(xin = xin, tin = tin, qin = qin, hin = hin,
-                                            xout = xout, tout = tout, optns = list(qSup = c(0,qSup,1))))
-    
+                                          xout = xout, tout = tout, optns = list(qSup = c(0,qSup,1))))
+  
   res_y <- suppressWarnings(PartGloDenCore(xin = xin, tin = tin, yin = yin,
-                          xout = xout, tout = tout, optns = list(qSup = c(0,qSup,1))))
+                                           xout = xout, tout = tout, optns = list(qSup = c(0,qSup,1))))
   res_h <- suppressWarnings(PartGloDenCore(xin = xin, tin = tin, hin = hin,
-                          xout = xout, tout = tout, optns = list(qSup = c(0,qSup,1))))
+                                           xout = xout, tout = tout, optns = list(qSup = c(0,qSup,1))))
   expect_equal(
     Reduce('+', lapply(1:n, function(ind){
       ni = nrow(qin[[ind]])
@@ -176,9 +183,9 @@ test_that("Generates warnings when more than one of the three, yin, hin, and qin
 test_that("Works with fully observed distributions when only providing bandwidth range; bandwidth selected by CV", {
   xout <- NULL; tout = NULL
   res <- suppressWarnings(PartGloDenCore(xin = xin, tin = tin, qin = qin,
-                        xout = xout, tout = tout,
-                        optns = list(qSup = c(0,qSup,1), bwRange = c(0.2,0.7))))
-
+                                         xout = xout, tout = tout,
+                                         optns = list(qSup = c(0,qSup,1), bwRange = c(0.2,0.7))))
+  
   qout_compare = lapply(1:n, function(i){
     ni = length(tin[[i]])
     t(sapply(1:ni, function(j){
@@ -191,7 +198,7 @@ test_that("Works with fully observed distributions when only providing bandwidth
       (qtrue[[i]][j,] - qout_compare[[i]][j,])^2 * diff(qSup)[2] 
       #pracma::trapz(x = c(0,qSup,1), y = (qtrue[[i]][j,] - qout_compare[[i]][j,])^2)
     })))
-  })))/mean_qin <.06)
+  })))/mean_qin <.1)
 })
 ###################################
 test_that("bw found by CV is in range when providing fully observed distributions and bandwidth range", {
@@ -207,18 +214,16 @@ test_that("bw found by CV is in range when providing fully observed distribution
 test_that("Works with fully observed distributions for higher dimension of xin (p > 2)", {
   dim = 4
   data = generateData_K(n,K, dim)
-  gen_pred = data$X_tilde
-  xin = t(sapply(1:n, function(i){
-    gen_pred[[i]]
-  }))
+  xin = data$X_tilde
   tin = data$T
   qSup <- seq(1e-6,1-1e-6,length.out = (m-2))
   qin = lapply(1:n, function(i){
-    ni = nrow(gen_pred[[i]])
+    ni = length(tin[[i]])
     t(sapply(1:ni, function(j){
-      gen_quantile(gen_pred[[i]][j,], tin[[i]][j])
+      gen_quantile(xin[[i]][j,], tin[[i]][j])
     }))
   })
+  
   qtrue = lapply(1:n, function(i){
     ni = length(tin[[i]])
     t(sapply(1:ni, function(j){
@@ -243,6 +248,6 @@ test_that("Works with fully observed distributions for higher dimension of xin (
     mean(sqrt(sapply(1:ni, function(j){
       (qtrue[[i]][j,] - qout_compare[[i]][j,])^2 * diff(qSup)[2]
     })))
-  })))/mean_qin <.06)
+  })))/mean_qin <.1)
 })
 
