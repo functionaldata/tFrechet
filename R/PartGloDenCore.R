@@ -102,20 +102,11 @@
 #'    }
 #'    return(list(X_tilde = X_tilde , T = T))
 #'  }
-#'   ##calculates true quantile model at given x and t values
-#'  true_reg = function(x,t){
-#'    zeta_xt = x + .5*t^2 
-#'    nu_xt = .6 + .1*sin(10*pi*t)
-#'    reg =  zeta_xt+  nu_xt * qnorm(seq(0.01,.99,length.out = m))
-#'    reg = sort(reg,decreasing = FALSE)
-#'    return(reg)
-#'  }
 #'   ##function to generate quantiles
 #'  gen_quantile = function(x,t){
 #'    mu_given = rnorm(n = 1, mean = x + .5*t^2 , .1)
 #'    sig_given = rgamma(1,shape = ((.6 + .1*sin(10*pi*t))^2/.1), scale = (.1/(.6 + .1*sin(10*pi*t))))
 #'    Q_Y = mu_given + sig_given*qnorm(seq(0.01,.99,length.out = m))
-#'    dens_Y = frechet:::qf2pdf(Q_Y)
 #'    return(Q_Y)
 #'  }
 #'  data = generateData_K(n,K)
@@ -172,8 +163,8 @@
 
 
 PartGloDenCore <- function(xin = NULL, tin = NULL, 
-                                  qin = NULL, yin = NULL, hin = NULL,
-                                  xout = NULL, tout = NULL, optns = list()){
+                           qin = NULL, yin = NULL, hin = NULL,
+                           xout = NULL, tout = NULL, optns = list()){
   
   if (is.null(xin)){
     stop ("xin no default and must be input by users.")
@@ -258,7 +249,7 @@ PartGloDenCore <- function(xin = NULL, tin = NULL,
       stop('tout if enterted by the user must be a number')
     }
   }
-
+  
   if(any(sapply(1:n, function(ind) nrow(xin[[ind]]))<2)){
     stop('The data is too sparse')
   }
@@ -332,7 +323,7 @@ PartGloDenCore <- function(xin = NULL, tin = NULL,
   #####
   if (!(is.null(yin) & is.null(hin))) {
     #require(fdadensity)
-  
+    
     if (!is.null(yin)) {
       if (!is.null(hin) | !is.null(qin))
         warning ("hin and qin are redundant when yin is available.")
@@ -359,8 +350,8 @@ PartGloDenCore <- function(xin = NULL, tin = NULL,
           if (is.null(hin[[ind]][[l]]$counts))
             stop ("Each element of hin must be a list with component counts.")
           CreateDensity(histogram = hin[[ind]][[l]], optns = optnsDen)
-          })
         })
+      })
     }
     qin <- lapply(1:length(den), function(ind){
       ni = length(den[[ind]])
@@ -383,7 +374,7 @@ PartGloDenCore <- function(xin = NULL, tin = NULL,
   }))
   if (is.null(optns$denLowerThreshold)) {
     optns$denLowerThreshold <- 0.001 *  mean_qin_aux
-     
+    
   } else if (optns$denLowerThreshold) {
     if(!is.numeric(optns$denLowerThreshold) | optns$denLowerThreshold < 0)
       optns$denLowerThreshold <- 0.001 *  mean_qin_aux
@@ -391,31 +382,31 @@ PartGloDenCore <- function(xin = NULL, tin = NULL,
   
   if (optns$denLowerThreshold) {
     if (sum(sapply(1:length(den), function(ind){
-        ni = length(den[[ind]])
-        sum(sapply(1:ni, function(l){
-          sum(den[[ind]][[l]]$y < optns$denLowerThreshold/diff(range(den[[ind]][[l]]$x)))
-        }))
-      }))>0) {
-    # density thresholding from below
-    lapply(1:length(den), function(ind){
       ni = length(den[[ind]])
-      lapply(1:ni, function(l){
-        d = den[[ind]][[l]]
+      sum(sapply(1:ni, function(l){
+        sum(den[[ind]][[l]]$y < optns$denLowerThreshold/diff(range(den[[ind]][[l]]$x)))
+      }))
+    }))>0) {
+      # density thresholding from below
+      lapply(1:length(den), function(ind){
+        ni = length(den[[ind]])
+        lapply(1:ni, function(l){
+          d = den[[ind]][[l]]
           lower <- optns$denLowerThreshold/diff(range(d$x))
           if (sum(d$y < lower) > 0) {
             d$y[d$y < lower] <- lower
             d$y <- d$y / pracma::trapz(d$x,d$y)
           }
           list(x=d$x, y=d$y)
-          })
+        })
       })
       
-    qin <- lapply(1:length(den), function(ind){
-      ni = length(den[[ind]])
-      t(sapply(1:ni, function(l){
-        fdadensity::dens2quantile(dens = den[[ind]][[l]]$y, dSup = den[[ind]][[l]]$x, qSup = qSup)
-      }))
-    })
+      qin <- lapply(1:length(den), function(ind){
+        ni = length(den[[ind]])
+        t(sapply(1:ni, function(l){
+          fdadensity::dens2quantile(dens = den[[ind]][[l]]$y, dSup = den[[ind]][[l]]$x, qSup = qSup)
+        }))
+      })
     }
   }
   ######
@@ -435,8 +426,8 @@ PartGloDenCore <- function(xin = NULL, tin = NULL,
   } else {
     if (optnsReg$bw_t < max(diff(sort(unlist(tin)))) & !is.null(optnsReg$ker)) {
       if(optnsReg$ker %in% c("rect","quar","epan")) {
-          warning("optns$bw_t was set too small and is reset to be chosen by CV.")
-          optnsReg$bw_t <- bwCV_pgm(xin, tin, qin, xout, tout, optns = optnsReg)
+        warning("optns$bw_t was set too small and is reset to be chosen by CV.")
+        optnsReg$bw_t <- bwCV_pgm(xin, tin, qin, xout, tout, optns = optnsReg)
       }
     }
   }
@@ -448,13 +439,13 @@ PartGloDenCore <- function(xin = NULL, tin = NULL,
   if (!is.null(optnsDen$dSup))
     names(optnsDen)[which(names(optnsDen) == "dSup")] <- "outputGrid"
   
-###
+  ###
   output_dout = function(qout){
     dout <- frechet:::qf2pdf(qout,prob = qSup, optns = optnsDen)
     dout[c("x","y")]
   }
   
-
+  
   if (is.null(optnsDen$outputGrid)) {
     if(!is.null(tout) & !is.null(xout)){
       dout = output_dout(qout)
@@ -490,4 +481,3 @@ PartGloDenCore <- function(xin = NULL, tin = NULL,
   class(res) <- "denReg"
   return(res)
 }
-  
