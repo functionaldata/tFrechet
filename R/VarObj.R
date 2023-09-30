@@ -2,9 +2,9 @@
 #' @description Modeling time varying density objects with respect to $L^2$-Wasserstein distance by Fréchet variance trajectory
 #' @param tgrid Time grid vector for the time varying object data.
 #' @param yin An array or list of lists holding the samples of observations. If \code{yin} is an array, it has size \code{n} x \code{length(tgrid)} x numbers of samples holding the observation, such that \code{yin[i,j,]} holds the observations to the ith sample at the jth time grid. If \code{yin} is a list of lists, \code{yin[[i]][[j]]} holds the observations to the ith sample at the jth time grid.     
-#' @param hin a list of lists holding the histogram for each subject. \code{hin[[i]][[j]]} holds the histogram to the ith sample at the jth time grid.     
-#' @param din A three dimension array of size \code{n} x \code{length(tgrid)} x \code{\length(optns$dSup)} holding the observed densities, such that \code{din[i,j,]} holds the observed density function taking values on \code{optns$dSup} corresponding to the ith sample at the jth time grid.
-#' @param qin A three dimension array of size \code{n} x \code{length(tgrid)} x \code{\length(optns$qSup)} holding the observed quantiles, such that \code{din[i,j,]} holds the observed density function taking values on \code{optns$qSup} corresponding to the ith sample at the jth time grid.
+#' @param hin A list of lists holding the histogram for each subject. \code{hin[[i]][[j]]} holds the histogram to the ith sample at the jth time grid.     
+#' @param din A three dimension array of size \code{n} x \code{length(tgrid)} x \code{length(optns$dSup)} holding the observed densities, such that \code{din[i,j,]} holds the observed density function taking values on \code{optns$dSup} corresponding to the ith sample at the jth time grid.
+#' @param qin A three dimension array of size \code{n} x \code{length(tgrid)} x \code{length(optns$qSup)} holding the observed quantiles, such that \code{din[i,j,]} holds the observed density function taking values on \code{optns$qSup} corresponding to the ith sample at the jth time grid.
 #' Note that only one of \code{yin}, \code{hin}, \code{din} and \code{qin} needs to be input. If more than one of them are specified, \code{yin} overwrites \code{hin}, \code{hin} overwrites \code{din} and \code{din} overwrites \code{qin}.
 #' where each row holds the observations for one subject on the common grid \code{tGrid}.
 #' @param optns a list of options control parameters specified by \code{list(name=value)}.
@@ -25,7 +25,7 @@
 #' \item{VarTraj}{A \code{n} X \code{length(tgridin)} matrix containing the variance trajectory.}
 #' @examples
 #' set.seed(1)
-#' use yin 
+#' #use yin 
 #' tgrid = seq(1, 50, length.out = 50)
 #' dSup = seq(-10, 60, length.out = 100)
 #' yin = array(dim=c(30, 50, 100))
@@ -34,7 +34,7 @@
 #'     rnorm(100, mean = rnorm(1, mean = 1, sd = 1/t))
 #'   }))
 #' }
-#' result1 = VarObj(tgrid, yin = yin2)
+#' result1 = VarObj(tgrid, yin = yin)
 #' plot(result1$phi[,1])
 #' plot(result1$phi[,2])
 #' yin2 = replicate(30, vector("list", 50), simplify = FALSE)
@@ -196,9 +196,9 @@ VarObj <- function(tgrid, yin = NULL, hin = NULL, din = NULL, qin = NULL, optns=
     for(i in 1:n){
       for(j in 1:nt){
         if (is.list(yin)){
-          dij <- CreateDensity(yin[[i]][[j]], optns = optnsDens)
+          dij <- CreateDensity(yin[[i]][[j]], optns = optnsDen)
         }else{
-          dij <- CreateDensity(yin[i,j,], optns = optnsDens)
+          dij <- CreateDensity(yin[i,j,], optns = optnsDen)
         }
         qin[i,j,] <- fdadensity::dens2quantile(dens = dij$y, dSup = dij$x, qSup = qSup)
       }
@@ -212,7 +212,7 @@ VarObj <- function(tgrid, yin = NULL, hin = NULL, din = NULL, qin = NULL, optns=
     qin <- array(dim=c(length(hin), nt, nq))
     for(i in 1:n){
       for(j in 1:nt){
-        dij <- CreateDensity(histogram = hin[[i]][[j]], optns = optnsDens)
+        dij <- CreateDensity(histogram = hin[[i]][[j]], optns = optnsDen)
         qin[i,j,] <- fdadensity::dens2quantile(dens = dij$y, dSup = dij$x, qSup = qSup)
       }
     }
@@ -228,7 +228,8 @@ VarObj <- function(tgrid, yin = NULL, hin = NULL, din = NULL, qin = NULL, optns=
     if (length(dSup)!=dim(din)[3]){
       stop ('dimension of the third arguement of din is not consistent with length of dSup')
     }
-    qin <- array(dim = c(dim(din)[1], nt, nq))
+    n = dim(din)[1]
+    qin <- array(dim = c(n, nt, nq))
     for (i in 1:n){
       for (j in 1: nt){
         qin[i,j,] <- fdadensity::dens2quantile(din[i,j,], dSup = dSup, qSup = qSup)

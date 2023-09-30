@@ -1,21 +1,20 @@
 #' @title Object Covariance
 #' @description Calculating covariance for time varying object data
-#' @param tgrid time grid for the time varying object data and covariance function
-#' @param n numbers of observations
-#' @param I four dimension array of \code{n} x \code{n} matrix of squared distances between the time point u of the ith process and process and the time point v of the jth object process, 
+#' @param tgrid Time grid for the time varying object data and covariance function
+#' @param I A four dimension array of \code{n} x \code{n} matrix of squared distances between the time point u of the ith process and process and the time point v of the jth object process, 
 #' e.g.: \eqn{I[i,j,u,v] = d^2(X_i(u) X_j(v))}
-#' @param K numbers of principal components 
-#' @param smooth logical indicating if the smoothing is enabled when calculating the eigenvalues and eigenfunctions
+#' @param K Numbers of principal components 
+#' @param smooth Logical indicating if the smoothing is enabled when calculating the eigenvalues and eigenfunctions
 #' @return A list of the following:
-#' \item{C}{estimated object covariance (nonsmooth) on the 2D grid of dimension \code{length(tgrid)} X \code{length(tgrid)}}
-#' \item{sC}{estimated object covariance (smooth) on the 2D grid of dimension \code{length(tgrid)} X \code{length(tgrid)}}
-#' \item{tgrid}{tgrid time grid for the time varying object data and covariance function}
-#' \item{K}{numbers of principal components}
-#' \item{phi}{matrix of smooth eigenfunctions (dimension: \code{length(tgrid)} X \code{K})}
-#' \item{lambda}{vector of eigenvalues of dimension \code{K} }
+#' \item{C}{Estimated object covariance (non-smooth) on the 2D grid of dimension \code{length(tgrid)} X \code{length(tgrid)}}
+#' \item{sC}{Estimated object covariance (smooth) on the 2D grid of dimension \code{length(tgrid)} X \code{length(tgrid)}}
+#' \item{tgrid}{Time grid for the time varying object data and covariance function}
+#' \item{K}{Numbers of principal components}
+#' \item{phi}{Matrix of smooth eigenfunctions (dimension: \code{length(tgrid)} X \code{K})}
+#' \item{lambda}{Vector of eigenvalues of dimension \code{K} }
 #' @examples 
 #' ### functional covariate
-#‘ phi1 <- function(x) -cos(pi*x/10)/sqrt(5)
+#' phi1 <- function(x) -cos(pi*x/10)/sqrt(5)
 #' phi2 <- function(x)  sin(pi*x/10)/sqrt(5)
 #' 
 #' lambdaX <- c(4,2)
@@ -26,7 +25,9 @@
 #' 
 #' Xi <- matrix(rnorm(2*n),nrow=n,ncol=2)
 #' CovX <- lambdaX[1] * phi1(tgrid) %*% t(phi1(tgrid)) + lambdaX[2] * phi2(tgrid) %*% t(phi2(tgrid))
-#' SampleX <- lambdaX[1]^(1/2) * Xi[,1] %*% t(phi1(tgrid)) + lambdaX[2]^(1/2) * Xi[,2] %*% t(phi2(tgrid))
+#' comp1 = lambdaX[1]^(1/2) * Xi[,1] %*% t(phi1(tgrid))
+#' comp2 = lambdaX[2]^(1/2) * Xi[,2] %*% t(phi2(tgrid))
+#' SampleX <- comp1 + comp2
 #' 
 #' I <- array(0, c(n,n,N,N))
 #' for (u in 1:N){
@@ -48,12 +49,6 @@
 #' @references 
 #' \cite{Dubey, P., & Müller, H. G. (2020). Functional models for time‐varying random objects. Journal of the Royal Statistical Society: Series B (Statistical Methodology), 82(2), 275-327.}
 #' @export
-
-
-# source("GCVLwls2DV2.R")
-# source("GetMinb.R")
-# source("getSmoothCov.R")
-# source("GetEigenAnalysisResults.R")
 
 
 ObjCov <- function(tgrid, I, K, smooth=TRUE){
@@ -87,13 +82,12 @@ ObjCov <- function(tgrid, I, K, smooth=TRUE){
   if(smooth == TRUE){
     sC <- getSmoothCov(C, tgrid, "GMeanAndGCV", "gauss",n)
     #derivat the eigenfunctions and eigenvalues
-    eigResult <- GetEigenAnalysisResults(sC, tgrid, optns = list(maxK = K, verbose = FALSE, FVEthreshold = 0.9999))
+    eigResult <- fdapace:::GetEigenAnalysisResults(sC, tgrid, optns = list(maxK = K, verbose = FALSE, FVEthreshold = 0.9999))
   }else{
     sC <- getSmoothCov(C, tgrid, "GMeanAndGCV", "gauss",n)
     #derivat the eigenfunctions and eigenvalues
-    eigResult <- GetEigenAnalysisResults(C, tgrid, optns = list(maxK = K, verbose = FALSE, FVEthreshold = 0.9999))
+    eigResult <- fdapace:::GetEigenAnalysisResults(C, tgrid, optns = list(maxK = K, verbose = FALSE, FVEthreshold = 0.9999))
   }
   return(list(C=C, sC = sC, tgrid = tgrid, K = K, phi = eigResult$phi, lambda = eigResult$lambda))
-  }
-
+}
 
