@@ -1,5 +1,6 @@
-library(pracma)
 getSmoothCov <- function(C, tgrid, method, kern, n){
+  require(pracma)
+  require(fdapace)
   t = length(tgrid)
   t1 = tgrid
   cyy = t(as.vector(C))
@@ -18,13 +19,13 @@ getSmoothCov <- function(C, tgrid, method, kern, n){
               cyy = cyy,
               count = count)
   if (method %in% c('GCV', 'GMeanAndGCV')){
-    gcvObj = GCVLwls2DV2(tgrid, tgrid, kern = kern, rcov = rcov, t = lapply(1:n, function(o) tgrid))
+    gcvObj = fdapace:::GCVLwls2DV2(tgrid, tgrid, kern = kern, rcov = rcov, t = lapply(1:n, function(o) tgrid))
     bwCov <- gcvObj$h
     if (method == 'GMeanAndGCV') {
       bwCov <- sqrt(bwCov * gcvObj$minBW)
     } 
   }
-  sC = Lwls2D(bwCov, "gauss", xin = cbind(rep(tgrid, times = t), rep(tgrid, each = t)), yin = as.vector(C), xout1 = tgrid, xout2 = tgrid)
+  sC = fdapace::Lwls2D(bwCov, "gauss", xin = cbind(rep(tgrid, times = t), rep(tgrid, each = t)), yin = as.vector(C), xout1 = tgrid, xout2 = tgrid)
   
   return(sC)
 }
