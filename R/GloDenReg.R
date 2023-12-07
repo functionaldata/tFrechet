@@ -44,6 +44,8 @@
 #' @references
 #' \cite{Petersen, A., & Müller, H.-G. (2019). "Fréchet regression for random objects with Euclidean predictors." The Annals of Statistics, 47(2), 691--719.}
 #' @export
+#' @importFrom fdadensity dens2quantile
+#' @importFrom pracma trapz
 
 GloDenReg <- function(xin=NULL, yin=NULL, hin=NULL, qin=NULL, xout=NULL, optns=list()) {
   if (is.null(optns$Rsquared)) optns$Rsquared <- FALSE

@@ -13,6 +13,7 @@
 #' \item{lower}{A scalar with the lower bound of the support of the distribution. Default is \code{NULL}.}
 #' \item{upper}{A scalar with the upper bound of the support of the distribution. Default is \code{NULL}.}
 #' }
+#' @importFrom osqp solve_osqp osqpSettings
 
 LocWassReg = function(xin, qin, xout, optns = list()){
 

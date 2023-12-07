@@ -37,7 +37,7 @@
 #' @references
 #' \cite{A Petersen and HG Müller (2019). "Fréchet regression for random objects with Euclidean predictors." An. Stat. 47, 691-719.}
 #' \cite{Z Lin (2019). " Riemannian Geometry of Symmetric Positive Definite Matrices via Cholesky Decomposition." Siam. J. Matrix. Anal, A. 40, 1353–1370.}
-
+#' @importFrom Matrix forceSymmetric
 
 LFRCovCholesky <- function(x, M, xout, optns=list()){
   if(!is.matrix(x)&!is.vector(x)){
@@ -102,16 +102,16 @@ LFRCovCholesky <- function(x, M, xout, optns=list()){
     stop("M must be provided")
   }
   
-  if(class(M) == 'array'){
+  if(is.array(M)){
     MM = list()
-    if(class(M) == 'array'){
+    if(is.array(M)){
       for (i in 1:dim(M)[3]) {
         MM[[i]] = M[,,i]
       }
     }
     M = lapply(MM, function(X) (X+t(X))/2)
   }else{
-    if(!class(M)=="list"){
+    if(!is.list(M)){
       stop('M must be an array or a list')
     }
     M = lapply(M, function(X) (X+t(X))/2)

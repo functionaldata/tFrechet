@@ -27,6 +27,7 @@
 #'covplot(mm, optns= list(plot.type = "categorical", plot.clust = "hclust"))
 #'covplot(mm, optns= list(plot.clust = "hclust"))
 #'}
+#'@importFrom corrplot corrplot
 
 
 covplot <- function(mout,optns = list()){

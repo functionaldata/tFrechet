@@ -63,11 +63,11 @@
 #' @references 
 #' \cite{Dubey, P., & Müller, H. G. (2020). Functional models for time‐varying random objects. Journal of the Royal Statistical Society: Series B (Statistical Methodology), 82(2), 275-327.}
 #' @export
+#' @import fdapace
+#' @import quadprog
+#' @import pracma
 
 WassFIntegral <- function(phi, t_out, Q, Qout){
-  require(fdapace)
-  require(quadprog)
-  require(pracma)
 
   m <- length(Qout)
   if(m<2){

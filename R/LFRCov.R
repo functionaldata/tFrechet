@@ -50,7 +50,8 @@
 #' @references
 #' \cite{Petersen, A. and Müller, H.-G. (2019). Fréchet regression for random objects with Euclidean predictors. The Annals of Statistics, 47(2), 691--719.}
 #' \cite{Petersen, A., Deoni, S. and Müller, H.-G. (2019). Fréchet estimation of time-varying covariance matrices from sparse data, with application to the regional co-evolution of myelination in the developing brain. The Annals of Applied Statistics, 13(1), 393--419.}
-
+#' @importFrom Matrix nearPD forceSymmetric
+#' 
 LFRCov  = function(x, y=NULL,M=NULL, xout,optns = list()){
   if(is.null(optns$corrOut)){
     corrOut=FALSE

@@ -13,6 +13,7 @@
 #' \item{phi}{Matrix of smooth eigenfunctions (dimension: \code{length(tgrid)} X \code{K})}
 #' \item{lambda}{Vector of eigenvalues of dimension \code{K} }
 #' @examples 
+#' \dontrun{
 #' ### functional covariate
 #' phi1 <- function(x) -cos(pi*x/10)/sqrt(5)
 #' phi2 <- function(x)  sin(pi*x/10)/sqrt(5)
@@ -46,13 +47,16 @@
 #' sC <- result_cov$sC
 #' sum((sC-CovX)^2) / sum(sC^2)
 #' sum((phi1(tgrid)-result_cov$phi[,1])^2)/sum(phi1(tgrid)^2)
+#' }
 #' @references 
 #' \cite{Dubey, P., & Müller, H. G. (2020). Functional models for time‐varying random objects. Journal of the Royal Statistical Society: Series B (Statistical Methodology), 82(2), 275-327.}
 #' @export
+#' @import pracma
+#' @import fdapace
+#' @importFrom utils getFromNamespace
 
 
 ObjCov <- function(tgrid, I, K, smooth=TRUE){
-  require(fdapace)
   if(length(dim(I))!=4){
     stop("I must be a four dimensional array")
   }
@@ -79,14 +83,15 @@ ObjCov <- function(tgrid, I, K, smooth=TRUE){
   }
   C[t,t] <- sum(sum(I[,,t,t])) / (2*n*(n-1))
   #obtain smooth covariance
+  GetEigenAnalysisResults <- utils::getFromNamespace("GetEigenAnalysisResults", "fdapace")
   if(smooth == TRUE){
     sC <- getSmoothCov(C, tgrid, "GMeanAndGCV", "gauss",n)
     #derivat the eigenfunctions and eigenvalues
-    eigResult <- fdapace:::GetEigenAnalysisResults(sC, tgrid, optns = list(maxK = K, verbose = FALSE, FVEthreshold = 0.9999))
+    eigResult <- GetEigenAnalysisResults(sC, tgrid, optns = list(maxK = K, verbose = FALSE, FVEthreshold = 0.9999))
   }else{
     sC <- getSmoothCov(C, tgrid, "GMeanAndGCV", "gauss",n)
     #derivat the eigenfunctions and eigenvalues
-    eigResult <- fdapace:::GetEigenAnalysisResults(C, tgrid, optns = list(maxK = K, verbose = FALSE, FVEthreshold = 0.9999))
+    eigResult <- GetEigenAnalysisResults(C, tgrid, optns = list(maxK = K, verbose = FALSE, FVEthreshold = 0.9999))
   }
   return(list(C=C, sC = sC, tgrid = tgrid, K = K, phi = eigResult$phi, lambda = eigResult$lambda))
 }

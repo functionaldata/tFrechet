@@ -1,6 +1,9 @@
+#'@noRd
+#'@import pracma
+#'@import fdapace
+#'@importFrom utils getFromNamespace
+
 getSmoothCov <- function(C, tgrid, method, kern, n){
-  require(pracma)
-  require(fdapace)
   t = length(tgrid)
   t1 = tgrid
   cyy = t(as.vector(C))
@@ -18,8 +21,9 @@ getSmoothCov <- function(C, tgrid, method, kern, n){
               win = win,
               cyy = cyy,
               count = count)
+  GCVLwls2DV2 <- utils::getFromNamespace("GCVLwls2DV2", "fdapace")
   if (method %in% c('GCV', 'GMeanAndGCV')){
-    gcvObj = fdapace:::GCVLwls2DV2(tgrid, tgrid, kern = kern, rcov = rcov, t = lapply(1:n, function(o) tgrid))
+    gcvObj = GCVLwls2DV2(tgrid, tgrid, kern = kern, rcov = rcov, t = lapply(1:n, function(o) tgrid))
     bwCov <- gcvObj$h
     if (method == 'GMeanAndGCV') {
       bwCov <- sqrt(bwCov * gcvObj$minBW)

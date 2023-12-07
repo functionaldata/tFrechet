@@ -93,6 +93,8 @@
 #' \item \cite{H.-G. Müller, U. Stadtmüller, and T. Schmitt. (1987) "Bandwidth choice and confidence intervals for derivatives of noisy data." Biometrika 74, 743--749.}
 #' }
 #' @export
+#' @importFrom fdapace Lwls1D
+#' @importFrom pracma trapz
 
 CreateDensity <- function(y=NULL, histogram=NULL, freq=NULL, bin=NULL, optns = list()){
 
@@ -180,9 +182,7 @@ CreateDensity <- function(y=NULL, histogram=NULL, freq=NULL, bin=NULL, optns = l
     densTmp <- density(y,kernel='epanechnikov')
     bw <- 2*densTmp$bw
     #bw <- 2*densTmp$bw
-
-    # bwCV = fdapace:::CVLwls1D(y = yin, t = xin, kernel = kernel, npoly = 1, nder = 0, dataType = 'Dense', kFolds = 5)
-    # bw <- bwCV
+    
   } else {
     bw = optns$userBwMu
   }

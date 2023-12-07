@@ -21,6 +21,8 @@
 #' d2$y <- dnorm(d2$x, mean = 1)
 #' dist <- dist4den(d1 = d1,d2 = d2)
 #'@export
+#'@importFrom fdadensity dens2quantile
+#'@importFrom pracma trapz
 
 dist4den <- function(d1 = NULL, d2 = NULL, fctn_type = NULL, optns = list()) {
   tol <- 1e-5

@@ -13,6 +13,8 @@
 #' \item{Rsquared}{A logical variable indicating whether R squared would be returned. Default is \code{FALSE}.}
 #' \item{qSup}{A numerical vector of length m holding the probability grid on [0, 1] at which the input quantile functions take values. If \code{optns$Rsquared} is TRUE, \code{qSup} is needed. Default is \code{seq(1,2*m,2)/2/m}.}
 #' }
+#' @importFrom osqp solve_osqp osqpSettings
+#' @importFrom pracma trapz
 
 GloWassReg <- function(xin, qin, xout, optns=list()){
   if (is.null(optns$Rsquared)) optns$Rsquared <- FALSE

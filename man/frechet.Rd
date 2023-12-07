@@ -3,6 +3,7 @@
 \docType{package}
 \name{frechet}
 \alias{frechet}
+\alias{frechet-package}
 \title{frechet: Statistical Analysis for Random Objects and Non-Euclidean Data}
 \description{
 Provides implementation of statistical methods for random objects 

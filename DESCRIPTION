@@ -51,8 +51,11 @@ Imports:
     Matrix,
     methods,
     pracma,
-    osqp
+    quadprog,
+    osqp,
+    utils
 Suggests: 
     Rcpp (>= 0.11.5), 
-    testthat
+    testthat,
+    mpoly
 RoxygenNote: 7.1.0

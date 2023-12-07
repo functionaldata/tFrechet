@@ -8,6 +8,7 @@
 #' covariance matrices endowed with power metric (with Frobenius metric as a special case), Cholesky and log-Cholesky metrics.  
 #' References: Petersen, A., & Müller, H.-G. (2019) <doi:10.1214/17-AOS1624>.
 #' @docType package
+#' @aliases frechet-package
 #' @name frechet
 #' @importFrom grDevices colorRampPalette dev.new palette
 #' @importFrom graphics abline axis barplot boxplot grid hist layout legend lines matlines matplot par plot points polygon rect text

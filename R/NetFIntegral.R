@@ -7,6 +7,7 @@
 #' @return A list of the following:
 #' \item{f}{An adjacency matrix which corresponds to the Fréchet integral of \code{X} along \code{phi}}
 #' @examples 
+#' \dontrun{
 #' set.seed(5)
 #' n <- 100
 #' N <- 50
@@ -77,13 +78,14 @@
 #' }
 #' # output the functional principal network(adjacency matrice) of the second eigenfunction
 #' NetFIntegral(Cov_result$phi[,2], t_out, X_mat, 2)
+#' }
 #' @references 
 #' \cite{Dubey, P., & Müller, H. G. (2020). Functional models for time‐varying random objects. Journal of the Royal Statistical Society: Series B (Statistical Methodology), 82(2), 275-327.}
 #' @export
+#' @import fdapace
 
 
 NetFIntegral <- function(phi, t_out, X, U){
-  require(fdapace)
   N <- length(phi)
   m <- dim(X)[2]
   if(dim(X)[1] != N){

@@ -24,6 +24,7 @@
 #' \item{qmean}{A \code{length(tgridin)} X \code{length(qSup)} matrix containing the time varying Fréchet mean function.}
 #' \item{VarTraj}{A \code{n} X \code{length(tgridin)} matrix containing the variance trajectory.}
 #' @examples
+#' \dontrun{
 #' set.seed(1)
 #' #use yin 
 #' tgrid = seq(1, 50, length.out = 50)
@@ -76,14 +77,14 @@
 #'   }))
 #' }
 #' result4 = VarObj(tgrid, qin = qin, optns=list(qSup = round(qSup, 4)))
-#' 
+#' }
 #' @references
 #' \cite{Dubey, P., & Müller, H. G. (2021). Modeling Time-Varying Random Objects and Dynamic Networks. Journal of the American Statistical Association, 1-33.}
 #' @export
+#' @import fdadensity
+#' @import fdapace
 
 VarObj <- function(tgrid, yin = NULL, hin = NULL, din = NULL, qin = NULL, optns=list()){
-  require(fdadensity)
-  require(fdapace)
   
   ### Check input ###
   if(is.null(tgrid)){
