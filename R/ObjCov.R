@@ -13,7 +13,7 @@
 #' \item{phi}{Matrix of smooth eigenfunctions (dimension: \code{length(tgrid)} X \code{K})}
 #' \item{lambda}{Vector of eigenvalues of dimension \code{K} }
 #' @examples 
-#' \dontrun{
+#' \donttest{
 #' ### functional covariate
 #' phi1 <- function(x) -cos(pi*x/10)/sqrt(5)
 #' phi2 <- function(x)  sin(pi*x/10)/sqrt(5)

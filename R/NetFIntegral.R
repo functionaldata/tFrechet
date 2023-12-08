@@ -7,7 +7,7 @@
 #' @return A list of the following:
 #' \item{f}{An adjacency matrix which corresponds to the Fréchet integral of \code{X} along \code{phi}}
 #' @examples 
-#' \dontrun{
+#' \donttest{
 #' set.seed(5)
 #' n <- 100
 #' N <- 50

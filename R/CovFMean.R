@@ -6,6 +6,7 @@
 #' \describe{
 #' \item{metric}{Metric type choice, \code{"frobenius"}, \code{"power"}, \code{"log_cholesky"}, \code{"cholesky"} - default: \code{"frobenius"} which corresponds to the power metric with \code{alpha} equal to 1.}
 #' \item{alpha}{The power parameter for the power metric, which can be any non-negative number. Default is 1 which corresponds to Frobenius metric.}
+#' \item{weights}{A vector of weights to compute the weighted barycenter. The length of \code{weights} is equal to the sample size n. Default is equal weights.}
 #' }
 #' @return A list containing the following fields:
 #' \item{Mout}{A list containing the Fréchet mean of the covariance matrices in \code{M}.}
@@ -54,14 +55,47 @@ CovFMean= function(M=NULL, optns = list()){
     stop("metric choice not supported.")
   }
 
-  if(metric=="frobenius"){
-    res <- list(Mout=GFRCov(x=x, y=NULL,M=M,xout=xout,optns = optns)$Mout,optns=optns)
-  } else if(metric=="power"){
-    res <- list(Mout=GFRCovPower(x=x, y=NULL,M=M,xout=xout,optns = optns)$Mout,optns=optns)
-  } else {
-    if (is.null(M))
-      stop("M must be input for Cholesky and log-Cholesky metrics; y does not apply.")
-    res <- list(Mout=GFRCovCholesky(x=x, M=M, xout=xout, optns = optns)$Mout,optns=optns)
+  flagUnweighted=FALSE
+  if(!is.null(optns$weights)){
+    if(!is.vector(optns$weights)){
+      stop("weights should be a vector")
+    }
+    if(n!=length(optns$weights)){
+      stop("The length of weights cannot differ from the sample size")
+    }
+    if(sum(optns$weights<0)>0){
+      stop("weights must be non-negative")
+    }
+    if(abs(sum(optns$weights)-1)>1e-15){
+      stop("weights must sum to 1")
+    }
+    if(sum(abs(optns$weights-1/n))==0){
+      #Case of equal weights requires different call to GFRCov function
+      flagUnweighted=TRUE
+    }else{
+      if(metric=="frobenius"){
+        res <- list(Mout=GFRCov(x=matrix(optns$weights), y=NULL,M=M,xout=matrix(sum(optns$weights^2)),optns = optns)$Mout,optns=optns)
+      } else if(metric=="power"){
+        res <- list(Mout=GFRCovPower(x=matrix(optns$weights), y=NULL,M=M,xout=matrix(sum(optns$weights^2)),optns = optns)$Mout,optns=optns)
+      } else {
+        if (is.null(M))
+          stop("M must be input for Cholesky and log-Cholesky metrics; y does not apply.")
+        res <- list(Mout=GFRCovCholesky(x=matrix(optns$weights), M=M, xout=matrix(sum(optns$weights^2)), optns = optns)$Mout,optns=optns)
+      }
+    }
+  }
+  
+  if(flagUnweighted | is.null(optns$weights)){
+    #If weights are provided and are equal (unweighted case) or weights not provided
+    if(metric=="frobenius"){
+      res <- list(Mout=GFRCov(x=x, y=NULL,M=M,xout=xout,optns = optns)$Mout,optns=optns)
+    } else if(metric=="power"){
+      res <- list(Mout=GFRCovPower(x=x, y=NULL,M=M,xout=xout,optns = optns)$Mout,optns=optns)
+    } else {
+      if (is.null(M))
+        stop("M must be input for Cholesky and log-Cholesky metrics; y does not apply.")
+      res <- list(Mout=GFRCovCholesky(x=x, M=M, xout=xout, optns = optns)$Mout,optns=optns)
+    }
   }
   class(res) <- "covReg"
   return(res)

@@ -24,7 +24,7 @@
 #' \item{qmean}{A \code{length(tgridin)} X \code{length(qSup)} matrix containing the time varying Fréchet mean function.}
 #' \item{VarTraj}{A \code{n} X \code{length(tgridin)} matrix containing the variance trajectory.}
 #' @examples
-#' \dontrun{
+#' \donttest{
 #' set.seed(1)
 #' #use yin 
 #' tgrid = seq(1, 50, length.out = 50)

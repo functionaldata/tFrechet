@@ -3,14 +3,14 @@ Type: Package
 Title: Statistical Analysis for Random Objects and Non-Euclidean Data
 URL: https://github.com/functionaldata/tFrechet
 BugReports: https://github.com/functionaldata/tFrechet/issues
-Version: 0.2.0
+Version: 0.3.0
 Encoding: UTF-8
-Date: 2020-12-15
+Date: 2023-12-06
 Authors@R: 
     c(person(given = "Yaqing",
              family = "Chen",
              role = c("aut", "cre"),
-             email = "yaqchen@ucdavis.edu"),
+             email = "yqchen@stat.rutgers.edu"),
       person(given = "Alvaro",
              family = "Gajardo",
              role = "aut"),
@@ -32,20 +32,22 @@ Authors@R:
       person(given = "Hans-Georg",
              family = "Müller",
              role = c("cph", "ths", "aut")))
-Maintainer: Yaqing Chen <yaqchen@ucdavis.edu>
+Maintainer: Yaqing Chen <yqchen@stat.rutgers.edu>
 Description: Provides implementation of statistical methods for random objects 
     lying in various metric spaces, which are not necessarily linear spaces. 
     The core of this package is Fréchet regression for random objects with 
     Euclidean predictors, which allows one to perform regression analysis 
     for non-Euclidean responses under some mild conditions. 
-    Examples include distributions in L^2-Wasserstein space, 
+    Examples include distributions in 2-Wasserstein space, 
     covariance matrices endowed with power metric (with Frobenius metric 
-    as a special case), Cholesky and log-Cholesky metrics.  
+    as a special case), Cholesky and log-Cholesky metrics, spherical data.  
     References: Petersen, A., & Müller, H.-G. (2019) <doi:10.1214/17-AOS1624>.
 License: BSD_3_clause + file LICENSE
 LazyData: false
 Imports:
+    boot,
     corrplot,
+    e1071,
     fdadensity,
     fdapace (>= 0.5.5),
     Matrix,
@@ -53,9 +55,12 @@ Imports:
     pracma,
     quadprog,
     osqp,
+    stats,
+    trust,
     utils
 Suggests: 
     Rcpp (>= 0.11.5), 
     testthat,
+    igraph,
     mpoly
-RoxygenNote: 7.1.0
+RoxygenNote: 7.1.1

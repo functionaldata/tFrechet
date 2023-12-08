@@ -124,9 +124,6 @@ LFRCov  = function(x, y=NULL,M=NULL, xout,optns = list()){
       sL[i] =aux[i]*(1-t(mu1)%*%solve(mu2)%*%(x[i,]-x0))
     }
     s = sum(sL)
-    if(s == 0){
-      stop('Bandwidth too small')
-    }
 
     M_aux=array(0,c(dim(M)[1],dim(M)[1],1))
     for(i in 1:length(idx)){
@@ -152,9 +149,7 @@ LFRCov  = function(x, y=NULL,M=NULL, xout,optns = list()){
     for(i in 1:n){
       M[,,i] = (y[i,] - cmh[i,]) %*% t(y[i,] - cmh[i,])
     }
-    if(is.na(sum(bw2))){
-      bw2 = bwMean
-    }
+    
   } else{
     if(!is.null(M)){
       if(is.list(M)){
@@ -162,48 +157,70 @@ LFRCov  = function(x, y=NULL,M=NULL, xout,optns = list()){
       }else{
         if(!is.array(M)){
           stop('M must be an array or a list')
+        } else if (length(dim(M))!=3) {
+          stop('M must be an array or a list')
         }
       }
       if(nrow(x)!=dim(M)[3]){
         stop("The number of rows of x must be the same as the number of covariance matrices in M")
       }
-      #CV for bw2 selection
-      if(is.na(sum(bw2))){
-        if(p==1){
-          bw_choice=SetBwRange(as.vector(x), as.vector(xout), kernel)
-          objF=matrix(0,nrow=20,ncol=1)
-          aux1=as.matrix(seq(bw_choice$min,bw_choice$max,length.out=20))
-          for(i in 1:20){
-            for(j in 1:dim(x)[1]){
-              aux=as.matrix(Matrix::nearPD(computeLFR(setdiff(1:dim(x)[1],j),x[j],aux1[i]),corr = FALSE)$mat)-M[,,j]
-              objF[i]=objF[i]+sum(diag(aux%*%t(aux)))
-            }
-          }
-          ind=which(objF==min(objF))[1]
-          bwCV=aux1[ind]
-        }
-        if(p==2){
-          bw_choice1=SetBwRange(as.vector(x[,1]), as.vector(xout[,1]), kernel)
-          bw_choice2=SetBwRange(as.vector(x[,2]), as.vector(xout[,2]), kernel)
-          objF=matrix(0,nrow=10,ncol=10)
-          aux1=seq(bw_choice1$min,bw_choice1$max,length.out=10)
-          aux2=seq(bw_choice2$min,bw_choice2$max,length.out=10)
-          for(i1 in 1:10){
-            for(i2 in 1:10){
-              for(j in 1:dim(x)[1]){
-                aux=as.matrix(Matrix::nearPD(computeLFR(setdiff(1:dim(x)[1],j),x[j,],c(aux1[i1],aux2[i2])),corr = FALSE)$mat)-M[,,j]
-                objF[i1,i2]=objF[i1,i2]+sum(diag(aux%*%t(aux)))
-              }
-            }
-          }
-          ind=which(objF==min(objF),arr.ind = TRUE)
-          bwCV=c(aux1[ind[1]],aux2[ind[2]])
-        }
-        bw2=bwCV
-      }
+      
     } else{
       stop("y or M must be provided.")
     }
+  }
+  
+  #CV for bandwidth bw2 selection
+  if(is.na(sum(bw2))){
+    if(p==1){
+      bw_choice=SetBwRange(as.vector(x), as.vector(xout), kernel)
+      objF=matrix(0,nrow=20,ncol=1)
+      aux1=as.matrix(seq(bw_choice$min,bw_choice$max,length.out=nrow(objF)))
+      for(i in 1:length(aux1)){
+        #Try-catch statement in case bandwidth is too small and produces numerical issues
+        objF[i] = tryCatch({
+          sum(sapply(1:dim(x)[1],function(j){
+            aux=as.matrix(Matrix::nearPD(computeLFR(setdiff(1:dim(x)[1],j),x[j],aux1[i]),corr = FALSE)$mat)-M[,,j]
+            sum(diag(aux%*%t(aux)))
+          }))
+        }, error = function(e) {
+          return(NA)
+        })
+      }
+      if(sum(is.na(objF))==dim(objF)[1]*dim(objF)[2]){
+        stop("Bandwidth too small in cross-validation search")
+      }else{
+        ind=which(objF==min(objF,na.rm=TRUE))[1]
+        bwCV=aux1[ind]
+      }
+    }
+    if(p==2){
+      bw_choice1=SetBwRange(as.vector(x[,1]), as.vector(xout[,1]), kernel)
+      bw_choice2=SetBwRange(as.vector(x[,2]), as.vector(xout[,2]), kernel)
+      objF=matrix(0,nrow=5,ncol=5)
+      aux1=seq(bw_choice1$min,bw_choice1$max,length.out=nrow(objF))
+      aux2=seq(bw_choice2$min,bw_choice2$max,length.out=ncol(objF))
+      for(i1 in 1:length(aux1)){
+        for(i2 in 1:length(aux2)){
+          #Try-catch statement in case bandwidth is too small and produces numerical issues
+          objF[i1,i2] = tryCatch({
+            sum(sapply(1:dim(x)[1],function(j){
+              aux=as.matrix(Matrix::nearPD(computeLFR(setdiff(1:dim(x)[1],j),x[j,],c(aux1[i1],aux2[i2])),corr = FALSE)$mat)-M[,,j]
+              sum(diag(aux%*%t(aux)))
+            }))
+          }, error = function(e) {
+            return(NA)
+          })
+        }
+      }
+      if(sum(is.na(objF))==dim(objF)[1]*dim(objF)[2]){
+        stop("Bandwidth too small in cross-validation search")
+      }else{
+        ind=which(objF==min(objF,na.rm=TRUE),arr.ind = TRUE)
+        bwCV=c(aux1[ind[1]],aux2[ind[2]])
+      }
+    }
+    bw2=bwCV
   }
 
   Mout = list()

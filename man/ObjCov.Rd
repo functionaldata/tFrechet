@@ -29,6 +29,7 @@ A list of the following:
 Calculating covariance for time varying object data
 }
 \examples{
+\dontrun{
 ### functional covariate
 phi1 <- function(x) -cos(pi*x/10)/sqrt(5)
 phi2 <- function(x)  sin(pi*x/10)/sqrt(5)
@@ -62,6 +63,7 @@ result_cov$lambda #4 2
 sC <- result_cov$sC
 sum((sC-CovX)^2) / sum(sC^2)
 sum((phi1(tgrid)-result_cov$phi[,1])^2)/sum(phi1(tgrid)^2)
+}
 }
 \references{
 \cite{Dubey, P., & Müller, H. G. (2020). Functional models for time‐varying random objects. Journal of the Royal Statistical Society: Series B (Statistical Methodology), 82(2), 275-327.}

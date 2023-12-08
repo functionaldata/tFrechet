@@ -44,6 +44,7 @@ Modeling time varying density objects with respect to $L^2$-Wasserstein distance
 Available control options are \code{qSup}, \code{nqSup}, \code{dSup} and other options in FPCA of fdapace.
 }
 \examples{
+\dontrun{
 set.seed(1)
 #use yin 
 tgrid = seq(1, 50, length.out = 50)
@@ -96,7 +97,7 @@ for(i in 1:30){
   }))
 }
 result4 = VarObj(tgrid, qin = qin, optns=list(qSup = round(qSup, 4)))
-
+}
 }
 \references{
 \cite{Dubey, P., & Müller, H. G. (2021). Modeling Time-Varying Random Objects and Dynamic Networks. Journal of the American Statistical Association, 1-33.}

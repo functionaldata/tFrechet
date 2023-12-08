@@ -26,3 +26,31 @@ test_that("Works with qin input", {
   expect_true(sum((res$qout[2:100] - colMeans(qtrue))^2) < 1e-8)
 })
 
+
+test_that("Weighted barycenter unequal weights works", {
+  set.seed(1)
+  n=50
+  xin <- seq(0,1,length.out=n)
+  qSup=seq(1e-6,1-1e-6,length.out=100)
+  qin=t(sapply(xin,function(x){qnorm(qSup,mean=0,sd=1)+x}))
+  weightsF=n:1
+  weightsF=weightsF/sum(weightsF)
+  res=DenFMean(qin=qin, optns = list(qSup = c(0,qSup[2:(length(qSup)-1)],1),weights=weightsF))
+  barycenter_weighted=colSums(diag(weightsF)%*%qin[,2:(length(qSup)-1)])
+  expect_true(sum((res$qout[2:(length(qSup)-1)] - barycenter_weighted)^2) < 1e-8)
+})
+
+test_that("Weighted barycenter using equal weights works", {
+  set.seed(1)
+  n=50
+  xin <- seq(0,1,length.out=n)
+  qSup=seq(1e-6,1-1e-6,length.out=100)
+  qin=t(sapply(xin,function(x){qnorm(qSup,mean=0,sd=1)+x}))
+  weightsF=rep(1/n,n)
+  res=DenFMean(qin=qin, optns = list(qSup = c(0,qSup[2:(length(qSup)-1)],1),weights=weightsF))
+  barycenter_weighted=colSums(diag(weightsF)%*%qin[,2:(length(qSup)-1)])
+  expect_true(sum((res$qout[2:(length(qSup)-1)] - barycenter_weighted)^2) < 1e-8)
+})
+
+
+

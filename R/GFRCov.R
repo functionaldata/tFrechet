@@ -87,6 +87,8 @@ GFRCov  = function(x, y=NULL,M=NULL,xout,optns = list()){
       } else{
         if(!is.array(M)){
           stop('M must be an array or a list')
+        } else if (length(dim(M))!=3) {
+          stop('M must be an array or a list')
         }
       }
       if(nrow(x)!=dim(M)[3]){
