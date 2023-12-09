@@ -39,6 +39,7 @@ For power (and Frobenius) metrics, either \code{y} or \code{M} must be input; \c
 }
 }
 \examples{
+\donttest{
 #Example y input
 n=30             # sample size
 t=seq(0,1,length.out=100)       # length of data
@@ -54,7 +55,7 @@ phi2 = sqrt(6/5)*(1-t/2)
 y = theta1\%*\%t(phi1) + theta2 \%*\% t(phi2)
 xout = matrix(c(0.25,0.5,0.75),3)
 Cov_est=LocCovReg(x=x,y=y,xout=xout,optns=list(corrOut=FALSE,metric="power",alpha=3))
-\donttest{
+
 #Example M input
 n=30 #sample size
 m=30 #dimension of covariance matrices

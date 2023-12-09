@@ -1,3 +1,17 @@
+frechet v0.3.0 (Release date: 07-Dec-2023)
+=============
+Changes:
+* Included implementations for Fréchet variance and Fréchet ANOVA <DOI:10.1093/biomet/asz052>.
+* Included implementations for Fréchet change-point detection <DOI:10.1214/19-AOS1930>.
+* Included methods for functional object data proposed in <DOI:10.1080/01621459.2021.1917416> and <DOI:10.1111/rssb.12337>.
+* Included implementations for Fréchet regression for spherical responses and correlations <DOI:10.1214/17-AOS1624>.
+* Included implementations for point process Fréchet regression <DOI:10.1109/TIT.2021.3126466>.
+* Included computation for Fréchet means with potentially unequal weights.
+
+Minors:
+* Fixed bugs in Fréchet regression for distributions and covariances.
+
+
 frechet v0.2.0 (Release date: 15-Dec-2020)
 =============
 Changes:

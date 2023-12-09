@@ -63,7 +63,7 @@ Available control options are
 }
 }
 \examples{
-\dontrun{
+\donttest{
 xin = seq(0,1,0.05)
 yin = lapply(xin, function(x) {
   rnorm(100, rnorm(1,x + x^2,0.005), 0.05)

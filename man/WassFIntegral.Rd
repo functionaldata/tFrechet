@@ -22,6 +22,64 @@ A list of the following:
 \description{
 Calculating generalized Fréchet integrals of 1D distribution (equipped with Wasserstein distance)
 }
+\examples{
+#simulation as in the paper Dubey, P., & Müller, H. G. (2020).
+# Functional models for time‐varying random objects. 
+# JRSSB, 82(2), 275-327.
+\donttest{
+n <- 100
+N <- 50
+t_out <- seq(0,1,length.out = N)
+
+phi1 <- function(t){
+  (t^2-0.5)/0.3416
+}
+phi2 <- function(t){
+  sqrt(3)*t
+}
+phi3 <- function(t){
+  (t^3 - 0.3571*t^2 - 0.6*t + 0.1786)/0.0895
+}
+
+Z <- cbind(rnorm(n)*sqrt(12), rnorm(n), runif(n)*sqrt(72), runif(n)*sqrt(9))
+mu_vec <- 1 + Z[,1] \%*\% t(phi1(t_out)) + Z[,2] \%*\% t(phi3(t_out))
+sigma_vec <- 3 + Z[,3] \%*\% t(phi2(t_out)) + Z[,4] \%*\% t(phi3(t_out))
+
+# grids of quantile function
+Nq <- 40
+eps <- 0.00001
+Qout <- seq(0+eps,1-eps,length.out=Nq)
+
+# I: four dimension array of n x n matrix of squared distances 
+# between the time point u of the ith process and 
+# process and the time point v of the jth object process, 
+# e.g.: I[i,j,u,v] <- d_w^2(X_i(u) X_j(v)).
+I <- array(0, dim = c(n,n,N,N))
+for(i in 1:n){
+  for(j in 1:n){
+    for(u in 1:N){
+      for(v in 1:N){
+        #wasserstein distance between distribution X_i(u) and X_j(v) 
+        I[i,j,u,v] <- (mu_vec[i,u] - mu_vec[j,v])^2 + (sigma_vec[i,u] - sigma_vec[j,v])^2
+      }
+    }
+  }
+}
+
+# check ObjCov work 
+Cov_result <- ObjCov(t_out, I, 3)
+#Cov_result$lambda #12 6 1.75
+
+# calculate Q 
+i <- 6 # for the ith subject
+Q <- t(sapply(1:N, function(t){
+  qnorm(Qout, mean = mu_vec[i,t], sd = sigma_vec[i,t])
+}))
+
+score_result <- WassFIntegral(Cov_result$phi[,1], t_out, Q, Qout)
+score_result$f
+}
+}
 \references{
 \cite{Dubey, P., & Müller, H. G. (2020). Functional models for time‐varying random objects. Journal of the Royal Statistical Society: Series B (Statistical Methodology), 82(2), 275-327.}
 }

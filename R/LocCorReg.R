@@ -11,13 +11,13 @@
 #'   \code{list(name=value)}. See `Details'.
 #' @details Available control options are
 #' \describe{
-#' \item{metric}{choice of metric. 'frobenius' and 'power' are supported,
+#' \item{metric}{choice of metric. \code{'frobenius'} and \code{'power'} are supported,
 #'   which corresponds to Frobenius metric and Euclidean power metric,
 #'   respectively. Default is Frobenius metric.}
 #' \item{alpha}{the power for Euclidean power metric. Default is 1 which
 #'   corresponds to Frobenius metric.}
-#' \item{kernel}{Name of the kernel function to be chosen from 'gauss',
-#'   'rect', 'epan', 'gausvar' and 'quar'. Default is 'gauss'.}
+#' \item{kernel}{Name of the kernel function to be chosen from \code{'gauss'},
+#'   \code{'rect'}, \code{'epan'}, \code{'gausvar'} and \code{'quar'}. Default is \code{'gauss'}.}
 #' \item{bw}{bandwidth for local Fréchet regression, if not entered
 #'   it would be chosen from cross validation.}
 #' \item{digits}{the integer indicating the number of decimal places (round)
@@ -33,6 +33,7 @@
 #' \item{optns}{the control options used.}
 #' @examples
 #' # Generate simulation data
+#' \donttest{
 #' n <- 100
 #' q <- 10
 #' d <- q * (q - 1) / 2
@@ -57,6 +58,7 @@
 #'     kernel = "epan", bw = 0.08
 #'   )
 #' )
+#' }
 #' @references
 #' \itemize{
 #' \item \cite{Petersen, A. and Müller, H.-G. (2019). Fréchet regression for random objects with Euclidean predictors. The Annals of Statistics, 47(2), 691--719.}

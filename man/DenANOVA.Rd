@@ -81,7 +81,7 @@ Available control options are
 \item{dSup}{User defined output grid for the support of 
   kernel density estimation used in \code{CreateDensity()}, 
   it overrides \code{ndSup}.}
-\item{delta}{A scalar giveing the size of the bin to be used used in 
+\item{delta}{A scalar giving the size of the bin to be used used in 
   \code{CreateDensity()}; numeric - default: \code{diff(range(y))/1000}. 
   It only works when the raw sample is available.}
 \item{kernelDen}{A character holding the type of kernel functions used in 

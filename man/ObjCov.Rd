@@ -29,7 +29,7 @@ A list of the following:
 Calculating covariance for time varying object data
 }
 \examples{
-\dontrun{
+\donttest{
 ### functional covariate
 phi1 <- function(x) -cos(pi*x/10)/sqrt(5)
 phi2 <- function(x)  sin(pi*x/10)/sqrt(5)

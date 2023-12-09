@@ -10,7 +10,7 @@ SpheGeoGrad(x, y)
 \item{x, y}{Two unit vectors.}
 }
 \value{
-A vector holding radient w.r.t. \code{y} of the geodesic distance between \code{x} and \code{y}.
+A vector holding gradient w.r.t. \code{y} of the geodesic distance between \code{x} and \code{y}.
 }
 \description{
 Compute gradient w.r.t. y of the geodesic distance \eqn{\arccos(x^\top y)} on a unit hypersphere

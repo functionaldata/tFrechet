@@ -18,7 +18,7 @@
 #' \item{xiEst}{A \code{n} X \code{K} matrix containing the FPC estimates.}
 #' \item{cumFVE}{A vector of dimension \code{K} with the fraction of the cumulative total variance explained with each additional FPC.}
 #' \item{FPCAObj}{FPCA Object of Fréchet variance function.}
-#' \item{tgridin}{Input tgrid.}
+#' \item{tgridin}{Input \code{tgrid}.}
 #' \item{qSup}{A vector of dimension \code{length(tgridin)} giving the domain grid of quantile functions \code{qout}.}
 #' \item{qout}{A three dimension array of dimension \code{n} x \code{length(tgridin)} x \code{length(qSup)} holding the observed quantiles, such that \code{qout[i,j,]} holds the observed density function taking values on \code{qSup} corresponding to the ith sample at the jth time grid.}
 #' \item{qmean}{A \code{length(tgridin)} X \code{length(qSup)} matrix containing the time varying Fréchet mean function.}

@@ -38,7 +38,7 @@ Global Fréchet regression for correlation matrices
 \details{
 Available control options are
 \describe{
-\item{metric}{choice of metric. 'frobenius' and 'power' are supported,
+\item{metric}{choice of metric. \code{'frobenius'} and \code{'power'} are supported,
   which corresponds to Frobenius metric and Euclidean power metric,
   respectively. Default is Frobenius metric.}
 \item{alpha}{the power for Euclidean power metric.

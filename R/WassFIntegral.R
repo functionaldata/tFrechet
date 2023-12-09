@@ -7,12 +7,13 @@
 #' @return A list of the following:
 #' \item{f}{Quantile function corresponding to the frechet integral of \code{Q} along \code{phi}}
 #' @examples 
-#' ### simulation ###
+#' #simulation as in the paper Dubey, P., & Müller, H. G. (2020).
+#' # Functional models for time‐varying random objects. 
+#' # JRSSB, 82(2), 275-327.
+#' \donttest{
 #' n <- 100
 #' N <- 50
 #' t_out <- seq(0,1,length.out = N)
-#' #simulation as in the paper Dubey, P., & Müller, H. G. (2020). Functional models for time‐varying random objects. 
-#' # Journal of the Royal Statistical Society: Series B (Statistical Methodology), 82(2), 275-327.}
 #' 
 #' phi1 <- function(t){
 #'   (t^2-0.5)/0.3416
@@ -33,7 +34,8 @@
 #' eps <- 0.00001
 #' Qout <- seq(0+eps,1-eps,length.out=Nq)
 #' 
-#' # I: four dimension array of n x n matrix of squared distances between the time point u of the ith process and 
+#' # I: four dimension array of n x n matrix of squared distances 
+#' # between the time point u of the ith process and 
 #' # process and the time point v of the jth object process, 
 #' # e.g.: I[i,j,u,v] <- d_w^2(X_i(u) X_j(v)).
 #' I <- array(0, dim = c(n,n,N,N))
@@ -60,6 +62,7 @@
 #' 
 #' score_result <- WassFIntegral(Cov_result$phi[,1], t_out, Q, Qout)
 #' score_result$f
+#' }
 #' @references 
 #' \cite{Dubey, P., & Müller, H. G. (2020). Functional models for time‐varying random objects. Journal of the Royal Statistical Society: Series B (Statistical Methodology), 82(2), 275-327.}
 #' @export

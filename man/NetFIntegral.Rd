@@ -23,7 +23,7 @@ A list of the following:
 Calculating generalized Fréchet integrals of networks (equipped with Frobenius norm of adjacency matrices with zero diagonal elements and non negative off diagonal elements.)
 }
 \examples{
-\dontrun{
+\donttest{
 set.seed(5)
 n <- 100
 N <- 50

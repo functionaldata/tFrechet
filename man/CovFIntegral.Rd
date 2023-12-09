@@ -21,7 +21,7 @@ A list of the following:
 Calculating generalized Fréchet integrals of covariance (equipped with Frobenius norm)
 }
 \examples{
-\dontrun{
+\donttest{
 set.seed(5)
 library(mpoly)
 n <- 100

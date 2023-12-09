@@ -36,13 +36,13 @@ Local Fréchet regression for correlation matrices
 \details{
 Available control options are
 \describe{
-\item{metric}{choice of metric. 'frobenius' and 'power' are supported,
+\item{metric}{choice of metric. \code{'frobenius'} and \code{'power'} are supported,
   which corresponds to Frobenius metric and Euclidean power metric,
   respectively. Default is Frobenius metric.}
 \item{alpha}{the power for Euclidean power metric. Default is 1 which
   corresponds to Frobenius metric.}
-\item{kernel}{Name of the kernel function to be chosen from 'gauss',
-  'rect', 'epan', 'gausvar' and 'quar'. Default is 'gauss'.}
+\item{kernel}{Name of the kernel function to be chosen from \code{'gauss'},
+  \code{'rect'}, \code{'epan'}, \code{'gausvar'} and \code{'quar'}. Default is \code{'gauss'}.}
 \item{bw}{bandwidth for local Fréchet regression, if not entered
   it would be chosen from cross validation.}
 \item{digits}{the integer indicating the number of decimal places (round)
@@ -51,6 +51,7 @@ Available control options are
 }
 \examples{
 # Generate simulation data
+\donttest{
 n <- 100
 q <- 10
 d <- q * (q - 1) / 2
@@ -75,6 +76,7 @@ fit2 <- LocCorReg(x, y, xOut,
     kernel = "epan", bw = 0.08
   )
 )
+}
 }
 \references{
 \itemize{
