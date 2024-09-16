@@ -46,7 +46,7 @@ GloSpheReg <- function(xin=NULL, yin=NULL, xout=NULL){
   if(is.vector(xout)){
     xout <- as.matrix(xout)
   }
-  if (length(xin)!=nrow(yin))
+  if (nrow(xin)!=nrow(yin))
     stop("The length of xin should be the same as the number of rows in yin.")
   if (sum(abs(rowSums(yin^2) - rep(1,nrow(yin))) > 1e-6)){
     yin = yin / sqrt(rowSums(yin^2))

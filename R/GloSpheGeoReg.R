@@ -3,8 +3,8 @@
 #' @import trust trust
 
 GloSpheGeoReg <- function(xin, yin, xout) {
-  k = length(xout)
-  n = length(xin)
+  k = nrow(xout)
+  n = nrow(xin)
   m = ncol(yin)
   
   xbar <- colMeans(xin)
