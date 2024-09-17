@@ -1,4 +1,5 @@
 library(frechet)
+library(Matrix)
 
 # Main Function : Single Index F-regression with covariance response with Frobenius metric
 SIdxCovReg = function(xin, Min, bw=NULL, M=NULL, ker = ker_gauss, lower = -Inf, upper = Inf, iter =  500,
@@ -151,6 +152,9 @@ CovDirLocLin <- function(xin, Min, direc, xout, bw, ker = ker_gauss,
     M_res = M_res + s[i]*Min[,,i]/sL
   }
   
+  M_res = as.matrix(Matrix::nearPD(M_res)$mat)
+  M_res = Matrix::forceSymmetric(M_res)
+
   return(M_res)
 }
 
@@ -324,7 +328,7 @@ CovGen_data_setting = function(n, true_beta, link){
   for(i in 1:n){
     
     proj = sum(true_beta * xin[i, ])
-    eig = c(link(proj),link(proj)/2, exp(-link(proj)))
+    eig = c(exp(link(proj)),exp(link(proj)/2), exp(-link(proj)))
     Min[,,i] = diag(eig) 
     
   }
