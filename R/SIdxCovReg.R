@@ -338,15 +338,14 @@ CovGen_data_setting = function(n, true_beta, link){
 }
 
 #### Test
-
-set.seed(100)
 b <- c(3, -1.3, -3, 1.7)
 b0 <- normalize(b)
 b0 #0.6313342 -0.2735781 -0.6313342  0.3577560
 
 for(rep in 1:10){
+  set.seed(rep+999)
   dat <- CovGen_data_setting(100, b0, function(x) x)
-  res_cov <- SIdxCovReg(dat$xin, dat$Min, iter = 100)
+  res_cov <- SIdxCovReg(dat$xin, dat$Min, iter = 1000, M = 10, bw = 0.25, verbose = F)
   print(res_cov$est)
 }
 

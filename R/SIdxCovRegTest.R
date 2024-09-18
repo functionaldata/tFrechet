@@ -43,18 +43,19 @@ SIdxCovTest <- function(est, b0, xin, Min, nboot = 500, bw, M, verbose = F){
   })
   p_val = mean(test_stat_boot >= test_stat)
   res = list(cov_boot = cova_boot, test_stat = test_stat, 
-             p_boot = p_val, p_asymp = pchisq(test_stat, df = p-1), df = p-1)
+             pval_bootstrap = p_val, pval_chisq = 1 - pchisq(test_stat, df = p-1), df = p-1)
   return(res)
 }
 
 #### Test
-set.seed(100)
+set.seed(1000)
 b <- c(3, -1.3, -3, 1.7)
 b0 <- normalize(b)
 b0 #0.6313342 -0.2735781 -0.6313342  0.3577560
 
 dat_cov <- CovGen_data_setting(100, b0, function(x) x)
-fit_cov <- SIdxCovReg(xin = dat_cov$xin, Min = dat_cov$Min, iter = 500, verbose = F)
-
+fit_cov <- SIdxCovReg(xin = dat_cov$xin, Min = dat_cov$Min, bw= 0.25, M = 4, iter = 1000, verbose = F)
+fit_cov$est
 SIdxCovTest(fit_cov$est, b0, xin = dat_cov$xin, Min = dat_cov$Min,
-            nboot = 1000, bw = fit_cov$bw, M = fit_cov$M)
+            nboot = 500, bw = fit_cov$bw, M = fit_cov$M)
+
