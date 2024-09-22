@@ -44,7 +44,7 @@ SIdxDenTest <- function(est, b0, xin, qin, nboot = 500, bw, M, verbose = F){
   })
   p_val = mean(test_stat_boot >= test_stat)
   res = list(cov_boot = cova_boot, test_stat = test_stat, 
-             p_boot = p_val, p_asymp = pchisq(test_stat, df = p-1), df = p-1)
+       pval_bootstrap = p_val, pval_chisq = 1 - pchisq(test_stat, df = p-1), df = p-1)
   return(res)
 }
 
