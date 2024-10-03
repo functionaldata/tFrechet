@@ -29,41 +29,24 @@ SIdxCovReg = function(xin, Min, bw=NULL, M=NULL, ker = ker_gauss, lower = -Inf, 
   
   p <- ncol(xin)
   
+  ## Parameter (bandwidth, bin size) choice using cross-validation
+  if (is.null(bw) | is.null(M)) {
+    param <- CovTuning(xin, Min, normalize(rep(1,p)))
+    bw2 <- param[1]
+    M2 <- ifelse(is.null(M), param[2], M)
+  } else {
+    bw2 <- bw
+    M2 <- M
+  }
+  
   fdi_curr = Inf
   
   for(i in 1:iter){
     
-    #set.seed(i)
     direc_new = normalize(rnorm(n = p))
     
     if(direc_new[1] < 0){
       direc_new = -1 * direc_new
-    }
-    
-    ## Parameter (bandwidth, bin size) choice using cross-validation
-    if(is.null(bw) | is.null(M)){
-      
-      if(is.null(bw)){
-        
-        param = CovTuning(xin, Min, direc_new)
-        bw2 = param[1]
-        
-        if(!is.null(M)){
-          
-          M2 = M
-          if (M < 4){stop("The number of binned data should be greater than 3")}
-          
-        } else{
-          
-          M2 = param[2]
-          
-        }
-        
-      }
-      
-    }else {
-      bw2 = bw
-      M2 = M
     }
     
     binned_dat <- CovBinned_data(xin, Min, direc_new, M2)
@@ -129,6 +112,10 @@ CovDirLocLin <- function(xin, Min, direc, xout, bw, ker = ker_gauss,
     
   }
   
+  
+  if (!is.matrix(xin)) stop("xin should be a matrix.")
+  if (!is.array(Min) || length(dim(Min)) != 3) stop("Min should be a 3-dimensional array.")
+  
   n <- nrow(xin)
   
   if (n < 3) {
@@ -136,24 +123,39 @@ CovDirLocLin <- function(xin, Min, direc, xout, bw, ker = ker_gauss,
   }
   
   projec <- xin %*% direc
-  xin_eff <- projec
+  aux = ker((projec - xout) / bw)
+  mu0 <- mean(aux)
+  mu1 <- mean(ker((projec - xout) / bw) * (projec - xout))
+  mu2 <- mean(ker((projec - xout) / bw) * (projec - xout)^2)
   
-  mu0 <- mean(ker((xin_eff - xout) / bw))
-  mu1 <- mean(ker((xin_eff - xout) / bw) * (xin_eff - xout))
-  mu2 <- mean(ker((xin_eff - xout) / bw) * ((xin_eff - xout)^2))
-  s <- ker((xin_eff - xout) / bw) * (mu2 - mu1 * (xin_eff - xout)) / (mu0 * mu2 - mu1^2)
-  s <- as.vector(s)
-  q = dim(Min)[1]
+  s = array(0, length(aux))
+  for(i in 1:length(aux)){
+    s[i] =aux[i]*(1-t(mu1)%*%solve(mu2)%*%(projec[i]-xout))
+  }
   
-  sL = sum(s)
   
-  M_res = matrix(0, nrow = q, ncol = q)
-  for(i in 1:n){
-    M_res = M_res + s[i]*Min[,,i]/sL
+ # s <- ker((projec - xout) / bw) * (mu2 - mu1 * (projec - xout)) / (mu0 * mu2 - mu1^2)
+  sL <- sum(s)
+    
+  M_res <- matrix(0, nrow = dim(Min)[1], ncol = dim(Min)[1])
+  
+  for (i in 1:nrow(xin)) {
+    M_res <- M_res + s[i] * Min[,,i] / sL
+  }
+  
+  eig = eigen(M_res, symmetric = TRUE)
+  eigenvalues <- eig$values
+  eigenvectors <- eig$vectors
+  if (all(eigenvalues <= 0)) {
+    
+    eigenvalues[eigenvalues <= 0] <- 1e-08
+    
+    # Replace with a zero matrix if negative semi-definite
+    M_res <- eigenvectors %*% diag(eigenvalues) %*% t(eigenvectors)
   }
   
   M_res = as.matrix(Matrix::nearPD(M_res)$mat)
-  M_res = Matrix::forceSymmetric(M_res)
+  #M_res = Matrix::forceSymmetric(M_res)
 
   return(M_res)
 }
@@ -337,17 +339,22 @@ CovGen_data_setting = function(n, true_beta, link){
   
 }
 
-#### Test
+#### Test ####
+#for(rep in 1:10){
+#  set.seed(rep+999)
+#  dat <- CovGen_data_setting(100, b0, function(x) x)
+#  res_cov <- SIdxCovReg(dat$xin, dat$Min, iter = 500, M = 10, bw = 0.25, verbose = F)
+#  print(res_cov$est)
+#}
+#save(res_cov, file = "res_cov.RData")
+
 b <- c(3, -1.3, -3, 1.7)
 b0 <- normalize(b)
 b0 #0.6313342 -0.2735781 -0.6313342  0.3577560
 
-for(rep in 1:10){
-  set.seed(rep+999)
-  dat <- CovGen_data_setting(100, b0, function(x) x)
-  res_cov <- SIdxCovReg(dat$xin, dat$Min, iter = 1000, M = 10, bw = 0.25, verbose = F)
-  print(res_cov$est)
-}
+set.seed(999)
+dat <- CovGen_data_setting(500, b0, function(x) x)
+res_cov <- SIdxCovReg(dat$xin, dat$Min, iter = 500)
+res_cov
 
-save(res_cov, file = "res_cov.RData")
 
