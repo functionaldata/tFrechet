@@ -24,40 +24,22 @@ SIdxDenReg = function(xin, qin, bw=NULL, M=NULL, ker = ker_gauss, lower = -Inf, 
   
   p <- ncol(xin)
   
+  ## Parameter (bandwidth, bin size) choice using cross-validation
+  if (is.null(bw) | is.null(M)) {
+    param <- DenTuning(xin, qin, normalize(rep(1,p)))
+    bw2 <- param[1]
+    M2 <- ifelse(is.null(M), param[2], M)
+  } else {
+    bw2 <- bw
+    M2 <- M
+  }
+  
   fdi_curr = Inf
   for(i in 1:iter){
     
-    #set.seed(i)
-    direc_new = normalize(rnorm(n = p))
-    
+    direc_new = normalize(rnorm(n=p))
     if(direc_new[1] < 0){
       direc_new = -1 * direc_new
-    }
-    
-    ## Parameter (bandwidth, bin size) choice using cross-validation
-    if(is.null(bw) | is.null(M)){
-      
-      if(is.null(bw)){
-        
-        param = DenTuning(xin, qin, direc_new)
-        bw2 = param[1]
-        
-        if(!is.null(M)){
-          
-          M2 = M
-          if (M < 4){stop("The number of binned data should be greater than 3")}
-        
-        } else{
-          
-          M2 = param[2]
-        
-        }
-        
-      }else {
-        bw2 = bw
-        M2 = M
-      }
-      
     }
     
     binned_dat <- DenBinned_data(xin, qin, direc_new, M2)
@@ -331,7 +313,6 @@ DenGen_data_setting = function(n, true_beta, link){
   
 }
 
-
 #### Test ####
 # set.seed(100)
 # b <- c(4, 1.3, -2.5, 1.7)
@@ -357,7 +338,6 @@ b0 #0.6313342 -0.2735781 -0.6313342  0.3577560
 
 
 dat <- DenGen_data_setting(500, b0, function(x) x)
-res_den <- SIdxDenReg(dat$xin, dat$qin, iter = 500)
+res_den <- SIdxDenReg(dat$xin, dat$qin, iter = 1500)
 
 res_den
-
