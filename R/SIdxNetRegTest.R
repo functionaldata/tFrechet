@@ -1,6 +1,6 @@
 library(parallel)
 
-SIdxCovTest <- function(est, b0, xin, Min, nboot = 500, bw, M, verbose = F){
+SIdxNetTest <- function(est, b0, xin, Min, nboot = 500, bw, M, verbose = F){
   ## est: estimate from SIdxCovReg
   ## b0: true value or H0
   ## xin, Min: data input
@@ -21,7 +21,7 @@ SIdxCovTest <- function(est, b0, xin, Min, nboot = 500, bw, M, verbose = F){
     
   }
   
-  CovBoot_est <- function(est, xin, Min, reps, bw, M, verbose = verbose){
+  NetBoot_est <- function(est, xin, Min, reps, bw, M, verbose = verbose){
     n = nrow(xin)
     p = length(est)
     samp_ind = mclapply(1:reps, function(i) {
@@ -39,7 +39,7 @@ SIdxCovTest <- function(est, b0, xin, Min, nboot = 500, bw, M, verbose = F){
     b_est <- mclapply(
       1:reps, 
       FUN = function(i){
-        fit = SIdxCovReg(xin_resamp[[i]], Min_resamp[[i]], bw, M, verbose = verbose)
+        fit = SIdxNetReg(xin_resamp[[i]], Min_resamp[[i]], bw, M, verbose = verbose, iter = 100)
         fit$est
       })
     
@@ -47,7 +47,7 @@ SIdxCovTest <- function(est, b0, xin, Min, nboot = 500, bw, M, verbose = F){
     return(est_signed)
   }
   
-  boot_res = CovBoot_est(est = est, xin = xin, Min = Min, reps = nboot, bw = bw, M = M, verbose = verbose)
+  boot_res = NetBoot_est(est = est, xin = xin, Min = Min, reps = nboot, bw = bw, M = M, verbose = verbose)
   
   p = length(est)
   
@@ -68,14 +68,43 @@ SIdxCovTest <- function(est, b0, xin, Min, nboot = 500, bw, M, verbose = F){
 }
 
 #### Test
-b <- c(3, -1.3, -3, 1.7)
-b0 <- normalize(b)
-b0 #0.6313342 -0.2735781 -0.6313342  0.3577560
 
-set.seed(99)
-dat <- CovGen_data_setting(500, b0, function(x) x)
-res_cov <- SIdxCovReg(dat$xin, dat$Min, iter = 500)
+set.seed(1)
+n = 100
+m=3
 
-test_res = SIdxCovTest(res_cov$est, b0, xin = dat$xin, Min = dat$Min,
-            nboot = 50, bw = res_cov$bw, M = res_cov$M)
+# Set Parameters
+X = matrix(c(runif(n, -1, 1), 
+             runif(n, -1, 1),
+             runif(n, 1, 2),
+             
+             rgamma(n, 3, 1),
+             rgamma(n, 4, 1),
+             rgamma(n, 5, 1),
+             
+             rbinom(n, 1, 0.2),
+             rbinom(n, 1, 0.3),
+             rbinom(n, 1, 0.5)), n) 
+
+y = lapply(1:n, function(i){
+  a = 2 * sin(pi*X[i,1])^2*X[i,7] + cos(pi*X[i,2])^2*(1-X[i,7])
+  b = X[i,4]*X[i,8]+X[i,5]*(1-X[i,8])
+  
+  Vec = -rbeta(m*(m-1)/2, shape1 = a, shape2 = b)
+  temp = matrix(0, nrow = m, ncol = m)
+  temp[lower.tri(temp)] = Vec
+  temp <- temp + t(temp)
+  diag(temp) = -colSums(temp)
+  return(temp)
+})
+
+y_mat = array(0, c(m, m, n))
+for(j in 1:n){
+  y_mat[,,j] = y[[j]]
+}
+
+res_net = SIdxNetReg(xin = X, Min = y_mat)
+b0 = c(1,0,0,0,0,0,0,0,0)
+test_res = SIdxNetTest(res_net$est, b0, xin = X, Min = y_mat,
+            nboot = 20, bw = res_net$bw, M = res_net$M)
 test_res

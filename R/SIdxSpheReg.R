@@ -27,32 +27,25 @@ SIdxSpheReg <- function(xin, yin, bw = NULL, M = NULL, ker = ker_gauss, iter = 5
   
   p <- ncol(xin)
   
+  ## Parameter (bandwidth, bin size) choice using cross-validation
+  if (is.null(bw) | is.null(M)) {
+    param <- SpheTuning(xin, yin, normalize(rep(1,p)))
+    bw2 <- param[1]
+    M2 <- ifelse(is.null(M), param[2], M)
+  } else {
+    bw2 <- bw
+    M2 <- M
+  }
+  
   fdi_curr = Inf
   
   for(i in 1:iter){
-    #set.seed(i)
+    
     direc_new = normalize(rnorm(n = p))
     if(direc_new[1] < 0){
       direc_new = -1 * direc_new
     }
-    ## Parameter (bandwidth, bin size) choice using cross-validation
-    if(is.null(bw) | is.null(M)){
-      if(is.null(bw)){
-        param = SpheTuning(xin, yin, direc_new)
-        bw2 = param[1]
-      
-        if(!is.null(M)){
-          
-          M2 = M
-          if (M < 4){stop("The number of binned data should be greater than 3")}
-        } else{
-          M2 = param[2]
-        }
-      }
-    } else{
-        bw2 = bw
-        M2 = M
-    }
+
     binned_dat <- SpheBinned_data(xin, yin, direc_new, M2)
     proj_binned <- binned_dat$binned_xmean %*% direc_new
     
@@ -77,7 +70,7 @@ SIdxSpheReg <- function(xin, yin, bw = NULL, M = NULL, ker = ker_gauss, iter = 5
     }
     
     if(verbose){
-      if(i %% 2 == 0){
+      if(i %% 10 == 0){
         print(paste("Iteration number:", i,"/",iter))
       }
     }
@@ -201,7 +194,6 @@ SpheTuning <- function(xin, yin, direc, ker = ker_gauss){
   
   
   n <- nrow(xin)
-  #p <- ncol(xin)
   projec = xin %*% direc
   
   xinSt = unique(sort(projec))
@@ -389,8 +381,9 @@ SpheGenerate_data <- function(n, sd, true_beta, link){
 
 
 set.seed(100)
-b <- c(4, 1.3, -2.5)
-b0 <- normalize(b) # 0.8175191  0.2656937 -0.5109494
+b <- c(3, -1.3, -3, 1.7)
+b0 <- normalize(b)
+b0 #0.6313342 -0.2735781 -0.6313342  0.3577560
 
 
 dat <- SpheGenerate_data(100, 0, b0, function(x) x)

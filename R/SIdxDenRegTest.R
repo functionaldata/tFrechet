@@ -8,6 +8,12 @@ SIdxDenTest <- function(est, b0, xin, qin, nboot = 100, bw, M, verbose = F){
   ## bw, M: parameters for DenBoot_est; should be given
   ## verbose: print the iteration counts
   
+  if (length(est) != length(b0)){
+    
+    stop("The length of est and b0 should be the same.")
+    
+  }
+  
   if (abs(sum(b0^2) -1) > 1e-04 ){
     
     warning("The norm of b0 is not 1, we normalize it")
