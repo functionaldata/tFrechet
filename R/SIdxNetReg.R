@@ -30,10 +30,11 @@ SIdxNetReg <- function(xin, Min, bw = NULL, M = NULL, ker = ker_gauss, iter = 50
     binned_dat <- NetBinned_data(xin, Min, direc_new, M2)
     proj_binned <- binned_dat$binned_xmean %*% direc_new
     
+    res <- NetDirLocLin(xin, Min, direc_new, proj_binned, bw2)
+    
     err <- 0
     for (l in 1:M2) {
-      res <- NetDirLocLin(xin, Min, direc_new, proj_binned[l], bw2)
-      err <- err + sum((res - binned_dat$binned_Mmean[,,l])^2)
+      err <- err + sum((res$predict[[l]] - binned_dat$binned_Mmean[,,l])^2)
     }
     
     fdi_new <- err / M2
@@ -70,9 +71,7 @@ NetDirLocLin <- function(xin, Min, direc, xout, bw) {
   
   lnr_fit = lnr(gl = Min_list, x = projec, xOut = xout, optns = list(bw = bw))
   
-  M_res = lnr_fit$predict[[1]]
-  
-  return(M_res)
+  return(lnr_fit)
 }
 
 
@@ -87,9 +86,10 @@ NetTuning <- function(xin, Min, direc, ker = ker_gauss) {
     for (i in 1:5) {
       xin_eff <- xin[-ind_cv[[i]], ]
       Min_eff <- Min[,,-ind_cv[[i]]]
+      res <- NetDirLocLin(xin_eff, Min_eff, direc, projec, bw)
+      
       for (k in ind_cv[[i]]) {
-        res <- NetDirLocLin(xin_eff, Min_eff, direc, projec[k], bw)
-        cv_err <- cv_err + sum((res - Min[,,k])^2)
+        cv_err <- cv_err + sum((res$predict[[k]] - Min[,,k])^2)
       }
       cv_err <- cv_err / length(ind_cv[[i]])
     }
@@ -111,7 +111,7 @@ NetTuning <- function(xin, Min, direc, ker = ker_gauss) {
       Min_eff <- Min_binned[,,-i, drop = FALSE]
       
       res <- NetDirLocLin(xin_eff, Min_eff, direc, proj_binned[i], bw)
-      cv_err <- cv_err + sum((res - Min_binned[,,i])^2)
+      cv_err <- cv_err + sum((res$predict[[1]] - Min_binned[,,i])^2)
     }
     
     # Return error; avoid returning NaN or Inf in case of numerical instability
