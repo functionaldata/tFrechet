@@ -2,7 +2,14 @@ library(frechet)
 library(Matrix)
 
 # Main Function: Single Index F-regression with network response using Frobenius metric
-SIdxNetReg <- function(xin, Min, bw = NULL, M = NULL, ker = ker_gauss, iter = 500, verbose = TRUE) {
+SIdxNetReg <- function(xin, Min, bw = NULL, M = NULL, ker = ker_gauss, iter = 1000, verbose = TRUE) {
+  ## xin: n by p matrix of input (n: number of inputs, p: dimension of predictors)
+  ## Min: m by m by n 3-d array of graph Laplacian  (m: number of nodes)
+  ## bw: bandwidth b
+  ## M: size of binning
+  ## ker: ker_gauss, ker_unif, ker_epan
+  ## iter: used for generation of directions.
+  ## verbose: print the iteration counts?
   
   # Input validation
   if (!is.matrix(xin)) stop("xin should be a matrix.")
@@ -10,22 +17,39 @@ SIdxNetReg <- function(xin, Min, bw = NULL, M = NULL, ker = ker_gauss, iter = 50
   
   p <- ncol(xin)
   
-  # Parameter selection (bandwidth, bin size)
-  if (is.null(bw) | is.null(M)) {
+  ## Parameter (bandwidth, bin size) choice using cross-validation
+  needParam <- (is.null(M) | is.null(bw))
+  
+  if (needParam) {
     param <- NetTuning(xin, Min, normalize(rep(1,p)))
+  }
+  
+  # bw2 depends on bw
+  if (is.null(bw)) {
     bw2 <- param[1]
-    M2 <- ifelse(is.null(M), param[2], M)
   } else {
     bw2 <- bw
+  }
+  
+  # M2 depends on M
+  if (is.null(M)) {
+    M2 <- param[2]
+  } else {
     M2 <- M
   }
+  
+  ## Generate Equal Grid over the angles
+  coords_mat <- matrix(rnorm(iter * p), nrow = iter, ncol = p)
+  
+  # Normalize each row to have unit norm
+  coords_mat <- coords_mat / sqrt(rowSums(coords_mat^2))
+  coords_mat[,1] = abs(coords_mat[,1])
   
   fdi_curr <- Inf
   
   for (i in 1:iter) {
-    direc_new <- normalize(rnorm(p))  # Random direction
-    if (direc_new[1] < 0) direc_new <- -1 * direc_new  # Ensure first element is non-negative
     
+    direc_new = coords_mat[i,]
     
     binned_dat <- NetBinned_data(xin, Min, direc_new, M2)
     proj_binned <- binned_dat$binned_xmean %*% direc_new
@@ -45,7 +69,7 @@ SIdxNetReg <- function(xin, Min, bw = NULL, M = NULL, ker = ker_gauss, iter = 50
       M_curr <- M2
     }
     
-    if (verbose && i %% 10 == 0) {
+    if (verbose && i %% 100 == 0) {
       print(paste("Iteration number:", i, "/", iter))
     }
   }
@@ -133,11 +157,29 @@ NetTuning <- function(xin, Min, direc, ker = ker_gauss) {
   bw <- optim(par = runif(1, bw_min, bw_max), fn = bwCV, xin = xin, Min = Min, direc = direc,
               method = "Brent", lower = bw_min, upper = bw_max)$par
   
-  M_range <- unique(ceiling(nrow(xin)^(1 / c(2:7))))
-  M_range = unique(M_range[M_range > 3])
+  M_range = ceiling(n/c(2:30))
+  M_range = unique(M_range[60 > M_range & M_range > 15])
   
-  M_curr <- M_range[which.min(sapply(M_range, function(M) bwCV_M(xin, Min, direc, M, bw, ker)))]
-  return(c(bw, as.integer(M_curr)))
+  if (length(M_range) >0){
+    
+    cv_err_curr = Inf
+    for(M in M_range){
+      
+      cv_err_new = bwCV_M(xin, Min, direc, M, bw, ker)
+      if (cv_err_new < cv_err_curr){
+        
+        cv_err_curr <- cv_err_new
+        M_curr <- M
+        
+      }
+      
+    }
+    
+  } else{
+    M = 15
+  }
+
+  return(c(bw, M))
 }
 
 # Binning function
@@ -541,39 +583,38 @@ kerFctn <- function(kernel_type){
 
 
 
-set.seed(1)
-n = 100
-m=3
+#set.seed(1)
+#n = 100
+#m=3
 
 # Set Parameters
-X = matrix(c(runif(n, -1, 1), 
-             runif(n, -1, 1),
-             runif(n, 1, 2),
+#X = matrix(c(runif(n, -1, 1), 
+#             runif(n, -1, 1),
+#             runif(n, 1, 2),
              
-             rgamma(n, 3, 1),
-             rgamma(n, 4, 1),
-             rgamma(n, 5, 1),
-             
-             rbinom(n, 1, 0.2),
-             rbinom(n, 1, 0.3),
-             rbinom(n, 1, 0.5)), n) 
+#             rgamma(n, 3, 1),
+#             rgamma(n, 4, 1),
+#             rgamma(n, 5, 1),
 
-y = lapply(1:n, function(i){
-  a = 2 * sin(pi*X[i,1])^2*X[i,7] + cos(pi*X[i,2])^2*(1-X[i,7])
-  b = X[i,4]*X[i,8]+X[i,5]*(1-X[i,8])
+#             rbinom(n, 1, 0.2),
+#             rbinom(n, 1, 0.3),
+#             rbinom(n, 1, 0.5)), n) 
+
+#y = lapply(1:n, function(i){
+#  a = 2 * sin(pi*X[i,1])^2*X[i,7] + cos(pi*X[i,2])^2*(1-X[i,7])
+#  b = X[i,4]*X[i,8]+X[i,5]*(1-X[i,8])
   
-  Vec = -rbeta(m*(m-1)/2, shape1 = a, shape2 = b)
-  temp = matrix(0, nrow = m, ncol = m)
-  temp[lower.tri(temp)] = Vec
-  temp <- temp + t(temp)
-  diag(temp) = -colSums(temp)
-  return(temp)
-})
+#  Vec = -rbeta(m*(m-1)/2, shape1 = a, shape2 = b)
+#  temp = matrix(0, nrow = m, ncol = m)
+#  temp[lower.tri(temp)] = Vec
+#  temp <- temp + t(temp)
+#  diag(temp) = -colSums(temp)
+#  return(temp)
+#})
 
-y_mat = array(0, c(m, m, n))
-for(j in 1:n){
-  y_mat[,,j] = y[[j]]
-}
+#y_mat = array(0, c(m, m, n))
+#for(j in 1:n){
+#  y_mat[,,j] = y[[j]]
+#}
 
-res_net = SIdxNetReg(xin = X, Min = y_mat)
-res_net
+#res_net = SIdxNetReg(xin = X, Min = y_mat)

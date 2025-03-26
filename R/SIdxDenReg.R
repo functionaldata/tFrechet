@@ -1,15 +1,16 @@
 library(Matrix)
 library(osqp)
 
+
 # Main Function
-SIdxDenReg = function(xin, qin, bw=NULL, M=NULL, ker = ker_gauss, lower = -Inf, upper = Inf, iter =  500,
-                      verbose = T) {
+SIdxDenReg = function(xin, qin, bw=NULL, M=NULL, ker = ker_gauss, lower = -Inf, upper = Inf,
+                      iter = 1000, verbose = T) {
   ## xin: n by p matrix of input (n: number of inputs, p: dimension of predictors)
   ## qin: n by m matrix of quantile function  (m: length of quantile)
   ## bw: bandwidth b
   ## M: size of binning
   ## ker: ker_gauss, ker_unif, ker_epan
-  ## iter: generation of directions.
+  ## iter: used for generation of directions.
   ## verbose: print the iteration counts?
   
   if (is.vector(xin)){
@@ -25,22 +26,38 @@ SIdxDenReg = function(xin, qin, bw=NULL, M=NULL, ker = ker_gauss, lower = -Inf, 
   p <- ncol(xin)
   
   ## Parameter (bandwidth, bin size) choice using cross-validation
-  if (is.null(bw) | is.null(M)) {
-    param <- DenTuning(xin, qin, normalize(rep(1,p)))
+  needParam <- (is.null(M) | is.null(bw))
+  
+  if (needParam) {
+    param <- DenTuning(xin, qin, normalize(rep(1, p)))
+  }
+  
+  # bw2 depends on bw
+  if (is.null(bw)) {
     bw2 <- param[1]
-    M2 <- ifelse(is.null(M), param[2], M)
   } else {
     bw2 <- bw
+  }
+  
+  # M2 depends on M
+  if (is.null(M)) {
+    M2 <- param[2]
+  } else {
     M2 <- M
   }
   
+  ## Generate Equal Grid over the angles
+  coords_mat <- matrix(rnorm(iter * p), nrow = iter, ncol = p)
+  
+  # Normalize each row to have unit norm
+  coords_mat <- coords_mat / sqrt(rowSums(coords_mat^2))
+  coords_mat[,1] = abs(coords_mat[,1])
+  
+  ## Find the single index
   fdi_curr = Inf
-  for(i in 1:iter){
+  for(i in 1:nrow(coords_mat)){
     
-    direc_new = normalize(rnorm(n=p))
-    if(direc_new[1] < 0){
-      direc_new = -1 * direc_new
-    }
+    direc_new = coords_mat[i,]
     
     binned_dat <- DenBinned_data(xin, qin, direc_new, M2)
     proj_binned <- binned_dat$binned_xmean %*% direc_new
@@ -67,8 +84,8 @@ SIdxDenReg = function(xin, qin, bw=NULL, M=NULL, ker = ker_gauss, lower = -Inf, 
     }
     
     if(verbose){
-      if(i %% 10 == 0){
-        print(paste("Iteration number:", i,"/",iter))
+      if(i %% 100 == 0){
+        print(paste("Iteration number:", i,"/",nrow(coords_mat)))
       }
     }
     
@@ -77,7 +94,6 @@ SIdxDenReg = function(xin, qin, bw=NULL, M=NULL, ker = ker_gauss, lower = -Inf, 
   return(list(est = normalize(direc_curr), bw = bw_curr, M = M_curr))
   
 }
-
 
 #### Directional local F-regression given probability density, 
 #### Direction along which to compute projection, and bandw choice
@@ -207,9 +223,9 @@ DenTuning <- function(xin, qin, direc, ker = ker_gauss){
              method = "Brent", 
              lower = bw_min, upper = bw_max)$par
   
+  M_range = ceiling(n/c(2:30))
+  M_range = unique(M_range[60 > M_range & M_range > 15])
   
-  M_range = ceiling(n^(1/c(2:7)))
-  M_range = unique(M_range[M_range > 3])
   if (length(M_range) >0){
     
     cv_err_curr = Inf
@@ -226,7 +242,7 @@ DenTuning <- function(xin, qin, direc, ker = ker_gauss){
     }
     
   } else{
-    M = n
+    M = 15
   }
   
   #end
@@ -305,39 +321,11 @@ DenGen_data_setting = function(n, true_beta, link){
     proj = sum(true_beta * xin[i, ])
     qin[i,] = qnorm(c(1e-6, qSup, 1 - 1e-6), 
                     mean = link(proj) ,
-                    sd=exp(proj)/(1+exp(proj)))
+                    sd = 1)
+                    #sd=exp(proj)/(1+exp(proj)))
     
   }
   
   return(list(xin = xin, qin = qin))
   
 }
-
-#### Test ####
-# set.seed(100)
-# b <- c(4, 1.3, -2.5, 1.7)
-# b0 <- normalize(b)
-# d <- length(b0)
-# 
-# res = vector("list", length = 100)
-# for(rep in 1:100){
-#   dat <- DenGen_data_setting(1000, b0, function(x) x)
-#   
-#   x_in = dat$xin
-#   y_in = dat$qin
-#   res[[rep]] <- SIdxDenReg(x_in, y_in, iter = 1500) 
-#   print(rep)
-# }
-# 
-# save(res, file = "den_res.RData")
-
-set.seed(100)
-b <- c(3, -1.3, -3, 1.7)
-b0 <- normalize(b)
-b0 #0.6313342 -0.2735781 -0.6313342  0.3577560
-
-
-dat <- DenGen_data_setting(500, b0, function(x) x)
-res_den <- SIdxDenReg(dat$xin, dat$qin, iter = 1500)
-
-res_den

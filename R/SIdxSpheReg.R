@@ -5,7 +5,7 @@ library(trust)
 
 #### Main implementation function that returns 
 #### the estimated direction parameter (unit vector) 
-SIdxSpheReg <- function(xin, yin, bw = NULL, M = NULL, ker = ker_gauss, iter = 500,
+SIdxSpheReg <- function(xin, yin, bw = NULL, M = NULL, ker = ker_gauss, iter = 1000,
                         verbose = T) {
   ## xin: n by p matrix of input (n: number of inputs, p: dimension of predictors)
   ## yin: n by m matrix of output (m: dimension of sphere; S^{m-1})
@@ -27,24 +27,42 @@ SIdxSpheReg <- function(xin, yin, bw = NULL, M = NULL, ker = ker_gauss, iter = 5
   
   p <- ncol(xin)
   
+  
   ## Parameter (bandwidth, bin size) choice using cross-validation
-  if (is.null(bw) | is.null(M)) {
+  needParam <- (is.null(M) | is.null(bw))
+  
+  if (needParam) {
     param <- SpheTuning(xin, yin, normalize(rep(1,p)))
+  }
+  
+  # bw2 depends on bw
+  if (is.null(bw)) {
     bw2 <- param[1]
-    M2 <- ifelse(is.null(M), param[2], M)
   } else {
     bw2 <- bw
+  }
+  
+  # M2 depends on M
+  if (is.null(M)) {
+    M2 <- param[2]
+  } else {
     M2 <- M
   }
+  
+  
+  ## Generate Equal Grid over the angles
+  coords_mat <- matrix(rnorm(iter * p), nrow = iter, ncol = p)
+  
+  # Normalize each row to have unit norm
+  coords_mat <- coords_mat / sqrt(rowSums(coords_mat^2))
+  coords_mat[,1] = abs(coords_mat[,1])
   
   fdi_curr = Inf
   
   for(i in 1:iter){
     
-    direc_new = normalize(rnorm(n = p))
-    if(direc_new[1] < 0){
-      direc_new = -1 * direc_new
-    }
+    direc_new = coords_mat[i,]
+    
 
     binned_dat <- SpheBinned_data(xin, yin, direc_new, M2)
     proj_binned <- binned_dat$binned_xmean %*% direc_new
@@ -70,7 +88,7 @@ SIdxSpheReg <- function(xin, yin, bw = NULL, M = NULL, ker = ker_gauss, iter = 5
     }
     
     if(verbose){
-      if(i %% 10 == 0){
+      if(i %% 100 == 0){
         print(paste("Iteration number:", i,"/",iter))
       }
     }
@@ -215,20 +233,28 @@ SpheTuning <- function(xin, yin, direc, ker = ker_gauss){
              lower = bw_min, upper = bw_max)$par
   
   ## M choice
-  M_range = ceiling(n^(1/c(2:7)))
-  M_range = unique(M_range[M_range > 3])
+  M_range = ceiling(n/c(2:30))
+  M_range = unique(M_range[60 > M_range & M_range > 15])
+  
   if (length(M_range) >0){
+    
     cv_err_curr = Inf
-    for (M in M_range){
+    for(M in M_range){
+      
       cv_err_new = bwCV_M(xin, yin, direc, M, bw)
       if (cv_err_new < cv_err_curr){
+        
         cv_err_curr <- cv_err_new
         M_curr <- M
+        
       }
+      
     }
+    
   } else{
-    M = n
+    M = 15
   }
+  
   return(c(bw, M))
 }
 
@@ -380,13 +406,13 @@ SpheGenerate_data <- function(n, sd, true_beta, link){
 }
 
 
-set.seed(100)
-b <- c(3, -1.3, -3, 1.7)
-b0 <- normalize(b)
-b0 #0.6313342 -0.2735781 -0.6313342  0.3577560
+#set.seed(100)
+#b <- c(3, -1.3, -3, 1.7)
+#b0 <- normalize(b)
+#b0 #0.6313342 -0.2735781 -0.6313342  0.3577560
 
 
-dat <- SpheGenerate_data(100, 0, b0, function(x) x)
-res_sphe <- SIdxSpheReg(xin = dat$xin, yin = dat$yin)
-res_sphe
+#dat <- SpheGenerate_data(100, 0, b0, function(x) x)
+#res_sphe <- SIdxSpheReg(xin = dat$xin, yin = dat$yin)
+#res_sphe
 

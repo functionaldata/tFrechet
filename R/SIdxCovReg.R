@@ -2,7 +2,7 @@ library(frechet)
 library(Matrix)
 
 # Main Function : Single Index F-regression with covariance response with Frobenius metric
-SIdxCovReg = function(xin, Min, bw=NULL, M=NULL, ker = ker_gauss, lower = -Inf, upper = Inf, iter =  500,
+SIdxCovReg = function(xin, Min, bw=NULL, M=NULL, ker = ker_gauss, lower = -Inf, upper = Inf, iter =  1000,
                       verbose = T){
   ## xin: n by p matrix of input (n: number of inputs, p: dimension of predictors)
   ## Min: q by q by n array where \code{M[,,i]} contains the i-th covariance matrix of dimension q by q
@@ -30,24 +30,38 @@ SIdxCovReg = function(xin, Min, bw=NULL, M=NULL, ker = ker_gauss, lower = -Inf, 
   p <- ncol(xin)
   
   ## Parameter (bandwidth, bin size) choice using cross-validation
-  if (is.null(bw) | is.null(M)) {
-    param <- CovTuning(xin, Min, normalize(rep(1,p)))
+  needParam <- (is.null(M) | is.null(bw))
+  
+  if (needParam) {
+    param <- CovTuning(xin, Min, normalize(rep(1, p)))
+  }
+  
+  # bw2 depends on bw
+  if (is.null(bw)) {
     bw2 <- param[1]
-    M2 <- ifelse(is.null(M), param[2], M)
   } else {
     bw2 <- bw
+  }
+  
+  # M2 depends on M
+  if (is.null(M)) {
+    M2 <- param[2]
+  } else {
     M2 <- M
   }
   
+  coords_mat <- matrix(rnorm(iter * p), nrow = iter, ncol = p)
+  
+  # Normalize each row to have unit norm
+  coords_mat <- coords_mat / sqrt(rowSums(coords_mat^2))
+  coords_mat[,1] = abs(coords_mat[,1])
+  
+  ## Find the single index
   fdi_curr = Inf
   
   for(i in 1:iter){
     
-    direc_new = normalize(rnorm(n = p))
-    
-    if(direc_new[1] < 0){
-      direc_new = -1 * direc_new
-    }
+    direc_new = coords_mat[i,]
     
     binned_dat <- CovBinned_data(xin, Min, direc_new, M2)
     proj_binned <- binned_dat$binned_xmean %*% direc_new
@@ -75,7 +89,7 @@ SIdxCovReg = function(xin, Min, bw=NULL, M=NULL, ker = ker_gauss, lower = -Inf, 
     }
     
     if(verbose){
-      if(i %% 10 == 0){
+      if(i %% 100 == 0){
         print(paste("Iteration number:", i,"/",iter))
       }
     }
@@ -243,8 +257,9 @@ CovTuning <- function(xin, Min, direc, ker = ker_gauss){
              lower = bw_min, upper = bw_max)$par
   
   
-  M_range = ceiling(n^(1/c(2:7)))
-  M_range = unique(M_range[M_range > 3])
+  M_range = ceiling(n/c(2:30))
+  M_range = unique(M_range[60 > M_range & M_range > 15])
+  
   if (length(M_range) >0){
     
     cv_err_curr = Inf
@@ -262,7 +277,7 @@ CovTuning <- function(xin, Min, direc, ker = ker_gauss){
     }
     
   } else{
-    M = n
+    M = 15
   }
   
   #end
@@ -354,7 +369,6 @@ b0 #0.6313342 -0.2735781 -0.6313342  0.3577560
 
 set.seed(999)
 dat <- CovGen_data_setting(500, b0, function(x) x)
-res_cov <- SIdxCovReg(dat$xin, dat$Min, iter = 500)
-res_cov
+res_cov <- SIdxCovReg(dat$xin, dat$Min)
 
 

@@ -1,6 +1,6 @@
 library(parallel)
 
-SIdxSpheTest <- function(est, b0, xin, yin, nboot = 500, bw, M, verbose = F){
+SIdxSpheTest <- function(est, b0, xin, yin, nboot = 100, iter = 1000, bw, M, nc = 10, verbose = F){
   ## est: estimate from SIdxDenReg
   ## b0: true value or H0
   ## xin, yin: data input
@@ -22,18 +22,18 @@ SIdxSpheTest <- function(est, b0, xin, yin, nboot = 500, bw, M, verbose = F){
     
   }
   
-  SpheBoot_est <- function(est, xin, yin, reps, bw, M, verbose = verbose){
+  SpheBoot_est <- function(est, xin, yin, reps, bw, M, nc, verbose = verbose){
     n = nrow(xin)
     p = length(est)
-    samp_ind = mclapply(1:reps, function(i) {
+    samp_ind = lapply(1:reps, function(i) {
       sample(1:n,n,replace=T)
     })
     
-    xin_resamp = mclapply(1:reps, function(i){
+    xin_resamp = lapply(1:reps, function(i){
       xin[samp_ind[[i]],]
     })
     
-    yin_resamp = mclapply(1:reps, function(i){
+    yin_resamp = lapply(1:reps, function(i){
       yin[samp_ind[[i]],]
     })  
     
@@ -42,14 +42,14 @@ SIdxSpheTest <- function(est, b0, xin, yin, nboot = 500, bw, M, verbose = F){
       FUN = function(i){
         fit = SIdxSpheReg(xin_resamp[[i]], yin_resamp[[i]], bw, M, verbose = verbose)
         fit$est
-      })
+      }, mc.cores = nc)
     
-    est_signed <- mclapply(b_est, function(x) {x[2:p] * sign(sum(est[2:p] * x[2:p]))})
+    est_signed <- lapply(b_est, function(x) {x[2:p] * sign(sum(est[2:p] * x[2:p]))})
     return(est_signed)
   }
   
   
-  boot_res = SpheBoot_est(est = est, xin = xin,  yin = yin, reps = nboot, bw =bw, M = M, verbose = verbose)
+  boot_res = SpheBoot_est(est = est, xin = xin,  yin = yin, reps = nboot, nc = nc, bw =bw, M = M, verbose = verbose)
   
   p = length(est)
   cov_mat = matrix(0, nrow = p-1, ncol = p-1)
@@ -58,26 +58,29 @@ SIdxSpheTest <- function(est, b0, xin, yin, nboot = 500, bw, M, verbose = F){
     cov_mat = cov_mat + (boot_res[[i]] - est[2:p]) %*% t(boot_res[[i]] - est[2:p])
     
   }
-  cova_boot = cov_mat / length(boot_res)
+  cov_mat = cov_mat / length(boot_res)
   
-  test_stat = c(t(est[2:p] - b0[2:p]) %*% solve(cova_boot, est[2:p] - b0[2:p]))
-  
-  p_val = 1 - pchisq(test_stat, df = p-1)
-  
-  res = list(cov_boot = (M * cova_boot), test_stat = test_stat, pval_chisq = p_val, df = p-1)
+  test_stat <- NULL
+  p_val <- NULL
+  try({
+    test_stat <- c(t(est[2:p] - b0[2:p]) %*% solve(cov_mat, est[2:p] - b0[2:p]))
+    p_val <- pchisq(test_stat, df = p-1, lower.tail = F)})
+
+  res = list(cov_boot = (M * cov_mat), test_stat = test_stat, pval_chisq = p_val, df = p-1, boot_b = do.call(rbind, boot_res))
   return(res)
 
 }
 
 #### Test
-set.seed(100)
-b <- c(3, -1.3, -3, 1.7)
-b0 <- normalize(b)
-b0 #0.6313342 -0.2735781 -0.6313342  0.3577560
+#set.seed(100)
+#b <- c(3, -1.3, -3, 1.7)
+#b0 <- normalize(b)
+#b0 #0.6313342 -0.2735781 -0.6313342  0.3577560
 
-dat <- SpheGenerate_data(100, 0, b0, function(x) x)
-res_sphe <- SIdxSpheReg(xin = dat$xin, yin = dat$yin)
+#dat <- SpheGenerate_data(100, 0, b0, function(x) x)
+#res_sphe <- SIdxSpheReg(xin = dat$xin, yin = dat$yin)
 
-test_res = SIdxSpheTest(res_sphe$est, b0, xin = dat$xin, yin = dat$yin,
-                       nboot = 50, bw = res_sphe$bw, M = res_sphe$M)
-test_res
+#test_res = SIdxSpheTest(res_sphe$est, b0, xin = dat$xin, yin = dat$yin,
+#                       nboot = 50, bw = res_sphe$bw, M = res_sphe$M)
+
+#test_res
