@@ -146,7 +146,8 @@ NetTuning <- function(xin, Min, direc, ker = ker_gauss) {
     }
   }
   
-  
+  n <- nrow(xin)
+
   bw_min <- max(diff(sort(xin %*% direc))) * 1.1
   bw_max <- (max(xin %*% direc) - min(xin %*% direc)) / 3
   
